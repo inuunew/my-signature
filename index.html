@@ -1,0 +1,967 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>lnuu Marketplace</title>
+    <!-- Font Awesome for icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Animate.css for initial animations -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css">
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        /* Custom CSS Variables for dynamic theming */
+        :root {
+            --bg-color-light: #f0f2f5;
+            --text-color-light: #2d3748;
+            --card-bg-light: #ffffff;
+            --card-hover-light: #e2e8f0;
+            --card-shadow-light: rgba(0, 0, 0, 0.08);
+            --music-bg-light: rgba(255, 255, 255, 0.9);
+
+            --bg-color-dark: #1a202c;
+            --text-color-dark: #e2e8f0;
+            --card-bg-dark: #2d3748;
+            --card-hover-dark: #4a5568;
+            --card-shadow-dark: rgba(0, 0, 0, 0.3);
+            --music-bg-dark: rgba(45, 55, 72, 0.9);
+
+            --primary-color: #6366f1; /* Indigo 500 */
+            --secondary-color: #8b5cf6; /* Violet 500 */
+            --accent-color: #ec4899; /* Pink 500 */
+            --transition-speed: 0.5s;
+        }
+
+        /* Default theme based on system preference */
+        body {
+            font-family: 'Inter', sans-serif;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+            background-color: var(--bg-color-light);
+            color: var(--text-color-light);
+            transition: background-color var(--transition-speed) ease, color var(--transition-speed) ease;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 40px 20px;
+            position: relative;
+            overflow-x: hidden;
+        }
+
+        body.dark-mode {
+            background-color: var(--bg-color-dark);
+            color: var(--text-color-dark);
+        }
+
+        /* Profile Picture Border Animation */
+        .profile-pic-container::before {
+            content: '';
+            position: absolute;
+            top: -4px;
+            left: -4px;
+            right: -4px;
+            bottom: -4px;
+            border-radius: 50%;
+            background: linear-gradient(45deg, var(--primary-color), var(--secondary-color));
+            z-index: -1;
+            animation: rotate 8s linear infinite;
+        }
+
+        @keyframes rotate {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* Card Hover Effect (for links and products) */
+        .card-item {
+            position: relative;
+            overflow: hidden;
+            transition: all var(--transition-speed) ease;
+            box-shadow: 0 4px 15px var(--card-shadow-light);
+            background-color: var(--card-bg-light);
+            color: var(--text-color-light);
+        }
+
+        .dark-mode .card-item {
+            box-shadow: 0 4px 15px var(--card-shadow-dark);
+            background-color: var(--card-bg-dark);
+            color: var(--text-color-dark);
+        }
+
+        .card-item::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 0;
+            height: 100%;
+            background: linear-gradient(to right, var(--primary-color), var(--secondary-color));
+            opacity: 0.1;
+            transition: width var(--transition-speed) ease;
+            z-index: 0;
+        }
+
+        .card-item:hover::before {
+            width: 100%;
+        }
+
+        .card-item span, .card-item i, .card-item img, .card-item h3, .card-item p, .card-item button {
+            position: relative;
+            z-index: 1;
+        }
+
+        .card-item:hover {
+            transform: translateY(-5px) scale(1.01);
+            box-shadow: 0 8px 25px var(--card-shadow-light);
+        }
+
+        .dark-mode .card-item:hover {
+            box-shadow: 0 8px 25px var(--card-shadow-dark);
+        }
+
+        /* Product Card Shake Animation */
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            10%, 30%, 50%, 70%, 90% { transform: translateX(-5px); }
+            20%, 40%, 60%, 80% { transform: translateX(5px); }
+        }
+
+        .product-item:hover {
+            animation: shake 0.5s cubic-bezier(.36,.07,.19,.97) both;
+            transform: translateY(-5px) scale(1.02); /* Combine with existing hover */
+        }
+
+        /* Background Lyrics Styling */
+        .sisurya-lyrics-background {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            z-index: 0;
+            pointer-events: none;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            opacity: 0.03; /* Even more subtle */
+            font-size: 5vw; /* Responsive font size */
+            font-weight: 900;
+            color: var(--primary-color);
+            text-align: center;
+            line-height: 1.2;
+            text-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .sisurya-lyrics-background .background-lyric-line {
+            position: absolute;
+            white-space: nowrap;
+            opacity: 0;
+            transform: translateY(-100%);
+            animation: lyricBackgroundFlow 25s linear infinite; /* Longer duration for subtlety */
+            will-change: transform, opacity;
+        }
+
+        @keyframes lyricBackgroundFlow {
+            0% { opacity: 0; transform: translateY(-100%); }
+            10% { opacity: 0.05; transform: translateY(0%); }
+            80% { opacity: 0.05; transform: translateY(100%); }
+            100% { opacity: 0; transform: translateY(200%); }
+        }
+
+        /* Music Player Animations */
+        .sisurya-music-player {
+            transform-origin: bottom right; /* For desktop animation */
+            transition: all var(--transition-speed) cubic-bezier(0.68, -0.55, 0.27, 1.55); /* Springy animation */
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .sisurya-music-player.hidden {
+            opacity: 0;
+            visibility: hidden;
+            transform: scale(0.7) translate(50px, 50px); /* Move out and shrink */
+        }
+
+        .minimized-music-player-icon {
+            transition: all var(--transition-speed) cubic-bezier(0.68, -0.55, 0.27, 1.55);
+            opacity: 0;
+            visibility: hidden;
+            transform: scale(0.7);
+        }
+
+        .minimized-music-player-icon.visible {
+            opacity: 1;
+            visibility: visible;
+            transform: scale(1);
+        }
+
+        /* Music player close button */
+        .sisurya-music-close-btn {
+            position: absolute;
+            top: -10px;
+            right: -10px;
+            background-color: #ef4444; /* Red 500 */
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 30px;
+            height: 30px;
+            cursor: pointer;
+            font-size: 16px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+            transition: transform 0.2s ease, background-color 0.2s ease;
+        }
+
+        .sisurya-music-close-btn:hover {
+            transform: scale(1.1);
+            background-color: #dc2626; /* Red 600 */
+        }
+
+        /* Lyrics display inside player */
+        .lyrics-line.active {
+            color: var(--primary-color);
+            font-weight: 600;
+            animation: fadeIn 0.5s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(5px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Theme Toggle Button */
+        .theme-toggle-btn {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            background-color: var(--card-bg-light);
+            color: var(--text-color-light);
+            border-radius: 9999px; /* Full rounded */
+            padding: 12px;
+            box-shadow: 0 4px 15px var(--card-shadow-light);
+            transition: all var(--transition-speed) ease;
+            z-index: 1000;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .dark-mode .theme-toggle-btn {
+            background-color: var(--card-bg-dark);
+            color: var(--text-color-dark);
+            box-shadow: 0 4px 15px var(--card-shadow-dark);
+        }
+
+        .theme-toggle-btn:hover {
+            transform: scale(1.05);
+        }
+
+        /* Top Product Badge */
+        .top-product-badge {
+            position: absolute;
+            top: 12px;
+            left: 12px;
+            background-color: var(--accent-color);
+            color: white;
+            font-size: 0.75rem; /* text-xs */
+            font-weight: 700; /* font-bold */
+            padding: 0.25rem 0.75rem; /* px-3 py-1 */
+            border-radius: 9999px; /* rounded-full */
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2); /* shadow-md */
+            transform: rotate(-8deg); /* Slightly less rotation */
+            animation: pulse 1.5s infinite ease-in-out; /* Add a subtle pulse animation */
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1) rotate(-8deg); }
+            50% { transform: scale(1.05) rotate(-8deg); }
+            100% { transform: scale(1) rotate(-8deg); }
+        }
+
+        /* Responsive Music Player Positioning */
+        @media (max-width: 768px) {
+            .sisurya-music-player {
+                top: auto;
+                bottom: 20px;
+                left: 50%;
+                right: auto;
+                transform: translateX(-50%);
+                transform-origin: bottom center; /* For mobile animation */
+                width: calc(100% - 40px); /* Adjust width for mobile */
+                max-width: 320px; /* Max width for mobile */
+            }
+
+            .sisurya-music-player.hidden {
+                transform: translateX(-50%) scale(0.7) translateY(50px);
+            }
+
+            .minimized-music-player-icon {
+                bottom: 20px;
+                right: 20px;
+            }
+
+            .sisurya-lyrics-background {
+                font-size: 8vw;
+            }
+        }
+
+        @media (max-width: 480px) {
+            body {
+                padding: 20px 15px;
+            }
+            .profile-pic-container {
+                width: 100px;
+                height: 100px;
+            }
+            .profile-name {
+                font-size: 2.25rem; /* 36px */
+            }
+            .profile-bio {
+                font-size: 0.95rem; /* ~15px */
+            }
+            .card-item {
+                padding: 14px 18px;
+                font-size: 0.95rem;
+            }
+            .card-item i {
+                font-size: 1.5rem;
+                margin-right: 12px;
+            }
+            .sisurya-music-player {
+                padding: 12px;
+            }
+            .album-art {
+                width: 50px;
+                height: 50px;
+            }
+            .song-title {
+                font-size: 0.9rem;
+            }
+            .artist {
+                font-size: 0.8rem;
+            }
+            .lyrics-line{
+line-height:1.3;
+}
+            .lyrics {
+                font-size: 0.75rem;
+            }
+            .play-pause {
+                font-size: 1.8rem;
+            }
+            .time-display {
+                font-size: 0.65rem;
+            }
+            .sisurya-lyrics-background {
+                font-size: 10vw;
+            }
+        }
+    </style>
+</head>
+<body class="flex flex-col items-center p-10 min-h-screen relative overflow-x-hidden">
+    <!-- Background Lyrics Container -->
+    <div class="sisurya-lyrics-background" id="sisuryaLyricsBackground">
+        <!-- Lyrics will be dynamically added here -->
+    </div>
+
+    <!-- Theme Toggle Button -->
+    <button id="themeToggleBtn" class="theme-toggle-btn">
+        <i class="fas fa-sun text-xl" id="themeIcon"></i>
+    </button>
+
+    <div class="container w-full max-w-xl flex flex-col items-center relative z-10 animate__animated animate__fadeIn animate__delay-1s">
+        <div class="profile text-center mb-10 w-full">
+            <div class="profile-pic-container w-36 h-36 mx-auto mb-5 relative rounded-full overflow-hidden shadow-2xl">
+                <img src="" alt="Profile Picture" class="profile-pic w-full h-full object-cover rounded-full border-4 border-white" id="profilePic">
+            </div>
+            <h1 class="profile-name text-5xl font-extrabold mb-3 bg-clip-text text-transparent bg-gradient-to-r from-[var(--primary-color)] to-[var(--secondary-color)] animate__animated animate__fadeInUp animate__delay-1s" id="profileName">Your Name</h1>
+            <p class="profile-bio text-lg text-gray-700 dark:text-gray-300 max-w-md mx-auto leading-relaxed animate__animated animate__fadeInUp animate__delay-1s" id="profileBio">Your short biography or description goes here. Keep it concise and interesting!</p>
+        </div>
+        
+        <div class="links-container w-full flex flex-col gap-5 mt-8" id="linksContainer">
+            <!-- Links will be added here from JSON data -->
+        </div>
+
+        <!-- Products Section -->
+        <div class="products-section w-full mt-12 animate__animated animate__fadeInUp animate__delay-2s">
+            <h2 class="text-3xl font-bold text-center mb-8 text-gray-800 dark:text-gray-200">Identitas Gw Dibawah</h2>
+            <div class="products-grid grid grid-cols-1 md:grid-cols-2 gap-6" id="productsGrid">
+                <!-- Products will be added here from JSON data -->
+            </div>
+        </div>
+        
+        <div class="footer mt-12 text-sm text-gray-600 dark:text-gray-400 opacity-80 w-full text-center animate__animated animate__fadeInUp animate__delay-2s">
+            &copy; <span id="currentYear"></span> InuuOfficial
+        </div>
+    </div>
+    
+    <!-- Music Player -->
+    <div class="sisurya-music-player fixed bg-white/90 dark:bg-gray-800/90 rounded-2xl p-5 w-80 shadow-2xl flex flex-col z-50 backdrop-blur-md border border-white/20 dark:border-gray-700/20" id="sisuryaMusicPlayer">
+        <button class="sisurya-music-close-btn" id="sisuryaMusicCloseBtn">
+            <i class="fas fa-times"></i>
+        </button>
+        <div class="sisurya-music-header flex items-center mb-3 relative">
+            <img src="" alt="Album Art" class="album-art w-16 h-16 rounded-lg object-cover mr-3 shadow-md transition-transform duration-300 hover:scale-105" id="albumArt">
+            <div class="music-info flex flex-col flex-1">
+                <div class="song-title font-bold text-base mb-1 truncate text-gray-900 dark:text-gray-100" id="songTitle">Song Title</div>
+                <div class="artist text-sm text-gray-600 dark:text-gray-400 truncate" id="artist">Artist Name</div>
+                <div class="lyrics-wrapper w-full mt-2">
+<div class="lyrics-container relative h-auto max-h-16 overflow-hidden">
+                        <div class="lyrics text-sm bg-gray-100/50 dark:bg-gray-700/50 rounded-md p-1 w-full overflow-y-auto text-left whitespace-pre-line text-gray-800 dark:text-gray-200" id="lyrics">
+                            <!-- Lyrics will be displayed here -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="music-controls flex flex-col items-center mt-3">
+            <button class="play-pause bg-transparent border-none cursor-pointer text-3xl text-[var(--primary-color)] mb-2 transition-all duration-300 hover:scale-125 hover:text-[var(--secondary-color)]" id="playPauseBtn">
+                <i class="fas fa-play" id="playPauseIcon"></i>
+            </button>
+            <div class="progress-container w-full h-1 bg-gray-200 dark:bg-gray-700 rounded-full mb-1 relative overflow-hidden cursor-pointer">
+                <div class="progress-bar h-full bg-gradient-to-r from-[var(--primary-color)] to-[var(--secondary-color)] w-0 rounded-full transition-all duration-100 ease-linear" id="progressBar"></div>
+            </div>
+            <div class="time-display w-full flex justify-between text-xs text-gray-500 dark:text-gray-400">
+                <span id="currentTime">0:00</span> / <span id="totalTime">0:00</span>
+            </div>
+        </div>
+        
+        <audio id="audioPlayer" preload="metadata"></audio>
+    </div>
+
+    <!-- Minimized Music Player Icon -->
+    <button class="minimized-music-player-icon fixed bottom-5 right-5 w-16 h-16 rounded-full bg-[var(--primary-color)] text-white flex items-center justify-center shadow-lg cursor-pointer z-50 hover:scale-110" id="minimizedMusicPlayerIcon">
+        <i class="fas fa-music text-3xl"></i>
+    </button>
+
+    <script>
+        let sisuryaUserData = null;
+        let sisuryaCurrentLyricIndex = -1;
+        let sisuryaSongDuration = 60;
+        let sisuryaIsPlaying = false;
+        let sisuryaIsMusicPlayerVisible = true;
+
+        const sisuryaProfilePic = document.getElementById('profilePic');
+        const sisuryaProfileName = document.getElementById('profileName');
+        const sisuryaProfileBio = document.getElementById('profileBio');
+        const sisuryaLinksContainer = document.getElementById('linksContainer');
+        const productsGrid = document.getElementById('productsGrid'); // New: Products Grid
+        const sisuryaCurrentYear = document.getElementById('currentYear');
+        const sisuryaAlbumArt = document.getElementById('albumArt');
+        const sisuryaSongTitle = document.getElementById('songTitle');
+        const sisuryaArtist = document.getElementById('artist');
+        const sisuryaLyrics = document.getElementById('lyrics');
+        const sisuryaPlayPauseBtn = document.getElementById('playPauseBtn');
+        const sisuryaPlayPauseIcon = document.getElementById('playPauseIcon');
+        const sisuryaMusicPlayer = document.getElementById('sisuryaMusicPlayer');
+        const sisuryaMusicCloseBtn = document.getElementById('sisuryaMusicCloseBtn');
+        const sisuryaProgressBar = document.getElementById('progressBar');
+        const sisuryaCurrentTimeDisplay = document.getElementById('currentTime');
+        const sisuryaTotalTimeDisplay = document.getElementById('totalTime');
+        const sisuryaAudioPlayer = document.getElementById('audioPlayer');
+        const sisuryaLyricsBackground = document.getElementById('sisuryaLyricsBackground');
+        const minimizedMusicPlayerIcon = document.getElementById('minimizedMusicPlayerIcon');
+        const themeToggleBtn = document.getElementById('themeToggleBtn');
+        const themeIcon = document.getElementById('themeIcon');
+
+        // Function to set theme (light/dark)
+        function setTheme(theme) {
+            if (theme === 'dark') {
+                document.body.classList.add('dark-mode');
+                themeIcon.className = 'fas fa-moon text-xl';
+                localStorage.setItem('theme', 'dark');
+            } else {
+                document.body.classList.remove('dark-mode');
+                themeIcon.className = 'fas fa-sun text-xl';
+                localStorage.setItem('theme', 'light');
+            }
+        }
+
+        // Initialize theme based on system preference or stored preference
+        function initializeTheme() {
+            const storedTheme = localStorage.getItem('theme');
+            if (storedTheme) {
+                setTheme(storedTheme);
+            } else { // Default to dark mode if no stored theme
+                setTheme('light');
+            }
+        }
+
+        // Toggle theme on button click
+        themeToggleBtn.addEventListener('click', () => {
+            if (document.body.classList.contains('dark-mode')) {
+                setTheme('light');
+            } else {
+                setTheme('dark');
+            }
+        });
+
+        // Function to extract average color from an image and set CSS variables
+        function getAverageColor(imageElement, callback) {
+            const canvas = document.createElement('canvas');
+            const context = canvas.getContext('2d');
+
+            if (!imageElement.complete) {
+                imageElement.onload = function() {
+                    extractColor();
+                };
+            } else {
+                extractColor();
+            }
+
+            function extractColor() {
+                canvas.width = imageElement.naturalWidth;
+                canvas.height = imageElement.naturalHeight;
+                context.drawImage(imageElement, 0, 0, canvas.width, canvas.height);
+                
+                const imageData = context.getImageData(0, 0, canvas.width, canvas.height).data;
+                let r = 0, g = 0, b = 0;
+                let pixelCount = 0;
+                
+                for (let i = 0; i < imageData.length; i += 4) {
+                    r += imageData[i];
+                    g += imageData[i + 1];
+                    b += imageData[i + 2];
+                    pixelCount++;
+                }
+                
+                r = Math.floor(r / pixelCount);
+                g = Math.floor(g / pixelCount);
+                b = Math.floor(b / pixelCount);
+                
+                const brightness = (r * 299 + g * 587 + b * 114) / 1000;
+                const textColor = brightness > 128 ? '33, 33, 33' : '255, 255, 255';
+                
+                const hue1 = (r + g + b) % 360;
+                const primaryColor = `hsl(${hue1}, 70%, 50%)`;
+                const secondaryColor = `hsl(${(hue1 + 120) % 360}, 70%, 50%)`;
+
+                callback(`rgba(${r}, ${g}, ${b}, 0.15)`, `rgb(${textColor})`, textColor, primaryColor, secondaryColor);
+            }
+        }
+
+        // Function to initialize the page content from JSON data
+        function initializeFromJSON(data) {
+            sisuryaUserData = data;
+
+            sisuryaProfileName.textContent = data.profile.name;
+            sisuryaProfileBio.textContent = data.profile.bio;
+            sisuryaProfilePic.crossOrigin = 'Anonymous';
+            sisuryaProfilePic.src = data.profile.image;
+            
+            sisuryaProfilePic.onload = function() {
+                getAverageColor(sisuryaProfilePic, (bgColor, textColor, textColorRgb, primaryColor, secondaryColor) => {
+                    document.documentElement.style.setProperty('--primary-color', primaryColor);
+                    document.documentElement.style.setProperty('--secondary-color', secondaryColor);
+                });
+            };
+            
+            sisuryaLinksContainer.innerHTML = '';
+            data.links.forEach((link, index) => {
+                const linkElement = document.createElement('a');
+                linkElement.href = link.url;
+                linkElement.className = 'card-item p-4 rounded-xl font-semibold flex items-center relative z-10 animate-link ' + 
+                                      'bg-white dark:bg-gray-700 text-gray-800 dark:text-gray-200';
+                linkElement.style.animationDelay = `${0.1 * (index + 1)}s`;
+                linkElement.target = '_blank';
+                linkElement.rel = 'noopener noreferrer';
+                
+                const icon = document.createElement('i');
+                icon.className = `${link.icon} mr-4 text-3xl transition-transform duration-300 group-hover:scale-110 text-[var(--primary-color)]`;
+                
+                const text = document.createElement('span');
+                text.textContent = link.title;
+                
+                linkElement.appendChild(icon);
+                linkElement.appendChild(text);
+                
+                sisuryaLinksContainer.appendChild(linkElement);
+            });
+
+            // Populate Products
+            productsGrid.innerHTML = '';
+            data.products.forEach((product, index) => {
+                const productItem = document.createElement('div');
+                productItem.className = 'product-item card-item p-6 rounded-xl flex flex-col items-center text-center relative z-10 animate-link ' +
+                                        'bg-white/90 dark:bg-gray-800/90 text-gray-800 dark:text-gray-200'; // Added transparency
+                productItem.style.animationDelay = `${0.1 * (index + 1)}s`;
+
+                // Add Top Product Badge for the first 2 products
+                
+                const productName = document.createElement('h1');
+                productName.className = 'text-xl font-bold mb-2 text-gray-900 dark:text-gray-100';
+                productName.textContent = product.name;
+
+                productItem.appendChild(productName);
+
+                productsGrid.appendChild(productItem);
+            });
+            
+            sisuryaSongTitle.textContent = data.music.title;
+            sisuryaArtist.textContent = data.music.artist;
+            sisuryaAlbumArt.src = data.music.albumArt;
+            
+            if (data.music.audioFile) {
+                sisuryaAudioPlayer.src = data.music.audioFile;
+                
+                sisuryaAudioPlayer.addEventListener('loadedmetadata', function() {
+                    sisuryaSongDuration = sisuryaAudioPlayer.duration;
+                    sisuryaTotalTimeDisplay.textContent = formatTime(sisuryaSongDuration);
+                });
+
+                sisuryaAudioPlayer.addEventListener('timeupdate', function() {
+                    sisuryaCurrentTimeDisplay.textContent = formatTime(sisuryaAudioPlayer.currentTime);
+                    const percent = (sisuryaAudioPlayer.currentTime / sisuryaSongDuration) * 100;
+                    sisuryaProgressBar.style.width = `${percent}%`;
+
+                    updateLyricsDisplay(sisuryaAudioPlayer.currentTime);
+                    updateBackgroundLyrics(sisuryaAudioPlayer.currentTime);
+                });
+
+                sisuryaAudioPlayer.addEventListener('ended', function() {
+                    sisuryaAudioPlayer.currentTime = 0;
+                    if (sisuryaIsPlaying) {
+                        sisuryaAudioPlayer.play();
+                    } else {
+                        sisuryaPlayPauseIcon.className = 'fas fa-play';
+                    }
+                });
+            } else {
+                sisuryaSongDuration = data.music.duration || 60;
+                sisuryaTotalTimeDisplay.textContent = formatTime(sisuryaSongDuration);
+            }
+            
+            if (data.music.timeSync) {
+                updateLyricsDisplay(0);
+                updateBackgroundLyrics(0);
+            } else {
+               sisuryaLyrics.textContent = data.music.lyrics || "No lyrics available";
+            }
+            sisuryaCurrentYear.textContent = new Date().getFullYear();
+        }
+
+        function updateLyricsDisplay(time) {
+            if (!sisuryaUserData || !sisuryaUserData.music.timeSync) return;
+
+            let lyricArray = sisuryaUserData.music.timeSync;
+            if (Array.isArray(lyricArray) && lyricArray.length > 0 && Array.isArray(lyricArray[0])) {
+                lyricArray = lyricArray[0];
+            }
+
+            let currentLyric = null;
+            let newLyricIndex = -1;
+            
+            for (let i = 0; i < lyricArray.length; i++) {
+                if (lyricArray[i].time <= time) {
+                    currentLyric = lyricArray[i];
+                    newLyricIndex = i;
+                } else {
+                    break;
+                }
+            }
+
+            if (currentLyric && newLyricIndex !== sisuryaCurrentLyricIndex) {
+                sisuryaCurrentLyricIndex = newLyricIndex;
+                
+                sisuryaLyrics.innerHTML = '';
+                
+                const lyricLine = document.createElement('div');
+                lyricLine.className = 'lyrics-line active text-[var(--primary-color)] font-semibold';
+                lyricLine.textContent = currentLyric.text;
+                
+                sisuryaLyrics.appendChild(lyricLine);
+                
+                lyricLine.classList.add('lyrics-fade-in');
+                setTimeout(() => {
+                    lyricLine.classList.remove('lyrics-fade-in');
+                }, 500);
+            }
+        }
+
+        function updateBackgroundLyrics(time) {
+            if (!sisuryaUserData || !sisuryaUserData.music.timeSync) return;
+
+            let lyricArray = sisuryaUserData.music.timeSync;
+            if (Array.isArray(lyricArray) && lyricArray.length > 0 && Array.isArray(lyricArray[0])) {
+                lyricArray = lyricArray[0];
+            }
+
+            sisuryaLyricsBackground.innerHTML = '';
+
+            const linesToShow = 3;
+            let startIndex = -1;
+
+            for (let i = 0; i < lyricArray.length; i++) {
+                if (lyricArray[i].time > time) {
+                    startIndex = i;
+                    break;
+                }
+            }
+
+            if (startIndex === -1 && lyricArray.length > 0) {
+                startIndex = lyricArray.length - 1;
+            } else if (startIndex === -1) {
+                return;
+            }
+
+            for (let i = 0; i < linesToShow; i++) {
+                const lyricIndex = startIndex + i;
+                if (lyricIndex < lyricArray.length) {
+                    const lyricLine = document.createElement('div');
+                    lyricLine.className = 'background-lyric-line';
+                    lyricLine.textContent = lyricArray[lyricIndex].text;
+                    lyricLine.style.animationDelay = `${i * 2}s`; 
+                    sisuryaLyricsBackground.appendChild(lyricLine);
+                }
+            }
+        }
+
+        function formatTime(seconds) {
+            const mins = Math.floor(seconds / 60);
+            const secs = Math.floor(seconds % 60);
+            return `${mins}:${secs.toString().padStart(2, '0')}`;
+        }
+
+        function togglePlayPause() {
+            sisuryaIsPlaying = !sisuryaIsPlaying;
+            
+            if (sisuryaIsPlaying) {
+                sisuryaPlayPauseIcon.className = 'fas fa-pause';
+                if (sisuryaAudioPlayer.src) {
+                    sisuryaAudioPlayer.play();
+                }
+            } else {
+                sisuryaPlayPauseIcon.className = 'fas fa-play';
+                if (sisuryaAudioPlayer.src) {
+                    sisuryaAudioPlayer.pause();
+                }
+            }
+        }
+
+        sisuryaPlayPauseBtn.addEventListener('click', (event) => {
+            event.stopPropagation();
+            togglePlayPause();
+        });
+
+        document.querySelector('.progress-container').addEventListener('click', function(e) {
+            if (sisuryaAudioPlayer.src) {
+                const progressContainer = this;
+                const rect = progressContainer.getBoundingClientRect();
+                const percent = (e.clientX - rect.left) / rect.width;
+                sisuryaAudioPlayer.currentTime = percent * sisuryaSongDuration;
+            }
+        });
+
+        // Music player visibility and positioning
+        function setMusicPlayerPosition() {
+            if (window.innerWidth <= 768) { // Mobile breakpoint
+                sisuryaMusicPlayer.style.top = 'auto';
+                sisuryaMusicPlayer.style.bottom = '20px';
+                sisuryaMusicPlayer.style.left = '50%';
+                sisuryaMusicPlayer.style.right = 'auto';
+                sisuryaMusicPlayer.style.transform = 'translateX(-50%)';
+                sisuryaMusicPlayer.style.transformOrigin = 'bottom center';
+            } else { // Desktop
+                sisuryaMusicPlayer.style.top = '20px';
+                sisuryaMusicPlayer.style.right = '20px';
+                sisuryaMusicPlayer.style.bottom = 'auto';
+                sisuryaMusicPlayer.style.left = 'auto';
+                sisuryaMusicPlayer.style.transform = 'none';
+                sisuryaMusicPlayer.style.transformOrigin = 'top right';
+            }
+        }
+
+        function minimizeMusicPlayer() {
+            sisuryaMusicPlayer.classList.add('hidden');
+            minimizedMusicPlayerIcon.classList.add('visible');
+            sisuryaIsMusicPlayerVisible = false;
+        }
+
+        function maximizeMusicPlayer() {
+            sisuryaMusicPlayer.classList.remove('hidden');
+            minimizedMusicPlayerIcon.classList.remove('visible');
+            sisuryaIsMusicPlayerVisible = true;
+            if (sisuryaIsPlaying && sisuryaAudioPlayer.paused) {
+                sisuryaAudioPlayer.play();
+            }
+        }
+
+        sisuryaMusicCloseBtn.addEventListener('click', minimizeMusicPlayer);
+        minimizedMusicPlayerIcon.addEventListener('click', maximizeMusicPlayer);
+
+        // Auto-play on first interaction
+        document.addEventListener('click', function playOnFirstInteraction() {
+            if (!sisuryaIsPlaying && sisuryaIsMusicPlayerVisible) {
+                togglePlayPause();
+            }
+            document.removeEventListener('click', playOnFirstInteraction);
+        }, { once: true });
+
+        document.addEventListener('DOMContentLoaded', function() {
+            initializeTheme();
+            setMusicPlayerPosition();
+            window.addEventListener('resize', setMusicPlayerPosition);
+
+            sisuryaCurrentLyricIndex = -1;
+            
+            const data = {
+                "profile": {
+                    "name": "InuuTyzDev",
+                    "bio": "Hanya manusia biasa yang menjalani hidup",
+                    "image": "https://files.catbox.moe/tv1rv6.jpeg"
+                },
+"links": [
+  {
+    "title": "Telegram Utama",
+    "url": "https://t.me/InuuUtama",
+    "icon": "fab fa-telegram"
+  },
+  {
+    "title": "Whatsapp Utama",
+    "url": "https://wa.me/6283160556330",
+    "icon": "fab fa-whatsapp"
+  },
+  {
+    "title": "Whatsapp Sampingan",
+    "url": "https://wa.me/6283846512665",
+    "icon": "fab fa-whatsapp"
+  },
+  {
+    "title": "TikTok",
+    "url": "https://www.tiktok.com/@username",
+    "icon": "fab fa-tiktok"
+  },
+  {
+    "title": "iPhone",
+    "url": "https://www.apple.com/iphone/",
+    "icon": "fab fa-apple"
+  },
+  {
+    "title": "iPhone Quote Creator",
+    "url": "https://nuuiqc.vercel.app",
+    "icon": "fas fa-quote-right"
+  },
+  {
+    "title": "TikTok Audio Downloader",
+    "url": "https://nuuttda.vercel.app",
+    "icon": "fas fa-music"
+  },
+  {
+    "title": "TikTok Video Downloader",
+    "url": "https://nuuttdv.vercel.app",
+    "icon": "fas fa-video"
+  },
+  {
+    "title": "Web Deployer",
+    "url": "https://nuudeploy.vercel.app",
+    "icon": "fas fa-cloud-upload-alt"
+  },
+  {
+    "title": "Get Code Web",
+    "url": "https://nuugc.vercel.app",
+    "icon": "fas fa-code"
+  },
+  {
+    "title": "QR Generator",
+    "url": "#",
+    "icon": "fas fa-qrcode"
+  },
+  {
+    "title": "Spam NGL",
+    "url": "#",
+    "icon": "fas fa-paper-plane"
+  }, 
+], 
+                "music": {
+                    "title": "五等分の気持ち",
+                    "artist": "Nakanoke no Itsutsugo",
+                    "albumArt": "https://files.catbox.moe/nr5615.jpeg",
+                    "audioFile": "https://files.catbox.moe/odtovs.mp3", 
+                    "duration": 267,
+                    "timeSync": [
+                        { "time": 0, "text": "フータローくん?\n(Fuutarou?)" },
+                        { "time": 1.38, "text": "上杉起きなさいよ?\n(Bangun dong Uesugi!)" },
+                        { "time": 2.87, "text": "フータロ\n(Fuutaro)" },
+                        { "time": 3.28, "text": "上杉さん\n(Uesugi-san)" },
+                        { "time": 3.91, "text": "上杉君起きて?\n(Uesugi-kun, bangun ya?)" },
+                        { "time": 6.22, "text": "喜びも (喜びも)\n(Kebahagiaan juga, kebahagiaan juga)" },
+                        { "time": 9.12, "text": "悲しみも (悲しみも)\n(Kesedihan juga, kesedihan juga)" },
+                        { "time": 11.72, "text": "あなたさえ\n(Bahkan kamu)" },
+                        { "time": 14.46, "text": "五等分なんです\n(Kubagi jadi lima bagian)" },
+                        { "time": 28.36, "text": "ひとつ 作り笑いも見抜かれ\n(Satu, bahkan senyum palsuku kau lihat)" },
+                        { "time": 31.18, "text": "ふたつ あんたなんか大嫌いよ\n(Dua, aku sangat benci padamu)" },
+                        { "time": 34.09, "text": "みっつまっすぐなこの気持ち\n(Tiga, perasaan tulusku ini)" },
+                        { "time": 37.62, "text": "気づいて\n(Kumohon sadarlah)" },
+                        { "time": 39.25, "text": "よおつ 気がつくとだんだん\n(Empat, tanpa sadar sedikit demi sedikit)" },
+                        { "time": 41.92, "text": "いつつ わかりあえたね\n(Lima, kita mulai saling memahami)" },
+                        { "time": 45.67, "text": "勉強だけじゃなくて\n(Bukan hanya belajar)" },
+                        { "time": 48.6, "text": "君を知りたいよ\n(Aku ingin lebih mengenalmu)" },
+                        { "time": 52.86, "text": "大嫌いから (大嫌いから)\n(Dari sangat benci, dari sangat benci)" },
+                        { "time": 55.67, "text": "大好きへと (大好きへと)\n(Menjadi sangat suka, menjadi sangat suka)" },
+                        { "time": 58.83, "text": "変わる心に ついていけないよ\n(Aku tak bisa mengikuti hatiku yang berubah)" },
+                        { "time": 63.75, "text": "どんなことも (どんなことも)\n(Apapun itu, apapun itu)" },
+                        { "time": 66.76, "text": "あなたさえ (あなたさえ)\n(Bahkan kamu, bahkan kamu)" },
+                        { "time": 69.85, "text": "五等分です\n(Kubagi jadi lima bagian)" },
+                        { "time": 71.76, "text": "でも私 私 私 私 私は\n(Tapi aku, aku, aku, aku, aku)" },
+                        { "time": 75.09, "text": "あなたが好きよ\n(Menyukaimu)" },
+                        { "time": 87.47, "text": "少し複雑に心の中\n(Hatiku sedikit rumit)" },
+                        { "time": 90.2, "text": "でも変わってゆく気持ち\n(Tapi perasaanku terus berubah)" },
+                        { "time": 92.93, "text": "ずっとこんな関係続いたら\n(Jika hubungan seperti ini terus berlanjut)" },
+                        { "time": 96.62, "text": "いいのにな\n(Rasanya akan menyenangkan)" },
+                        { "time": 98.27, "text": "忘れられない想い出も\n(Kenangan yang tak terlupakan)" },
+                        { "time": 101.08, "text": "これから増えるストーリーも\n(Dan cerita yang akan bertambah nanti)" },
+                        { "time": 104.62, "text": "あなたなしだったら\n(Jika tanpa dirimu)" },
+                        { "time": 107.7, "text": "意味がないだめよ\n(Tak ada artinya, itu tak boleh)" },
+                        { "time": 111.77, "text": "ずっとそばで (ずっとそばで)\n(Selalu di sampingku, selalu di sampingku)" },
+                        { "time": 114.76, "text": "教えてね (教えてね)\n(Beri tahu aku ya, beri tahu aku ya)" },
+                        { "time": 117.86, "text": "だけど勝手に 胸の鼓動 高鳴る\n(Tapi jantungku, berdebar kencang sendiri)" },
+                        { "time": 122.74, "text": "運命だって (運命だって)\n(Katanya takdir, katanya takdir)" },
+                        { "time": 125.63, "text": "信じられる (信じられる)\n(Aku percaya, aku percaya)" },
+                        { "time": 128.88, "text": "おんなじ気持ちね\n(Kita punya perasaan yang sama ya)" },
+                        { "time": 130.71, "text": "またいつか いつか\n(Lagi, suatu hari, suatu hari)" },
+                        { "time": 132.1, "text": "いつか いつか この日を\n(Suatu hari, suatu hari, hari ini)" },
+                        { "time": 134.07, "text": "夢に見るかな\n(Akankah terlihat dalam mimpi)" },
+                        { "time": 146.1, "text": "少しづc berubah 想い\n(Perasaan yang berubah sedikit demi sedikit)" },
+                        { "time": 149.0, "text": "焦りや苛立ち和らいでく\n(Kecemasan dan kekesalan mereda)" },
+                        { "time": 152.35, "text": "信じきれる自信\n(Keyakinan yang bisa dipercaya)" },
+                        { "time": 156.61, "text": "胸の奥に隠れてる言葉\n(Kata-kata yang tersembunyi di dalam hati)" },
+                        { "time": 159.77, "text": "甘えベタだけどいいんですかって\n(Aku payah dalam bermanja, tapi apa itu baik-baik saja?)" },
+                        { "time": 163.27, "text": "私ついて行くわ\n(Aku akan mengikutimu)" },
+                        { "time": 168.08, "text": "いつまでも 忘れない\n(Selamanya, tak akan kulupakan)" },
+                        { "time": 173.88, "text": "出会えた奇跡\n(Keajaiban pertemuan kita)" },
+                        { "time": 175.98, "text": "偶然じゃない そおでしょ?\n(Bukan kebetulan, kan?)" },
+                        { "time": 178.98, "text": "大嫌いから (大嫌いから)\n(Dari sangat benci, dari sangat benci)" },
+                        { "time": 181.83, "text": "大好きへと (大好きへと)\n(Menjadi sangat suka, menjadi sangat suka)" },
+                        { "time": 184.98, "text": "変わる心に ついていきたいよ\n(Aku ingin mengikuti hatiku yang berubah)" },
+                        { "time": 189.93, "text": "どんなことも (どんなことも)\n(Apapun itu, apapun itu)" },
+                        { "time": 192.93, "text": "あなたさえ (あなたさえ)\n(Bahkan kamu, bahkan kamu)" },
+                        { "time": 195.9, "text": "五等分です\n(Kubagi jadi lima bagian)" },
+                        { "time": 197.91, "text": "でも私 私 私 私 私は\n(Tapi aku, aku, aku, aku, aku)" },
+                        { "time": 201.21, "text": "ずうと ずうと\n(Selamanya, selamanya)" },
+                        { "time": 202.0, "text": "ずうと ずうと あなたに\n(Selamanya, selamanya, kepadamu)" },
+                        { "time": 204.04, "text": "愛を誓います\n(Aku bersumpah cinta)" },
+                        { "time": 206.86, "text": "We are the brides we are the brides\n(Kami adalah pengantin, kami adalah pengantin)" },
+                        { "time": 213.69, "text": "We are the brides we are the brides\n(Kami adalah pengantin, kami adalah pengantin)" },
+                        { "time": 216.41, "text": "Please\n(Kumohon)" }
+                    ]
+                },
+                "products": [
+                    {
+                        "name": "Hm gapenting(dalem hati gw masyaallah cool banget gw idaman semua jenis makhluk hidup) wkwk ya intinya ini yapping doang ges gapenting jadi mending lupakan tentang ini:p",
+                     
+                    }
+                    ]
+            };
+            initializeFromJSON(data);
+        });
+    </script>
+</body>
+</html>
