@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>lnuu Marketplace</title>
+    <title>InuuSocial</title>
     <!-- Font Awesome for icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <!-- Animate.css for initial animations -->
@@ -134,7 +134,7 @@
         }
 
         /* Background Lyrics Styling */
-        .sisurya-lyrics-background {
+        .inuutyz-lyrics-background {
             position: fixed;
             top: 0;
             left: 0;
@@ -156,7 +156,7 @@
             text-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
         }
 
-        .sisurya-lyrics-background .background-lyric-line {
+        .inuutyz-lyrics-background .background-lyric-line {
             position: absolute;
             white-space: nowrap;
             opacity: 0;
@@ -173,14 +173,14 @@
         }
 
         /* Music Player Animations */
-        .sisurya-music-player {
+        .inuutyz-music-player {
             transform-origin: bottom right; /* For desktop animation */
             transition: all var(--transition-speed) cubic-bezier(0.68, -0.55, 0.27, 1.55); /* Springy animation */
             opacity: 1;
             visibility: visible;
         }
 
-        .sisurya-music-player.hidden {
+        .inuutyz-music-player.hidden {
             opacity: 0;
             visibility: hidden;
             transform: scale(0.7) translate(50px, 50px); /* Move out and shrink */
@@ -200,7 +200,7 @@
         }
 
         /* Music player close button */
-        .sisurya-music-close-btn {
+        .inuutyz-music-close-btn {
             position: absolute;
             top: -10px;
             right: -10px;
@@ -219,7 +219,7 @@
             transition: transform 0.2s ease, background-color 0.2s ease;
         }
 
-        .sisurya-music-close-btn:hover {
+        .inuutyz-music-close-btn:hover {
             transform: scale(1.1);
             background-color: #dc2626; /* Red 600 */
         }
@@ -288,7 +288,7 @@
 
         /* Responsive Music Player Positioning */
         @media (max-width: 768px) {
-            .sisurya-music-player {
+            .inuutyz-music-player {
                 top: auto;
                 bottom: 20px;
                 left: 50%;
@@ -299,7 +299,7 @@
                 max-width: 320px; /* Max width for mobile */
             }
 
-            .sisurya-music-player.hidden {
+            .inuutyz-music-player.hidden {
                 transform: translateX(-50%) scale(0.7) translateY(50px);
             }
 
@@ -308,7 +308,7 @@
                 right: 20px;
             }
 
-            .sisurya-lyrics-background {
+            .inuutyz-lyrics-background {
                 font-size: 8vw;
             }
         }
@@ -335,7 +335,7 @@
                 font-size: 1.5rem;
                 margin-right: 12px;
             }
-            .sisurya-music-player {
+            .inuutyz-music-player {
                 padding: 12px;
             }
             .album-art {
@@ -360,7 +360,7 @@ line-height:1.3;
             .time-display {
                 font-size: 0.65rem;
             }
-            .sisurya-lyrics-background {
+            .inuutyz-lyrics-background {
                 font-size: 10vw;
             }
         }
@@ -368,7 +368,7 @@ line-height:1.3;
 </head>
 <body class="flex flex-col items-center p-10 min-h-screen relative overflow-x-hidden">
     <!-- Background Lyrics Container -->
-    <div class="sisurya-lyrics-background" id="sisuryaLyricsBackground">
+    <div class="inuutyz-lyrics-background" id="inuutyzLyricsBackground">
         <!-- Lyrics will be dynamically added here -->
     </div>
 
@@ -392,7 +392,7 @@ line-height:1.3;
 
         <!-- Products Section -->
         <div class="products-section w-full mt-12 animate__animated animate__fadeInUp animate__delay-2s">
-            <h2 class="text-3xl font-bold text-center mb-8 text-gray-800 dark:text-gray-200">Identitas Gw Dibawah</h2>
+            <h2 class="text-3xl font-bold text-center mb-8 text-gray-800 dark:text-white">About<br>友 | —͟͞͞𝑰𝒏𝒖𝒖𝑻𝒚𝒛𝑫𝒆𝒗<br>~~~~~~~~~~~</h2>
             <div class="products-grid grid grid-cols-1 md:grid-cols-2 gap-6" id="productsGrid">
                 <!-- Products will be added here from JSON data -->
             </div>
@@ -404,11 +404,11 @@ line-height:1.3;
     </div>
     
     <!-- Music Player -->
-    <div class="sisurya-music-player fixed bg-white/90 dark:bg-gray-800/90 rounded-2xl p-5 w-80 shadow-2xl flex flex-col z-50 backdrop-blur-md border border-white/20 dark:border-gray-700/20" id="sisuryaMusicPlayer">
-        <button class="sisurya-music-close-btn" id="sisuryaMusicCloseBtn">
+    <div class="inuutyz-music-player fixed bg-white/90 dark:bg-gray-800/90 rounded-2xl p-5 w-80 shadow-2xl flex flex-col z-50 backdrop-blur-md border border-white/20 dark:border-gray-700/20" id="inuutyzMusicPlayer">
+        <button class="inuutyz-music-close-btn" id="inuutyzMusicCloseBtn">
             <i class="fas fa-times"></i>
         </button>
-        <div class="sisurya-music-header flex items-center mb-3 relative">
+        <div class="inuutyz-music-header flex items-center mb-3 relative">
             <img src="" alt="Album Art" class="album-art w-16 h-16 rounded-lg object-cover mr-3 shadow-md transition-transform duration-300 hover:scale-105" id="albumArt">
             <div class="music-info flex flex-col flex-1">
                 <div class="song-title font-bold text-base mb-1 truncate text-gray-900 dark:text-gray-100" id="songTitle">Song Title</div>
@@ -443,47 +443,56 @@ line-height:1.3;
     </button>
 
     <script>
-        let sisuryaUserData = null;
-        let sisuryaCurrentLyricIndex = -1;
-        let sisuryaSongDuration = 60;
-        let sisuryaIsPlaying = false;
-        let sisuryaIsMusicPlayerVisible = true;
+        let inuutyzUserData = null;
+        let inuutyzCurrentLyricIndex = -1;
+        let inuutyzSongDuration = 60;
+        let inuutyzIsPlaying = false;
+        let inuutyzIsMusicPlayerVisible = true;
+        let globalData = null; 
 
-        const sisuryaProfilePic = document.getElementById('profilePic');
-        const sisuryaProfileName = document.getElementById('profileName');
-        const sisuryaProfileBio = document.getElementById('profileBio');
-        const sisuryaLinksContainer = document.getElementById('linksContainer');
+        const inuutyzProfilePic = document.getElementById('profilePic');
+        const inuutyzProfileName = document.getElementById('profileName');
+        const inuutyzProfileBio = document.getElementById('profileBio');
+        const inuutyzLinksContainer = document.getElementById('linksContainer');
         const productsGrid = document.getElementById('productsGrid'); // New: Products Grid
-        const sisuryaCurrentYear = document.getElementById('currentYear');
-        const sisuryaAlbumArt = document.getElementById('albumArt');
-        const sisuryaSongTitle = document.getElementById('songTitle');
-        const sisuryaArtist = document.getElementById('artist');
-        const sisuryaLyrics = document.getElementById('lyrics');
-        const sisuryaPlayPauseBtn = document.getElementById('playPauseBtn');
-        const sisuryaPlayPauseIcon = document.getElementById('playPauseIcon');
-        const sisuryaMusicPlayer = document.getElementById('sisuryaMusicPlayer');
-        const sisuryaMusicCloseBtn = document.getElementById('sisuryaMusicCloseBtn');
-        const sisuryaProgressBar = document.getElementById('progressBar');
-        const sisuryaCurrentTimeDisplay = document.getElementById('currentTime');
-        const sisuryaTotalTimeDisplay = document.getElementById('totalTime');
-        const sisuryaAudioPlayer = document.getElementById('audioPlayer');
-        const sisuryaLyricsBackground = document.getElementById('sisuryaLyricsBackground');
+        const inuutyzCurrentYear = document.getElementById('currentYear');
+        const inuutyzAlbumArt = document.getElementById('albumArt');
+        const inuutyzSongTitle = document.getElementById('songTitle');
+        const inuutyzArtist = document.getElementById('artist');
+        const inuutyzLyrics = document.getElementById('lyrics');
+        const inuutyzPlayPauseBtn = document.getElementById('playPauseBtn');
+        const inuutyzPlayPauseIcon = document.getElementById('playPauseIcon');
+        const inuutyzMusicPlayer = document.getElementById('inuutyzMusicPlayer');
+        const inuutyzMusicCloseBtn = document.getElementById('inuutyzMusicCloseBtn');
+        const inuutyzProgressBar = document.getElementById('progressBar');
+        const inuutyzCurrentTimeDisplay = document.getElementById('currentTime');
+        const inuutyzTotalTimeDisplay = document.getElementById('totalTime');
+        const inuutyzAudioPlayer = document.getElementById('audioPlayer');
+        const inuutyzLyricsBackground = document.getElementById('inuutyzLyricsBackground');
         const minimizedMusicPlayerIcon = document.getElementById('minimizedMusicPlayerIcon');
         const themeToggleBtn = document.getElementById('themeToggleBtn');
         const themeIcon = document.getElementById('themeIcon');
 
         // Function to set theme (light/dark)
         function setTheme(theme) {
-            if (theme === 'dark') {
-                document.body.classList.add('dark-mode');
-                themeIcon.className = 'fas fa-moon text-xl';
-                localStorage.setItem('theme', 'dark');
-            } else {
-                document.body.classList.remove('dark-mode');
-                themeIcon.className = 'fas fa-sun text-xl';
-                localStorage.setItem('theme', 'light');
-            }
-        }
+    const profilePic = document.getElementById('profilePic');
+    const themeIcon = document.getElementById('themeIcon');
+
+    if (theme === 'dark') {
+        document.body.classList.add('dark-mode');
+        themeIcon.className = 'fas fa-moon text-xl';
+        // Ambil dari globalData
+        if(globalData) profilePic.src = globalData.profile.image.dark; 
+        localStorage.setItem('theme', 'dark');
+    } else {
+        document.body.classList.remove('dark-mode');
+        themeIcon.className = 'fas fa-sun text-xl';
+        // Ambil dari globalData
+        if(globalData) profilePic.src = globalData.profile.image.light; 
+        localStorage.setItem('theme', 'light');
+    }
+}
+
 
         // Initialize theme based on system preference or stored preference
         function initializeTheme() {
@@ -550,21 +559,28 @@ line-height:1.3;
 
         // Function to initialize the page content from JSON data
         function initializeFromJSON(data) {
-            sisuryaUserData = data;
+    inuutyzUserData = data;
+    globalData = data; // Tambahkan ini agar globalData terisi saat load
+    
+    inuutyzProfileName.textContent = data.profile.name;
+    inuutyzProfileBio.textContent = data.profile.bio;
+    inuutyzProfilePic.crossOrigin = 'Anonymous';
 
-            sisuryaProfileName.textContent = data.profile.name;
-            sisuryaProfileBio.textContent = data.profile.bio;
-            sisuryaProfilePic.crossOrigin = 'Anonymous';
-            sisuryaProfilePic.src = data.profile.image;
+    // Atur foto profil awal berdasarkan tema yang tersimpan
+    const currentTheme = localStorage.getItem('theme') || 'light';
+    inuutyzProfilePic.src = data.profile.image[currentTheme];
+    
+    // ... sisa kode di bawahnya tetap sama ...
+
             
-            sisuryaProfilePic.onload = function() {
-                getAverageColor(sisuryaProfilePic, (bgColor, textColor, textColorRgb, primaryColor, secondaryColor) => {
+            inuutyzProfilePic.onload = function() {
+                getAverageColor(inuutyzProfilePic, (bgColor, textColor, textColorRgb, primaryColor, secondaryColor) => {
                     document.documentElement.style.setProperty('--primary-color', primaryColor);
                     document.documentElement.style.setProperty('--secondary-color', secondaryColor);
                 });
             };
             
-            sisuryaLinksContainer.innerHTML = '';
+            inuutyzLinksContainer.innerHTML = '';
             data.links.forEach((link, index) => {
                 const linkElement = document.createElement('a');
                 linkElement.href = link.url;
@@ -583,7 +599,7 @@ line-height:1.3;
                 linkElement.appendChild(icon);
                 linkElement.appendChild(text);
                 
-                sisuryaLinksContainer.appendChild(linkElement);
+                inuutyzLinksContainer.appendChild(linkElement);
             });
 
             // Populate Products
@@ -605,53 +621,53 @@ line-height:1.3;
                 productsGrid.appendChild(productItem);
             });
             
-            sisuryaSongTitle.textContent = data.music.title;
-            sisuryaArtist.textContent = data.music.artist;
-            sisuryaAlbumArt.src = data.music.albumArt;
+            inuutyzSongTitle.textContent = data.music.title;
+            inuutyzArtist.textContent = data.music.artist;
+            inuutyzAlbumArt.src = data.music.albumArt;
             
             if (data.music.audioFile) {
-                sisuryaAudioPlayer.src = data.music.audioFile;
+                inuutyzAudioPlayer.src = data.music.audioFile;
                 
-                sisuryaAudioPlayer.addEventListener('loadedmetadata', function() {
-                    sisuryaSongDuration = sisuryaAudioPlayer.duration;
-                    sisuryaTotalTimeDisplay.textContent = formatTime(sisuryaSongDuration);
+                inuutyzAudioPlayer.addEventListener('loadedmetadata', function() {
+                    inuutyzSongDuration = inuutyzAudioPlayer.duration;
+                    inuutyzTotalTimeDisplay.textContent = formatTime(inuutyzSongDuration);
                 });
 
-                sisuryaAudioPlayer.addEventListener('timeupdate', function() {
-                    sisuryaCurrentTimeDisplay.textContent = formatTime(sisuryaAudioPlayer.currentTime);
-                    const percent = (sisuryaAudioPlayer.currentTime / sisuryaSongDuration) * 100;
-                    sisuryaProgressBar.style.width = `${percent}%`;
+                inuutyzAudioPlayer.addEventListener('timeupdate', function() {
+                    inuutyzCurrentTimeDisplay.textContent = formatTime(inuutyzAudioPlayer.currentTime);
+                    const percent = (inuutyzAudioPlayer.currentTime / inuutyzSongDuration) * 100;
+                    inuutyzProgressBar.style.width = `${percent}%`;
 
-                    updateLyricsDisplay(sisuryaAudioPlayer.currentTime);
-                    updateBackgroundLyrics(sisuryaAudioPlayer.currentTime);
+                    updateLyricsDisplay(inuutyzAudioPlayer.currentTime);
+                    updateBackgroundLyrics(inuutyzAudioPlayer.currentTime);
                 });
 
-                sisuryaAudioPlayer.addEventListener('ended', function() {
-                    sisuryaAudioPlayer.currentTime = 0;
-                    if (sisuryaIsPlaying) {
-                        sisuryaAudioPlayer.play();
+                inuutyzAudioPlayer.addEventListener('ended', function() {
+                    inuutyzAudioPlayer.currentTime = 0;
+                    if (inuutyzIsPlaying) {
+                        inuutyzAudioPlayer.play();
                     } else {
-                        sisuryaPlayPauseIcon.className = 'fas fa-play';
+                        inuutyzPlayPauseIcon.className = 'fas fa-play';
                     }
                 });
             } else {
-                sisuryaSongDuration = data.music.duration || 60;
-                sisuryaTotalTimeDisplay.textContent = formatTime(sisuryaSongDuration);
+                inuutyzSongDuration = data.music.duration || 60;
+                inuutyzTotalTimeDisplay.textContent = formatTime(inuutyzSongDuration);
             }
             
             if (data.music.timeSync) {
                 updateLyricsDisplay(0);
                 updateBackgroundLyrics(0);
             } else {
-               sisuryaLyrics.textContent = data.music.lyrics || "No lyrics available";
+               inuutyzLyrics.textContent = data.music.lyrics || "No lyrics available";
             }
-            sisuryaCurrentYear.textContent = new Date().getFullYear();
+            inuutyzCurrentYear.textContent = new Date().getFullYear();
         }
 
         function updateLyricsDisplay(time) {
-            if (!sisuryaUserData || !sisuryaUserData.music.timeSync) return;
+            if (!inuutyzUserData || !inuutyzUserData.music.timeSync) return;
 
-            let lyricArray = sisuryaUserData.music.timeSync;
+            let lyricArray = inuutyzUserData.music.timeSync;
             if (Array.isArray(lyricArray) && lyricArray.length > 0 && Array.isArray(lyricArray[0])) {
                 lyricArray = lyricArray[0];
             }
@@ -668,16 +684,16 @@ line-height:1.3;
                 }
             }
 
-            if (currentLyric && newLyricIndex !== sisuryaCurrentLyricIndex) {
-                sisuryaCurrentLyricIndex = newLyricIndex;
+            if (currentLyric && newLyricIndex !== inuutyzCurrentLyricIndex) {
+                inuutyzCurrentLyricIndex = newLyricIndex;
                 
-                sisuryaLyrics.innerHTML = '';
+                inuutyzLyrics.innerHTML = '';
                 
                 const lyricLine = document.createElement('div');
                 lyricLine.className = 'lyrics-line active text-[var(--primary-color)] font-semibold';
                 lyricLine.textContent = currentLyric.text;
                 
-                sisuryaLyrics.appendChild(lyricLine);
+                inuutyzLyrics.appendChild(lyricLine);
                 
                 lyricLine.classList.add('lyrics-fade-in');
                 setTimeout(() => {
@@ -687,14 +703,14 @@ line-height:1.3;
         }
 
         function updateBackgroundLyrics(time) {
-            if (!sisuryaUserData || !sisuryaUserData.music.timeSync) return;
+            if (!inuutyzUserData || !inuutyzUserData.music.timeSync) return;
 
-            let lyricArray = sisuryaUserData.music.timeSync;
+            let lyricArray = inuutyzUserData.music.timeSync;
             if (Array.isArray(lyricArray) && lyricArray.length > 0 && Array.isArray(lyricArray[0])) {
                 lyricArray = lyricArray[0];
             }
 
-            sisuryaLyricsBackground.innerHTML = '';
+            inuutyzLyricsBackground.innerHTML = '';
 
             const linesToShow = 3;
             let startIndex = -1;
@@ -719,7 +735,7 @@ line-height:1.3;
                     lyricLine.className = 'background-lyric-line';
                     lyricLine.textContent = lyricArray[lyricIndex].text;
                     lyricLine.style.animationDelay = `${i * 2}s`; 
-                    sisuryaLyricsBackground.appendChild(lyricLine);
+                    inuutyzLyricsBackground.appendChild(lyricLine);
                 }
             }
         }
@@ -731,75 +747,75 @@ line-height:1.3;
         }
 
         function togglePlayPause() {
-            sisuryaIsPlaying = !sisuryaIsPlaying;
+            inuutyzIsPlaying = !inuutyzIsPlaying;
             
-            if (sisuryaIsPlaying) {
-                sisuryaPlayPauseIcon.className = 'fas fa-pause';
-                if (sisuryaAudioPlayer.src) {
-                    sisuryaAudioPlayer.play();
+            if (inuutyzIsPlaying) {
+                inuutyzPlayPauseIcon.className = 'fas fa-pause';
+                if (inuutyzAudioPlayer.src) {
+                    inuutyzAudioPlayer.play();
                 }
             } else {
-                sisuryaPlayPauseIcon.className = 'fas fa-play';
-                if (sisuryaAudioPlayer.src) {
-                    sisuryaAudioPlayer.pause();
+                inuutyzPlayPauseIcon.className = 'fas fa-play';
+                if (inuutyzAudioPlayer.src) {
+                    inuutyzAudioPlayer.pause();
                 }
             }
         }
 
-        sisuryaPlayPauseBtn.addEventListener('click', (event) => {
+        inuutyzPlayPauseBtn.addEventListener('click', (event) => {
             event.stopPropagation();
             togglePlayPause();
         });
 
         document.querySelector('.progress-container').addEventListener('click', function(e) {
-            if (sisuryaAudioPlayer.src) {
+            if (inuutyzAudioPlayer.src) {
                 const progressContainer = this;
                 const rect = progressContainer.getBoundingClientRect();
                 const percent = (e.clientX - rect.left) / rect.width;
-                sisuryaAudioPlayer.currentTime = percent * sisuryaSongDuration;
+                inuutyzAudioPlayer.currentTime = percent * inuutyzSongDuration;
             }
         });
 
         // Music player visibility and positioning
         function setMusicPlayerPosition() {
             if (window.innerWidth <= 768) { // Mobile breakpoint
-                sisuryaMusicPlayer.style.top = 'auto';
-                sisuryaMusicPlayer.style.bottom = '20px';
-                sisuryaMusicPlayer.style.left = '50%';
-                sisuryaMusicPlayer.style.right = 'auto';
-                sisuryaMusicPlayer.style.transform = 'translateX(-50%)';
-                sisuryaMusicPlayer.style.transformOrigin = 'bottom center';
+                inuutyzMusicPlayer.style.top = 'auto';
+                inuutyzMusicPlayer.style.bottom = '20px';
+                inuutyzMusicPlayer.style.left = '50%';
+                inuutyzMusicPlayer.style.right = 'auto';
+                inuutyzMusicPlayer.style.transform = 'translateX(-50%)';
+                inuutyzMusicPlayer.style.transformOrigin = 'bottom center';
             } else { // Desktop
-                sisuryaMusicPlayer.style.top = '20px';
-                sisuryaMusicPlayer.style.right = '20px';
-                sisuryaMusicPlayer.style.bottom = 'auto';
-                sisuryaMusicPlayer.style.left = 'auto';
-                sisuryaMusicPlayer.style.transform = 'none';
-                sisuryaMusicPlayer.style.transformOrigin = 'top right';
+                inuutyzMusicPlayer.style.top = '20px';
+                inuutyzMusicPlayer.style.right = '20px';
+                inuutyzMusicPlayer.style.bottom = 'auto';
+                inuutyzMusicPlayer.style.left = 'auto';
+                inuutyzMusicPlayer.style.transform = 'none';
+                inuutyzMusicPlayer.style.transformOrigin = 'top right';
             }
         }
 
         function minimizeMusicPlayer() {
-            sisuryaMusicPlayer.classList.add('hidden');
+            inuutyzMusicPlayer.classList.add('hidden');
             minimizedMusicPlayerIcon.classList.add('visible');
-            sisuryaIsMusicPlayerVisible = false;
+            inuutyzIsMusicPlayerVisible = false;
         }
 
         function maximizeMusicPlayer() {
-            sisuryaMusicPlayer.classList.remove('hidden');
+            inuutyzMusicPlayer.classList.remove('hidden');
             minimizedMusicPlayerIcon.classList.remove('visible');
-            sisuryaIsMusicPlayerVisible = true;
-            if (sisuryaIsPlaying && sisuryaAudioPlayer.paused) {
-                sisuryaAudioPlayer.play();
+            inuutyzIsMusicPlayerVisible = true;
+            if (inuutyzIsPlaying && inuutyzAudioPlayer.paused) {
+                inuutyzAudioPlayer.play();
             }
         }
 
-        sisuryaMusicCloseBtn.addEventListener('click', minimizeMusicPlayer);
+        inuutyzMusicCloseBtn.addEventListener('click', minimizeMusicPlayer);
         minimizedMusicPlayerIcon.addEventListener('click', maximizeMusicPlayer);
 
         // Auto-play on first interaction
         document.addEventListener('click', function playOnFirstInteraction() {
-            if (!sisuryaIsPlaying && sisuryaIsMusicPlayerVisible) {
+            if (!inuutyzIsPlaying && inuutyzIsMusicPlayerVisible) {
                 togglePlayPause();
             }
             document.removeEventListener('click', playOnFirstInteraction);
@@ -810,14 +826,18 @@ line-height:1.3;
             setMusicPlayerPosition();
             window.addEventListener('resize', setMusicPlayerPosition);
 
-            sisuryaCurrentLyricIndex = -1;
+            inuutyzCurrentLyricIndex = -1;
             
             const data = {
                 "profile": {
-                    "name": "InuuTyzDev",
-                    "bio": "Hanya manusia biasa yang menjalani hidup",
-                    "image": "https://files.catbox.moe/tv1rv6.jpeg"
-                },
+    "name": "InuuTyzDev",
+    "bio": "Manusia biasa yang menjalani hidup",
+    "image": {
+        "light": "https://files.catbox.moe/tv1rv6.jpeg",
+        "dark": "https://files.catbox.moe/w0lloy.png"
+    }
+},
+
 "links": [
   {
     "title": "Telegram Utama",
@@ -950,7 +970,7 @@ line-height:1.3;
                 },
                 "products": [
                     {
-                        "name": "Hm gapenting(dalem hati gw masyaallah cool banget gw idaman semua jenis makhluk hidup) wkwk ya intinya ini yapping doang ges gapenting jadi mending lupakan tentang ini:p",
+                        "name": "Developer Modal AI.​Membangun masa depan digital dengan bantuan kecerdasan buatan. Fokus pada efisiensi tinggi, desain minimalis, dan solusi tanpa batas. Inovasi bukan lagi pilihan, tapi pondasi utama kami.",
                      
                     }
                     ]
