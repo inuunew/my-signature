@@ -1,69 +1,611 @@
 <!DOCTYPE html>
-<html lang="id">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>InuuSocial</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>InuuTyzDev - Portfolio</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800;900&display=swap" rel="stylesheet">
     <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" />
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                    }
+                }
+            }
+        }
+    </script>
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap');
-        body { font-family: 'Inter', sans-serif; }
+        :root {
+            --primary-color: #6366f1;
+            --secondary-color: #8b5cf6;
+            --transition-speed: 0.5s;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+            transition: background-color var(--transition-speed) ease, color var(--transition-speed) ease;
+        }
+
+        body {
+            background-color: #ffffff;
+            color: #1a202c;
+        }
+
+        body.dark {
+            background-color: #121212;
+            color: #e2e8f0;
+        }
+
+        .inuutyz-lyrics-background {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            z-index: 0;
+            pointer-events: none;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            opacity: 0.02;
+            font-size: 6vw;
+            font-weight: 900;
+            color: var(--primary-color);
+            text-align: center;
+            line-height: 1.2;
+        }
+
+        .inuutyz-lyrics-background .background-lyric-line {
+            position: absolute;
+            white-space: nowrap;
+            opacity: 0;
+            transform: translateY(-100%);
+            animation: lyricBackgroundFlow 25s linear infinite;
+            will-change: transform, opacity;
+        }
+
+        @keyframes lyricBackgroundFlow {
+            0% { opacity: 0; transform: translateY(-100%); }
+            10% { opacity: 0.05; transform: translateY(0%); }
+            80% { opacity: 0.05; transform: translateY(100%); }
+            100% { opacity: 0; transform: translateY(200%); }
+        }
+
+        .inuutyz-music-player {
+            transform-origin: bottom right;
+            transition: all var(--transition-speed) cubic-bezier(0.68, -0.55, 0.27, 1.55);
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .inuutyz-music-player.hidden {
+            opacity: 0;
+            visibility: hidden;
+            transform: scale(0.7) translate(50px, 50px);
+        }
+
+        .minimized-music-player-icon {
+            transition: all var(--transition-speed) cubic-bezier(0.68, -0.55, 0.27, 1.55);
+            opacity: 0;
+            visibility: hidden;
+            transform: scale(0.7);
+        }
+
+        .minimized-music-player-icon.visible {
+            opacity: 1;
+            visibility: visible;
+            transform: scale(1);
+        }
+
+        .inuutyz-music-close-btn {
+            position: absolute;
+            top: -10px;
+            right: -10px;
+            background-color: #ef4444;
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 30px;
+            height: 30px;
+            cursor: pointer;
+            font-size: 16px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+            transition: transform 0.2s ease, background-color 0.2s ease;
+        }
+
+        .inuutyz-music-close-btn:hover {
+            transform: scale(1.1);
+            background-color: #dc2626;
+        }
+
+        .lyrics-line.active {
+            color: var(--primary-color);
+            font-weight: 600;
+            animation: fadeIn 0.5s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(5px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .theme-toggle-btn {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background-color: #f3f4f6;
+            color: #1f2937;
+            border-radius: 9999px;
+            padding: 10px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            transition: all var(--transition-speed) ease;
+            z-index: 1000;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .dark .theme-toggle-btn {
+            background-color: #374151;
+            color: #f9fafb;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.5);
+        }
+
+        .theme-toggle-btn:hover {
+            transform: scale(1.1);
+        }
+
+        .fade-up-element {
+            animation: fadeInUp 0.6s cubic-bezier(0.16, 1, 0.3, 1) both;
+        }
+
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(15px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @media (max-width: 768px) {
+            .inuutyz-music-player {
+                top: auto;
+                bottom: 20px;
+                left: 50%;
+                right: auto;
+                transform: translateX(-50%);
+                transform-origin: bottom center;
+                width: calc(100% - 40px);
+                max-width: 320px;
+            }
+
+            .inuutyz-music-player.hidden {
+                transform: translateX(-50%) scale(0.7) translateY(50px);
+            }
+
+            .minimized-music-player-icon {
+                bottom: 20px;
+                right: 20px;
+            }
+        }
     </style>
 </head>
-<body class="bg-white text-gray-900 antialiased min-w-[1280px] overflow-x-auto">
+<body class="flex flex-col items-center justify-center h-[100dvh] w-full overflow-hidden relative">
+    
+    <div class="inuutyz-lyrics-background" id="inuutyzLyricsBackground"></div>
 
-    <nav class="fixed top-0 w-full bg-white/80 backdrop-blur-md z-50 border-b border-gray-100">
-        <div class="flex justify-between items-center py-5 px-8 md:px-16 max-w-7xl mx-auto">
-            <div class="text-2xl font-black tracking-tighter text-gray-950">Developer Modal Ai</div>
-            <div class="hidden md:flex items-center space-x-10 text-sm font-semibold text-gray-500">
-                <a href="index.html" class="text-gray-950 transition">Beranda</a>
-                <a href="tentang.html#tentang" class="hover:text-gray-950 transition">Tentang</a>
-                <a href="tentang.html#keahlian" class="hover:text-gray-950 transition">Keahlian</a>
-                <a href="tentang.html#proyek" class="hover:text-gray-950 transition">Proyek</a>
-                <a href="tentang.html#blog" class="hover:text-gray-950 transition">Blog</a>
-            </div>
-            <a href="kontak.html" class="bg-gray-950 text-white px-7 py-3 rounded-full text-xs font-bold hover:bg-gray-800 transition shadow-sm">
-                Hubungi Saya
-            </a>
-        </div>
-    </nav>
+    <button id="themeToggleBtn" class="theme-toggle-btn w-10 h-10">
+        <i class="fas fa-moon text-lg" id="themeIcon"></i>
+    </button>
 
-    <section class="min-h-screen flex flex-col items-center justify-center max-w-7xl mx-auto px-8 md:px-16 pt-24 pb-12">
-        <div class="space-y-8 text-center max-w-4xl flex flex-col items-center w-full">
+    <div class="w-full max-w-md mx-auto flex flex-col items-center relative z-10 px-4 pt-2">
+        
+        <div class="profile text-center mb-2 w-full flex flex-col items-center fade-up-element" style="animation-delay: 0.1s;">
             
-            <div class="relative flex justify-center mb-8">
-                <div class="absolute -z-10 w-[120%] h-[120%] top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 border border-gray-100 rounded-full animate-[pulse_5s_infinite]"></div>
-                <div class="relative w-80 h-80 md:w-[450px] md:h-[450px] rounded-full overflow-hidden border-[15px] border-white shadow-2xl z-10">
-                    <img src="https://via.placeholder.com/600" alt="Danendra" class="w-full h-full object-cover" />
+            <div class="relative flex justify-center items-center mb-3 w-[220px] h-[220px]">
+                <div class="absolute inset-0 bg-gray-50 dark:bg-gray-800/50 rounded-full shadow-inner transform scale-105 -z-10 transition-colors duration-500"></div>
+                
+                <div class="profile-pic-container w-[140px] h-[140px] relative rounded-full z-10 bg-white dark:bg-gray-900 shadow-sm flex items-center justify-center overflow-hidden border-4 border-white dark:border-gray-800">
+                    <img src="" alt="Profile Picture" class="w-full h-full object-cover rounded-full" id="profilePic">
                 </div>
-                <div class="absolute bottom-10 left-0 md:-left-10 bg-white p-6 rounded-3xl shadow-2xl flex items-center space-x-5 z-20 border border-gray-50">
-                    <div class="bg-gray-950 text-white p-4 rounded-2xl"><i class="fas fa-medal text-2xl"></i></div>
-                    <div>
-                        <div class="text-[10px] text-gray-400 font-bold uppercase tracking-widest">Tahun Pengalaman</div>
-                        <div class="text-4xl font-black text-gray-950">1th+</div>
+            </div>
+
+            <div class="bg-[#f8f9fa] dark:bg-gray-800 text-gray-500 dark:text-gray-300 text-[8px] font-bold px-3 py-1 rounded-full mb-2 flex items-center gap-1.5 tracking-widest shadow-sm transition-colors duration-500">
+                <span class="text-yellow-400 text-[10px]">👋</span> HELLO, I'M
+            </div>
+
+            <h1 class="text-4xl md:text-5xl leading-none font-black mb-1.5 text-[#0f141e] dark:text-white tracking-[-0.04em]" id="profileName">InuuTyzDev</h1>
+            
+            <div class="text-sm md:text-base font-bold text-gray-800 dark:text-gray-200 mb-2 flex items-center justify-center flex-wrap gap-2">
+                Web Developer <span class="text-gray-900 dark:text-white text-base font-normal opacity-40">|</span> 
+                <span class="text-[#8c92a0] dark:text-gray-400">UI/UX Enthusiast</span>
+            </div>
+
+            <p class="text-[11px] md:text-[12px] text-[#6b7280] dark:text-gray-400 max-w-[280px] mx-auto leading-relaxed px-2 font-medium mb-2" id="profileBio"></p>
+        </div>
+        
+        <div class="links-container w-full max-w-[320px] grid grid-cols-2 gap-3 mt-1 fade-up-element" id="linksContainer" style="animation-delay: 0.3s;">
+        </div>
+
+        <div class="footer mt-3 text-[10px] font-semibold text-gray-400 dark:text-gray-600 tracking-wider w-full text-center fade-up-element" style="animation-delay: 0.5s;">
+            &copy; <span id="currentYear"></span> INUU OFFICIAL
+        </div>
+    </div>
+    
+    <div class="inuutyz-music-player fixed bg-white/95 dark:bg-[#1f2937]/95 rounded-2xl p-4 w-[280px] shadow-[0_20px_50px_rgb(0,0,0,0.1)] dark:shadow-black/50 flex flex-col z-50 backdrop-blur-xl border border-gray-100 dark:border-gray-800" id="inuutyzMusicPlayer">
+        <button class="inuutyz-music-close-btn" id="inuutyzMusicCloseBtn">
+            <i class="fas fa-times"></i>
+        </button>
+        <div class="inuutyz-music-header flex items-center mb-2 relative">
+            <img src="" alt="Album Art" class="album-art w-12 h-12 rounded-xl object-cover mr-3 shadow-md transition-transform duration-300 hover:scale-105" id="albumArt">
+            <div class="music-info flex flex-col flex-1 overflow-hidden">
+                <div class="song-title font-bold text-sm mb-0.5 truncate text-gray-900 dark:text-gray-100" id="songTitle">Song Title</div>
+                <div class="artist text-[10px] text-gray-500 dark:text-gray-400 truncate" id="artist">Artist Name</div>
+                <div class="lyrics-wrapper w-full mt-1.5">
+                    <div class="lyrics-container relative h-auto max-h-12 overflow-hidden">
+                        <div class="lyrics text-[10px] bg-gray-50 dark:bg-gray-800/80 rounded-lg p-1.5 w-full overflow-y-auto text-left whitespace-pre-line text-gray-700 dark:text-gray-300 font-medium leading-snug" id="lyrics"></div>
                     </div>
                 </div>
             </div>
-
-            <div class="inline-block bg-gray-100 text-gray-500 px-5 py-2 rounded-full text-[10px] font-bold tracking-[0.2em] uppercase">👋 Hello, I'm</div>
-            <h1 class="text-6xl md:text-8xl font-black tracking-tighter text-gray-950 leading-[0.9]">InuuTyzDev</h1>
-            <div class="inline-block border-l-4 border-gray-950 pl-5">
-                <h2 class="text-2xl md:text-3xl font-bold text-gray-700">Web Developer & <span class="text-gray-400">UI/UX Enthusiast</span></h2>
+        </div>
+        <div class="music-controls flex flex-col items-center mt-2">
+            <button class="play-pause bg-transparent border-none cursor-pointer text-2xl text-[var(--primary-color)] mb-2 transition-all duration-300 hover:scale-110 hover:text-[var(--secondary-color)]" id="playPauseBtn">
+                <i class="fas fa-play" id="playPauseIcon"></i>
+            </button>
+            <div class="progress-container w-full h-1 bg-gray-100 dark:bg-gray-700 rounded-full mb-1 relative overflow-hidden cursor-pointer">
+                <div class="progress-bar h-full bg-gradient-to-r from-[var(--primary-color)] to-[var(--secondary-color)] w-0 rounded-full transition-all duration-100 ease-linear" id="progressBar"></div>
             </div>
-            <p class="text-gray-500 text-lg leading-relaxed max-w-lg mx-auto">
-                Saya menciptakan pengalaman digital yang modern dan fungsional. Bersemangat mengubah ide kompleks menjadi desain yang elegan dan intuitif.
-            </p>
-            
-            <div class="flex flex-col sm:flex-row gap-5 pt-4 justify-center w-full max-w-md mx-auto">
-                <a href="tentang.html" class="bg-gray-950 text-white px-10 py-5 rounded-full font-bold hover:bg-gray-800 transition shadow-xl text-center w-full">Tentang</a>
-                <a href="kontak.html" class="bg-white text-gray-950 px-10 py-5 rounded-full font-bold border border-gray-200 hover:bg-gray-50 transition text-center w-full">Hubungi Saya</a>
-            </div>
-            
-            <div class="flex flex-col sm:flex-row gap-5 pt-4 justify-center w-full max-w-md mx-auto">
-                <a href="digital-market.inuu.my.id" class="bg-white text-gray-950 px-10 py-5 rounded-full font-bold border border-gray-200 hover:bg-gray-50 transition text-center w-full">Marketplace</a>
+            <div class="time-display w-full flex justify-between text-[9px] font-semibold text-gray-400 dark:text-gray-500">
+                <span id="currentTime">0:00</span> / <span id="totalTime">0:00</span>
             </div>
         </div>
-    </section>
+        <audio id="audioPlayer" preload="metadata"></audio>
+    </div>
 
+    <button class="minimized-music-player-icon fixed bottom-5 right-5 w-12 h-12 rounded-full bg-gradient-to-tr from-[var(--primary-color)] to-[var(--secondary-color)] text-white flex items-center justify-center shadow-xl cursor-pointer z-50 hover:scale-110" id="minimizedMusicPlayerIcon">
+        <i class="fas fa-music text-xl"></i>
+    </button>
+
+    <script>
+        let inuutyzUserData = null;
+        let inuutyzCurrentLyricIndex = -1;
+        let inuutyzSongDuration = 60;
+        let inuutyzIsPlaying = false;
+        let inuutyzIsMusicPlayerVisible = true;
+
+        const inuutyzProfilePic = document.getElementById('profilePic');
+        const inuutyzProfileName = document.getElementById('profileName');
+        const inuutyzProfileBio = document.getElementById('profileBio');
+        const inuutyzLinksContainer = document.getElementById('linksContainer');
+        const inuutyzCurrentYear = document.getElementById('currentYear');
+        
+        const inuutyzAlbumArt = document.getElementById('albumArt');
+        const inuutyzSongTitle = document.getElementById('songTitle');
+        const inuutyzArtist = document.getElementById('artist');
+        const inuutyzLyrics = document.getElementById('lyrics');
+        const inuutyzPlayPauseBtn = document.getElementById('playPauseBtn');
+        const inuutyzPlayPauseIcon = document.getElementById('playPauseIcon');
+        const inuutyzMusicPlayer = document.getElementById('inuutyzMusicPlayer');
+        const inuutyzMusicCloseBtn = document.getElementById('inuutyzMusicCloseBtn');
+        const inuutyzProgressBar = document.getElementById('progressBar');
+        const inuutyzCurrentTimeDisplay = document.getElementById('currentTime');
+        const inuutyzTotalTimeDisplay = document.getElementById('totalTime');
+        const inuutyzAudioPlayer = document.getElementById('audioPlayer');
+        const inuutyzLyricsBackground = document.getElementById('inuutyzLyricsBackground');
+        const minimizedMusicPlayerIcon = document.getElementById('minimizedMusicPlayerIcon');
+        
+        const themeToggleBtn = document.getElementById('themeToggleBtn');
+        const themeIcon = document.getElementById('themeIcon');
+
+        function setTheme(theme) {
+            if (theme === 'dark') {
+                document.documentElement.classList.add('dark');
+                document.body.classList.add('dark');
+                themeIcon.className = 'fas fa-sun text-lg';
+                if(inuutyzUserData) inuutyzProfilePic.src = inuutyzUserData.profile.image.dark; 
+                localStorage.setItem('theme', 'dark');
+            } else {
+                document.documentElement.classList.remove('dark');
+                document.body.classList.remove('dark');
+                themeIcon.className = 'fas fa-moon text-lg';
+                if(inuutyzUserData) inuutyzProfilePic.src = inuutyzUserData.profile.image.light; 
+                localStorage.setItem('theme', 'light');
+            }
+        }
+
+        function initializeTheme() {
+            const storedTheme = localStorage.getItem('theme');
+            if (storedTheme) {
+                setTheme(storedTheme);
+            } else {
+                setTheme('light');
+            }
+        }
+
+        themeToggleBtn.addEventListener('click', () => {
+            if (document.body.classList.contains('dark')) setTheme('light');
+            else setTheme('dark');
+        });
+
+        function initializeFromJSON(data) {
+            inuutyzUserData = data;
+            
+            inuutyzProfileName.textContent = data.profile.name;
+            inuutyzProfileBio.textContent = data.profile.bio;
+            
+            const currentTheme = localStorage.getItem('theme') || 'light';
+            inuutyzProfilePic.src = data.profile.image[currentTheme];
+            
+            inuutyzLinksContainer.innerHTML = '';
+            data.links.forEach((link, index) => {
+                const linkElement = document.createElement('a');
+                linkElement.href = link.url;
+                linkElement.target = '_blank';
+                linkElement.rel = 'noopener noreferrer';
+                
+                let baseClasses = "py-2 px-4 rounded-full font-bold text-[11px] flex items-center justify-center transition-all duration-300 hover:-translate-y-1 ";
+                
+                if (index === 0) {
+                    linkElement.className = baseClasses + "col-span-1 bg-[#0f141e] text-white dark:bg-white dark:text-black shadow-md hover:shadow-lg";
+                } else if (index === 1) {
+                    linkElement.className = baseClasses + "col-span-1 bg-transparent border border-gray-200 dark:border-gray-700 text-[#0f141e] dark:text-white hover:border-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800";
+                } else {
+                    linkElement.className = baseClasses + "col-span-2 bg-transparent border border-gray-200 dark:border-gray-700 text-[#0f141e] dark:text-white hover:border-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800";
+                }
+                
+                linkElement.textContent = link.title;
+                inuutyzLinksContainer.appendChild(linkElement);
+            });
+
+            inuutyzSongTitle.textContent = data.music.title;
+            inuutyzArtist.textContent = data.music.artist;
+            inuutyzAlbumArt.src = data.music.albumArt;
+            
+            if (data.music.audioFile) {
+                inuutyzAudioPlayer.src = data.music.audioFile;
+                inuutyzAudioPlayer.addEventListener('loadedmetadata', function() {
+                    inuutyzSongDuration = inuutyzAudioPlayer.duration;
+                    inuutyzTotalTimeDisplay.textContent = formatTime(inuutyzSongDuration);
+                });
+                inuutyzAudioPlayer.addEventListener('timeupdate', function() {
+                    inuutyzCurrentTimeDisplay.textContent = formatTime(inuutyzAudioPlayer.currentTime);
+                    const percent = (inuutyzAudioPlayer.currentTime / inuutyzSongDuration) * 100;
+                    inuutyzProgressBar.style.width = `${percent}%`;
+                    updateLyricsDisplay(inuutyzAudioPlayer.currentTime);
+                    updateBackgroundLyrics(inuutyzAudioPlayer.currentTime);
+                });
+                inuutyzAudioPlayer.addEventListener('ended', function() {
+                    inuutyzAudioPlayer.currentTime = 0;
+                    if (inuutyzIsPlaying) inuutyzAudioPlayer.play();
+                    else inuutyzPlayPauseIcon.className = 'fas fa-play';
+                });
+            }
+            if (data.music.timeSync) {
+                updateLyricsDisplay(0);
+                updateBackgroundLyrics(0);
+            } else {
+               inuutyzLyrics.textContent = data.music.lyrics || "No lyrics available";
+            }
+            inuutyzCurrentYear.textContent = new Date().getFullYear();
+        }
+
+        function updateLyricsDisplay(time) {
+            if (!inuutyzUserData || !inuutyzUserData.music.timeSync) return;
+            let lyricArray = inuutyzUserData.music.timeSync;
+            if (Array.isArray(lyricArray) && lyricArray.length > 0 && Array.isArray(lyricArray[0])) lyricArray = lyricArray[0];
+            let currentLyric = null, newLyricIndex = -1;
+            for (let i = 0; i < lyricArray.length; i++) {
+                if (lyricArray[i].time <= time) { currentLyric = lyricArray[i]; newLyricIndex = i; } else break;
+            }
+            if (currentLyric && newLyricIndex !== inuutyzCurrentLyricIndex) {
+                inuutyzCurrentLyricIndex = newLyricIndex;
+                inuutyzLyrics.innerHTML = '';
+                const lyricLine = document.createElement('div');
+                lyricLine.className = 'lyrics-line active text-[var(--primary-color)] font-bold';
+                lyricLine.textContent = currentLyric.text;
+                inuutyzLyrics.appendChild(lyricLine);
+            }
+        }
+
+        function updateBackgroundLyrics(time) {
+            if (!inuutyzUserData || !inuutyzUserData.music.timeSync) return;
+            let lyricArray = inuutyzUserData.music.timeSync;
+            if (Array.isArray(lyricArray) && lyricArray.length > 0 && Array.isArray(lyricArray[0])) lyricArray = lyricArray[0];
+            inuutyzLyricsBackground.innerHTML = '';
+            const linesToShow = 3; let startIndex = -1;
+            for (let i = 0; i < lyricArray.length; i++) {
+                if (lyricArray[i].time > time) { startIndex = i; break; }
+            }
+            if (startIndex === -1 && lyricArray.length > 0) startIndex = lyricArray.length - 1;
+            else if (startIndex === -1) return;
+            for (let i = 0; i < linesToShow; i++) {
+                const lyricIndex = startIndex + i;
+                if (lyricIndex < lyricArray.length) {
+                    const lyricLine = document.createElement('div');
+                    lyricLine.className = 'background-lyric-line';
+                    lyricLine.textContent = lyricArray[lyricIndex].text;
+                    lyricLine.style.animationDelay = `${i * 2}s`; 
+                    inuutyzLyricsBackground.appendChild(lyricLine);
+                }
+            }
+        }
+
+        function formatTime(seconds) {
+            const mins = Math.floor(seconds / 60);
+            const secs = Math.floor(seconds % 60);
+            return `${mins}:${secs.toString().padStart(2, '0')}`;
+        }
+
+        function togglePlayPause() {
+            inuutyzIsPlaying = !inuutyzIsPlaying;
+            if (inuutyzIsPlaying) {
+                inuutyzPlayPauseIcon.className = 'fas fa-pause';
+                if (inuutyzAudioPlayer.src) inuutyzAudioPlayer.play();
+            } else {
+                inuutyzPlayPauseIcon.className = 'fas fa-play';
+                if (inuutyzAudioPlayer.src) inuutyzAudioPlayer.pause();
+            }
+        }
+
+        inuutyzPlayPauseBtn.addEventListener('click', (event) => {
+            event.stopPropagation();
+            togglePlayPause();
+        });
+
+        document.querySelector('.progress-container').addEventListener('click', function(e) {
+            if (inuutyzAudioPlayer.src) {
+                const rect = this.getBoundingClientRect();
+                const percent = (e.clientX - rect.left) / rect.width;
+                inuutyzAudioPlayer.currentTime = percent * inuutyzSongDuration;
+            }
+        });
+
+        function setMusicPlayerPosition() {
+            if (window.innerWidth <= 768) {
+                inuutyzMusicPlayer.style.top = 'auto';
+                inuutyzMusicPlayer.style.bottom = '15px';
+                inuutyzMusicPlayer.style.left = '50%';
+                inuutyzMusicPlayer.style.right = 'auto';
+                inuutyzMusicPlayer.style.transform = 'translateX(-50%)';
+                inuutyzMusicPlayer.style.transformOrigin = 'bottom center';
+            } else {
+                inuutyzMusicPlayer.style.top = 'auto';
+                inuutyzMusicPlayer.style.bottom = '20px';
+                inuutyzMusicPlayer.style.left = '20px';
+                inuutyzMusicPlayer.style.right = 'auto';
+                inuutyzMusicPlayer.style.transform = 'none';
+                inuutyzMusicPlayer.style.transformOrigin = 'bottom left';
+            }
+        }
+
+        function minimizeMusicPlayer() {
+            inuutyzMusicPlayer.classList.add('hidden');
+            minimizedMusicPlayerIcon.classList.add('visible');
+            inuutyzIsMusicPlayerVisible = false;
+        }
+
+        function maximizeMusicPlayer() {
+            inuutyzMusicPlayer.classList.remove('hidden');
+            minimizedMusicPlayerIcon.classList.remove('visible');
+            inuutyzIsMusicPlayerVisible = true;
+            if (inuutyzIsPlaying && inuutyzAudioPlayer.paused) inuutyzAudioPlayer.play();
+        }
+
+        inuutyzMusicCloseBtn.addEventListener('click', minimizeMusicPlayer);
+        minimizedMusicPlayerIcon.addEventListener('click', maximizeMusicPlayer);
+
+        document.addEventListener('click', function playOnFirstInteraction() {
+            if (!inuutyzIsPlaying && inuutyzIsMusicPlayerVisible) togglePlayPause();
+            document.removeEventListener('click', playOnFirstInteraction);
+        }, { once: true });
+
+        document.addEventListener('DOMContentLoaded', function() {
+            initializeTheme();
+            setMusicPlayerPosition();
+            window.addEventListener('resize', setMusicPlayerPosition);
+
+            const data = {
+                "profile": {
+                    "name": "InuuTyzDev",
+                    "bio": "Saya menciptakan pengalaman digital yang modern dan fungsional. Bersemangat mengubah ide kompleks menjadi desain yang elegan.",
+                    "image": {
+                        "light": "https://files.catbox.moe/tv1rv6.jpeg",
+                        "dark": "https://files.catbox.moe/w0lloy.png"
+                    }
+                },
+                "links": [
+                    { "title": "Tentang", "tentang.html"},
+                    { "title": "Hubungi Saya", "kontak.html" },
+                    { "title": "Marketplace", "url": "https://digital-market.inuu.my.id" }
+                ], 
+                "music": {
+                    "title": "五等分の気持ち",
+                    "artist": "Nakanoke no Itsutsugo",
+                    "albumArt": "https://files.catbox.moe/nr5615.jpeg",
+                    "audioFile": "https://files.catbox.moe/odtovs.mp3", 
+                    "duration": 267,
+                    "timeSync": [
+                        { "time": 0, "text": "フータローくん?\n(Fuutarou?)" },
+                        { "time": 1.38, "text": "上杉起きなさいよ?\n(Bangun dong Uesugi!)" },
+                        { "time": 2.87, "text": "フータロ\n(Fuutaro)" },
+                        { "time": 3.28, "text": "上杉さん\n(Uesugi-san)" },
+                        { "time": 3.91, "text": "上杉君起きて?\n(Uesugi-kun, bangun ya?)" },
+                        { "time": 6.22, "text": "喜びも (喜びも)\n(Kebahagiaan juga, kebahagiaan juga)" },
+                        { "time": 9.12, "text": "悲しみも (悲しみも)\n(Kesedihan juga, kesedihan juga)" },
+                        { "time": 11.72, "text": "あなたさえ\n(Bahkan kamu)" },
+                        { "time": 14.46, "text": "五等分なんです\n(Kubagi jadi lima bagian)" },
+                        { "time": 28.36, "text": "ひとつ 作り笑いも見抜かれ\n(Satu, bahkan senyum palsuku kau lihat)" },
+                        { "time": 31.18, "text": "ふたつ あんたなんか大嫌いよ\n(Dua, aku sangat benci padamu)" },
+                        { "time": 34.09, "text": "みっつまっすぐなこの気持ち\n(Tiga, perasaan tulusku ini)" },
+                        { "time": 37.62, "text": "気づいて\n(Kumohon sadarlah)" },
+                        { "time": 39.25, "text": "よおつ 気がつくとだんだん\n(Empat, tanpa sadar sedikit demi sedikit)" },
+                        { "time": 41.92, "text": "いつつ わかりあえたね\n(Lima, kita mulai saling memahami)" },
+                        { "time": 45.67, "text": "勉強だけじゃなくて\n(Bukan hanya belajar)" },
+                        { "time": 48.6, "text": "君を知りたいよ\n(Aku ingin lebih mengenalmu)" },
+                        { "time": 52.86, "text": "大嫌いから (大嫌いから)\n(Dari sangat benci, dari sangat benci)" },
+                        { "time": 55.67, "text": "大好きへと (大好きへと)\n(Menjadi sangat suka, menjadi sangat suka)" },
+                        { "time": 58.83, "text": "変わる心に ついていけないよ\n(Aku tak bisa mengikuti hatiku yang berubah)" },
+                        { "time": 63.75, "text": "どんなことも (どんなことも)\n(Apapun itu, apapun itu)" },
+                        { "time": 66.76, "text": "あなたさえ (あなたさえ)\n(Bahkan kamu, bahkan kamu)" },
+                        { "time": 69.85, "text": "五等分です\n(Kubagi jadi lima bagian)" },
+                        { "time": 71.76, "text": "でも私 私 私 私 私は\n(Tapi aku, aku, aku, aku, aku)" },
+                        { "time": 75.09, "text": "あなたが好きよ\n(Menyukaimu)" },
+                        { "time": 87.47, "text": "少し複雑に心の中\n(Hatiku sedikit rumit)" },
+                        { "time": 90.2, "text": "でも変わってゆく気持ち\n(Tapi perasaanku terus berubah)" },
+                        { "time": 92.93, "text": "ずっとこんな関係続いたら\n(Jika hubungan seperti ini terus berlanjut)" },
+                        { "time": 96.62, "text": "いいのにな\n(Rasanya akan menyenangkan)" },
+                        { "time": 98.27, "text": "忘れられない想い出も\n(Kenangan yang tak terlupakan)" },
+                        { "time": 101.08, "text": "これから増えるストーリーも\n(Dan cerita yang akan bertambah nanti)" },
+                        { "time": 104.62, "text": "あなたなしだったら\n(Jika tanpa dirimu)" },
+                        { "time": 107.7, "text": "意味がないだめよ\n(Tak ada artinya, itu tak boleh)" },
+                        { "time": 111.77, "text": "ずっとそばで (ずっとそばで)\n(Selalu di sampingku, selalu di sampingku)" },
+                        { "time": 114.76, "text": "教えてね (教えてね)\n(Beri tahu aku ya, beri tahu aku ya)" },
+                        { "time": 117.86, "text": "だけど勝手に 胸の鼓動 高鳴る\n(Tapi jantungku, berdebar kencang sendiri)" },
+                        { "time": 122.74, "text": "運命だって (運命だって)\n(Katanya takdir, katanya takdir)" },
+                        { "time": 125.63, "text": "信じられる (信じられる)\n(Aku percaya, aku percaya)" },
+                        { "time": 128.88, "text": "おんなじ気持ちね\n(Kita punya perasaan yang sama ya)" },
+                        { "time": 130.71, "text": "またいつか いつか\n(Lagi, suatu hari, suatu hari)" },
+                        { "time": 132.1, "text": "いつか いつか この日を\n(Suatu hari, suatu hari, hari ini)" },
+                        { "time": 134.07, "text": "夢に見るかな\n(Akankah terlihat dalam mimpi)" },
+                        { "time": 146.1, "text": "少しづc berubah 想い\n(Perasaan yang berubah sedikit demi sedikit)" },
+                        { "time": 149.0, "text": "焦りや苛立ち和らいでく\n(Kecemasan dan kekesalan mereda)" },
+                        { "time": 152.35, "text": "信じきれる自信\n(Keyakinan yang bisa dipercaya)" },
+                        { "time": 156.61, "text": "胸の奥に隠れてる言葉\n(Kata-kata yang tersembunyi di dalam hati)" },
+                        { "time": 159.77, "text": "甘えベタだけどいいんですかって\n(Aku payah dalam bermanja, tapi apa itu baik-baik saja?)" },
+                        { "time": 163.27, "text": "私ついて行くわ\n(Aku akan mengikutimu)" },
+                        { "time": 168.08, "text": "いつまでも 忘れない\n(Selamanya, tak akan kulupakan)" },
+                        { "time": 173.88, "text": "出会えた奇跡\n(Keajaiban pertemuan kita)" },
+                        { "time": 175.98, "text": "偶然じゃない そおでしょ?\n(Bukan kebetulan, kan?)" },
+                        { "time": 178.98, "text": "大嫌いから (大嫌いから)\n(Dari sangat benci, dari sangat benci)" },
+                        { "time": 181.83, "text": "大好きへと (大好きへと)\n(Menjadi sangat suka, menjadi sangat suka)" },
+                        { "time": 184.98, "text": "変わる心に ついていきたいよ\n(Aku ingin mengikuti hatiku yang berubah)" },
+                        { "time": 189.93, "text": "どんなことも (どんなことも)\n(Apapun itu, apapun itu)" },
+                        { "time": 192.93, "text": "あなたさえ (あなたさえ)\n(Bahkan kamu, bahkan kamu)" },
+                        { "time": 195.9, "text": "五等分です\n(Kubagi jadi lima bagian)" },
+                        { "time": 197.91, "text": "でも私 私 私 私 私は\n(Tapi aku, aku, aku, aku, aku)" },
+                        { "time": 201.21, "text": "ずうと ずうと\n(Selamanya, selamanya)" },
+                        { "time": 202.0, "text": "ずうと ずうと あなたに\n(Selamanya, selamanya, kepadamu)" },
+                        { "time": 204.04, "text": "愛を誓います\n(Aku bersumpah cinta)" },
+                        { "time": 206.86, "text": "We are the brides we are the brides\n(Kami adalah pengantin, kami adalah pengantin)" },
+                        { "time": 213.69, "text": "We are the brides we are the brides\n(Kami adalah pengantin, kami adalah pengantin)" },
+                        { "time": 216.41, "text": "Please\n(Kumohon)" }
+                    ]
+                }
+            };
+            
+            initializeFromJSON(data);
+        });
+    </script>
 </body>
 </html>
