@@ -45,7 +45,7 @@
     </div>
 
     <div class="max-w-7xl mx-auto px-16 pb-32">
-        <div id="container-proyek" class="grid grid-cols-3 gap-8">
+        <div id="container-proyek" class="grid grid-cols-2 gap-12">
             </div>
         <div id="no-results" class="hidden text-center py-20 text-gray-400 font-medium">
             Proyek tidak ditemukan...
@@ -66,22 +66,25 @@
             } else {
                 noResults.classList.add('hidden');
                 data.forEach(proyek => {
+                    // SEMUA TEKS DI DALAM CARD INI DIPERBESAR
                     container.innerHTML += `
-                        <div class="bg-white rounded-[35px] overflow-hidden shadow-sm hover:shadow-2xl transition-all duration-500 border border-gray-100 flex flex-col group">
+                        <div class="bg-white rounded-[40px] overflow-hidden shadow-sm hover:shadow-2xl transition-all duration-500 border border-gray-100 flex flex-col group">
                             
-                            <div style="background-color: ${proyek.warna}" class="h-52 flex items-center justify-center p-10 text-center text-white font-black text-2xl relative">
-                                <span class="absolute top-5 right-8 text-[10px] tracking-[0.2em] uppercase opacity-60 font-bold">${proyek.layanan}</span>
+                            <div style="background-color: ${proyek.warna}" class="h-64 flex items-center justify-center p-12 text-center text-white font-black text-3xl relative">
+                                <span class="absolute top-6 right-8 text-xs tracking-[0.2em] uppercase opacity-60 font-bold">${proyek.layanan}</span>
                                 <h3 class="leading-tight drop-shadow-sm">${proyek.nama}</h3>
                             </div>
                             
-                            <div class="p-10 flex flex-col flex-grow">
-                                <div class="flex items-center space-x-4 mb-5 text-[10px] font-bold text-gray-400 uppercase tracking-widest">
+                            <div class="p-12 flex flex-col flex-grow">
+                                <div class="flex items-center space-x-4 mb-6 text-xs font-bold text-gray-400 uppercase tracking-widest">
                                     <span>${proyek.tanggal}</span><span>•</span><span class="truncate">${proyek.klien}</span>
                                 </div>
-                                <h4 class="text-xl font-bold mb-4 text-gray-900 group-hover:text-gray-700 transition">${proyek.nama}</h4>
-                                <p class="text-gray-400 text-sm mb-10 leading-relaxed flex-grow">${proyek.deskripsi}</p>
                                 
-                                <a href="detail-proyek.html?id=${proyek.id}" class="mt-auto w-full py-4 border-2 border-gray-100 rounded-2xl text-[10px] font-bold uppercase tracking-widest text-gray-500 hover:bg-gray-950 hover:text-white hover:border-gray-950 active:bg-gray-950 active:text-white transition-all flex items-center justify-center space-x-3">
+                                <h4 class="text-3xl font-bold mb-6 text-gray-900 group-hover:text-gray-700 transition">${proyek.nama}</h4>
+                                
+                                <p class="text-gray-500 text-lg mb-12 leading-relaxed flex-grow line-clamp-3">${proyek.deskripsi}</p>
+                                
+                                <a href="detail-proyek.html?id=${proyek.id}" class="mt-auto w-full py-5 border-2 border-gray-100 rounded-2xl text-xs font-bold uppercase tracking-widest text-gray-500 hover:bg-gray-950 hover:text-white hover:border-gray-950 active:bg-gray-950 active:text-white transition-all flex items-center justify-center space-x-3">
                                     <span>Lihat Detail</span>
                                     <i class="fas fa-arrow-right"></i>
                                 </a>
@@ -109,8 +112,12 @@
                 btn.classList.remove('bg-gray-950', 'text-white');
                 btn.classList.add('text-gray-500');
             });
-            event.target.classList.remove('text-gray-500');
-            event.target.classList.add('bg-gray-950', 'text-white');
+            // Update kelas tombol yang diklik
+            const clickedBtn = Array.from(buttons).find(b => b.innerText.trim() === cat);
+            if(clickedBtn) {
+                clickedBtn.classList.remove('text-gray-500');
+                clickedBtn.classList.add('bg-gray-950', 'text-white');
+            }
 
             if (cat === 'Semua') {
                 renderProyek(databaseProyek);
