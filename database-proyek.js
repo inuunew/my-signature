@@ -8,7 +8,7 @@ const databaseProyek = [
     "layanan": "Web Application",
     "deskripsi": "Aplikasi web yang memungkinkan pengguna membuat gambar kutipan dengan estetika antarmuka iPhone yang elegan.",
     "fitur": ["Custom Text", "iOS Style UI", "Image Export"],
-    "gambar": "https://via.placeholder.com/600x450", // Ganti dengan screenshot proyekmu
+    "warna": "#2D3E50", // Biru Gelap
     "linkPreview": "https://nuuiqc.vercel.app",
     "linkGithub": "#"
   },
@@ -20,7 +20,7 @@ const databaseProyek = [
     "layanan": "Tools & Utility",
     "deskripsi": "Alat praktis untuk mengunduh audio dari video TikTok secara cepat dan mudah melalui tautan video.",
     "fitur": ["High Quality Audio", "Fast Process", "MP3 Converter"],
-    "gambar": "https://via.placeholder.com/600x450",
+    "warna": "#7B61FF", // Ungu
     "linkPreview": "https://nuuttda.vercel.app",
     "linkGithub": "#"
   },
@@ -32,7 +32,7 @@ const databaseProyek = [
     "layanan": "Tools & Utility",
     "deskripsi": "Platform pengunduh video TikTok tanpa watermark untuk mendapatkan konten video yang jernih.",
     "fitur": ["No Watermark", "Full HD", "One-Click Download"],
-    "gambar": "https://via.placeholder.com/600x450",
+    "warna": "#F43F5E", // Rose/Merah Muda
     "linkPreview": "https://nuuttdv.vercel.app",
     "linkGithub": "#"
   },
@@ -44,7 +44,7 @@ const databaseProyek = [
     "layanan": "Development Tool",
     "deskripsi": "Aplikasi pembantu untuk melakukan deployment file HTML secara otomatis ke layanan hosting statis.",
     "fitur": ["Easy Deploy", "Vercel API Integration", "Live Tracking"],
-    "gambar": "https://via.placeholder.com/600x450",
+    "warna": "#0EA5E9", // Biru Terang
     "linkPreview": "https://nuudeploy.vercel.app",
     "linkGithub": "#"
   },
@@ -56,7 +56,7 @@ const databaseProyek = [
     "layanan": "Web Utility",
     "deskripsi": "Generator kode QR yang fleksibel untuk berbagai kebutuhan seperti URL, teks, hingga konfigurasi Wi-Fi.",
     "fitur": ["Dynamic QR", "Custom Color", "Download SVG/PNG"],
-    "gambar": "https://via.placeholder.com/600x450",
+    "warna": "#10B981", // Hijau Emerald
     "linkPreview": "https://nuuqrcgenerate.vercel.app/",
     "linkGithub": "#"
   },
@@ -68,7 +68,7 @@ const databaseProyek = [
     "layanan": "Interactive Web Game",
     "deskripsi": "Simulator kubus rubik 3D berbasis web yang interaktif, dibangun menggunakan teknologi grafis modern.",
     "fitur": ["3D Graphics", "Smooth Animation", "Logic Solver"],
-    "gambar": "https://via.placeholder.com/600x450",
+    "warna": "#F59E0B", // Kuning Amber
     "linkPreview": "https://nucube.vercel.app",
     "linkGithub": "#"
   },
@@ -80,7 +80,7 @@ const databaseProyek = [
     "layanan": "Scripting Tool",
     "deskripsi": "Eksperimen script otomatisasi untuk platform pesan anonim NGL.",
     "fitur": ["Auto Send", "Random Text Generator", "Fast Mode"],
-    "gambar": "https://via.placeholder.com/600x450",
+    "warna": "#171717", // Hitam
     "linkPreview": "https://nuuspamngl.vercel.app",
     "linkGithub": "#"
   }
