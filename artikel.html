@@ -8,32 +8,42 @@
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;900&display=swap');
         body { font-family: 'Inter', sans-serif; }
+        
+        /* CSS KHUSUS UNTUK MEMBESARKAN TEKS DARI DATABASE */
+        .artikel-body p { font-size: 1.5rem; line-height: 1.8; margin-bottom: 2rem; color: #4B5563; } /* text-2xl */
+        .artikel-body h3 { font-size: 2.25rem; font-weight: 900; margin-top: 3.5rem; margin-bottom: 1.5rem; color: #111827; } /* text-4xl */
+        .artikel-body ul { font-size: 1.5rem; line-height: 1.8; list-style-type: disc; padding-left: 2.5rem; margin-bottom: 2rem; color: #4B5563; }
+        .artikel-body li { margin-bottom: 1rem; }
+        .artikel-body code { background-color: #F3F4F6; padding: 0.25rem 0.5rem; border-radius: 0.5rem; font-size: 1.25rem; color: #EF4444; }
+        .artikel-body strong { color: #111827; font-weight: 800; }
     </style>
 </head>
 <body class="bg-white text-gray-900 antialiased min-w-[1280px] overflow-x-auto pt-24">
 
     <nav class="fixed top-0 w-full bg-white/80 backdrop-blur-md z-50 border-b border-gray-100">
         <div class="flex justify-between items-center py-5 px-16 max-w-7xl mx-auto">
-            <div class="text-2xl font-black tracking-tighter text-gray-950">Dn</div>
+            <div class="text-2xl font-black tracking-tighter text-gray-950">Developer Modal Ai</div>
             <div class="flex items-center space-x-10 text-sm font-semibold text-gray-500">
                 <a href="index.html" class="hover:text-gray-950 transition">Beranda</a>
+                <a href="tentang.html" class="hover:text-gray-950 transition">Tentang</a>
+                <a href="proyek.html" class="hover:text-gray-950 transition">Proyek</a>
                 <a href="blog.html" class="hover:text-gray-950 transition font-bold">Blog</a>
             </div>
-            <a href="kontak.html" class="bg-gray-950 text-white px-7 py-3 rounded-full text-xs font-bold transition">Hubungi Saya</a>
+            <a href="kontak.html" class="bg-gray-950 text-white px-7 py-3 rounded-full text-xs font-bold transition shadow-sm">Hubungi Saya</a>
         </div>
     </nav>
 
-    <main id="root-artikel" class="max-w-4xl mx-auto px-16 py-16">
+    <main id="root-artikel" class="max-w-5xl mx-auto px-16 py-24">
         <div class="animate-pulse flex flex-col items-center">
-             <div class="h-4 w-20 bg-gray-100 mb-4"></div>
-             <div class="h-12 w-3/4 bg-gray-100 mb-10"></div>
-             <div class="h-80 w-full bg-gray-100 rounded-[40px]"></div>
+             <div class="h-6 w-32 bg-gray-100 mb-6"></div>
+             <div class="h-16 w-3/4 bg-gray-100 mb-12"></div>
+             <div class="h-[500px] w-full bg-gray-100 rounded-[50px]"></div>
         </div>
     </main>
 
     <div class="text-center pb-32">
-        <a href="blog.html" class="inline-flex items-center space-x-3 bg-gray-950 text-white px-10 py-4 rounded-full font-bold hover:bg-gray-800 transition">
-            <i class="fas fa-arrow-left"></i>
+        <a href="blog.html" class="inline-flex items-center space-x-4 bg-gray-950 text-white px-12 py-6 rounded-full font-bold hover:bg-gray-800 transition text-xl shadow-lg">
+            <i class="fas fa-arrow-left text-xl"></i>
             <span>Kembali ke Blog</span>
         </a>
     </div>
@@ -48,10 +58,10 @@
 
         if (post) {
             root.innerHTML = `
-                <div class="text-center mb-16">
-                    <span class="text-[10px] font-black text-gray-400 uppercase tracking-[0.3em]">${post.kategori}</span>
-                    <h1 class="text-5xl md:text-6xl font-black text-gray-900 mt-6 mb-8 leading-tight">${post.judulArtikel}</h1>
-                    <div class="flex justify-center items-center space-x-4 text-[10px] font-bold text-gray-400 uppercase tracking-widest">
+                <div class="text-center mb-20">
+                    <span class="text-xl font-black text-gray-400 uppercase tracking-[0.3em]">${post.kategori}</span>
+                    <h1 class="text-6xl md:text-7xl font-black text-gray-900 mt-8 mb-12 leading-tight">${post.judulArtikel}</h1>
+                    <div class="flex justify-center items-center space-x-6 text-xl font-bold text-gray-400 uppercase tracking-widest">
                         <span>Oleh Danendra N Rs</span>
                         <span class="text-gray-200">|</span>
                         <span>${post.tanggal}</span>
@@ -60,31 +70,32 @@
                     </div>
                 </div>
 
-                <div style="background-color: ${post.warna}" class="w-full h-96 rounded-[50px] flex items-center justify-center p-16 shadow-2xl mb-20 text-center">
-                    <h2 class="text-4xl md:text-5xl font-black text-white leading-tight shadow-sm">${post.judulBanner}</h2>
+                <div style="background-color: ${post.warna}" class="w-full h-[500px] rounded-[50px] flex items-center justify-center p-16 shadow-2xl mb-24 text-center">
+                    <h2 class="text-6xl md:text-7xl font-black text-white leading-tight drop-shadow-lg">${post.judulBanner}</h2>
                 </div>
 
-                <article class="prose prose-lg max-w-none text-gray-600 leading-relaxed">
-                    <p class="text-xl mb-8 font-medium text-gray-800">${post.deskripsi}</p>
-                    <div class="space-y-6">
+                <article class="max-w-4xl mx-auto">
+                    <p class="text-3xl mb-16 font-semibold text-gray-800 leading-relaxed border-l-8 border-gray-900 pl-8">${post.deskripsi}</p>
+                    
+                    <div class="artikel-body">
                         ${post.isi}
                     </div>
                 </article>
 
-                <div class="mt-24 pt-10 border-t border-gray-100 flex justify-between items-center">
-                    <span class="text-sm font-bold text-gray-900 uppercase tracking-widest">Bagikan Artikel</span>
-                    <div class="flex space-x-6 text-gray-400">
-                        <a href="#" class="hover:text-gray-950 transition text-xl"><i class="fab fa-twitter"></i></a>
-                        <a href="#" class="hover:text-gray-950 transition text-xl"><i class="fab fa-facebook-f"></i></a>
-                        <a href="#" class="hover:text-gray-950 transition text-xl"><i class="fab fa-linkedin-in"></i></a>
-                        <a href="#" class="hover:text-gray-950 transition text-xl"><i class="fas fa-link"></i></a>
+                <div class="mt-32 pt-12 border-t border-gray-100 flex flex-col md:flex-row justify-between items-center gap-8 max-w-4xl mx-auto">
+                    <span class="text-2xl font-bold text-gray-900 uppercase tracking-widest">Bagikan Artikel</span>
+                    <div class="flex space-x-8 text-gray-400">
+                        <a href="#" class="hover:text-gray-950 transition text-4xl"><i class="fab fa-twitter"></i></a>
+                        <a href="#" class="hover:text-gray-950 transition text-4xl"><i class="fab fa-facebook-f"></i></a>
+                        <a href="#" class="hover:text-gray-950 transition text-4xl"><i class="fab fa-linkedin-in"></i></a>
+                        <a href="#" class="hover:text-gray-950 transition text-4xl"><i class="fas fa-link"></i></a>
                     </div>
                 </div>
             `;
             // Mengubah judul halaman browser sesuai judul artikel
             document.title = `${post.judulArtikel} | InuuTyzDev`;
         } else {
-            root.innerHTML = `<h1 class="text-center text-3xl font-bold py-20">Artikel tidak ditemukan.</h1>`;
+            root.innerHTML = `<h1 class="text-center text-5xl font-bold py-32 text-gray-900">Artikel tidak ditemukan.</h1>`;
         }
     </script>
 </body>
