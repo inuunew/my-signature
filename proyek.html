@@ -12,16 +12,29 @@
 </head>
 <body class="bg-white text-gray-900 antialiased min-w-[1280px] overflow-x-auto pt-24">
 
+<div id="loading-layar" class="fixed inset-0 z-[9999] bg-white flex flex-col items-center justify-center opacity-0 pointer-events-none transition-opacity duration-500">
+    
+    <i class="fas fa-robot text-gray-950 text-[180px] mb-16 animate-bounce"></i>
+    
+    <div class="flex space-x-6">
+        <div class="w-6 h-6 bg-gray-950 rounded-full animate-ping"></div>
+        <div class="w-6 h-6 bg-gray-950 rounded-full animate-ping" style="animation-delay: 0.2s;"></div>
+        <div class="w-6 h-6 bg-gray-950 rounded-full animate-ping" style="animation-delay: 0.4s;"></div>
+    </div>
+
+    <span class="text-gray-950 mt-10 text-sm font-black uppercase tracking-[0.5em]">友 | —͟͞͞𝑰𝒏𝒖𝒖𝑻𝒚𝒛𝑫𝒆𝒗</span>
+    </div>
+
     <nav class="fixed top-0 w-full bg-white/80 backdrop-blur-md z-50 border-b border-gray-100">
         <div class="flex justify-between items-center py-5 px-16 max-w-7xl mx-auto">
             <div class="text-2xl font-black tracking-tighter text-gray-950">Developer Modal Ai</div>
             <div class="flex items-center space-x-10 text-sm font-semibold text-gray-500">
-                <a href="index.html" class="hover:text-gray-950 transition">Beranda</a>
-                <a href="tentang.html" class="hover:text-gray-950 transition">Tentang</a>
-                <a href="proyek.html" class="text-gray-950 transition font-bold">Proyek</a>
-                <a href="blog.html" class="hover:text-gray-950 transition">Blog</a>
+                <a href="index.html" class="transisi-ai hover:text-gray-950 transition">Beranda</a>
+                <a href="tentang.html" class="transisi-ai hover:text-gray-950 transition">Tentang</a>
+                <a href="#" class="text-gray-950 transition font-bold cursor-default">Proyek</a>
+                <a href="blog.html" class="transisi-ai hover:text-gray-950 transition">Blog</a>
             </div>
-            <a href="kontak.html" class="bg-gray-950 text-white px-7 py-3 rounded-full text-xs font-bold hover:bg-gray-800 transition shadow-sm">
+            <a href="kontak.html" class="transisi-ai bg-gray-950 text-white px-7 py-3 rounded-full text-xs font-bold hover:bg-gray-800 transition shadow-sm">
                 Hubungi Saya
             </a>
         </div>
@@ -55,6 +68,32 @@
     <script src="database-proyek.js"></script>
 
     <script>
+        // 1. FUNGSI LOADING SCREEN (Event Delegation)
+        document.addEventListener('click', function(event) {
+            // Cek apakah yang diklik adalah link dengan class 'transisi-ai' atau anaknya
+            const link = event.target.closest('a.transisi-ai');
+            
+            if (link) {
+                // Abaikan jika user menekan ctrl/cmd + click (buka di tab baru)
+                if (event.ctrlKey || event.metaKey) return;
+
+                event.preventDefault(); // Tahan browser
+                
+                const tujuanUrl = link.getAttribute('href');
+                const layarLoading = document.getElementById('loading-layar');
+
+                // Munculkan overlay
+                layarLoading.classList.remove('opacity-0', 'pointer-events-none');
+                layarLoading.classList.add('opacity-100');
+
+                // Pindah halaman setelah 0.6 detik
+                setTimeout(() => {
+                    window.location.href = tujuanUrl;
+                }, 600);
+            }
+        });
+
+        // 2. LOGIKA RENDER PROYEK
         const container = document.getElementById('container-proyek');
         const searchInput = document.getElementById('searchProyek');
         const noResults = document.getElementById('no-results');
@@ -66,7 +105,6 @@
             } else {
                 noResults.classList.add('hidden');
                 data.forEach(proyek => {
-                    // SEMUA TEKS DI DALAM CARD INI DIPERBESAR
                     container.innerHTML += `
                         <div class="bg-white rounded-[40px] overflow-hidden shadow-sm hover:shadow-2xl transition-all duration-500 border border-gray-100 flex flex-col group">
                             
@@ -84,7 +122,7 @@
                                 
                                 <p class="text-gray-500 text-lg mb-12 leading-relaxed flex-grow line-clamp-3">${proyek.deskripsi}</p>
                                 
-                                <a href="detail-proyek.html?id=${proyek.id}" class="mt-auto w-full py-5 border-2 border-gray-100 rounded-2xl text-xs font-bold uppercase tracking-widest text-gray-500 hover:bg-gray-950 hover:text-white hover:border-gray-950 active:bg-gray-950 active:text-white transition-all flex items-center justify-center space-x-3">
+                                <a href="detail-proyek.html?id=${proyek.id}" class="transisi-ai mt-auto w-full py-5 border-2 border-gray-100 rounded-2xl text-xs font-bold uppercase tracking-widest text-gray-500 hover:bg-gray-950 hover:text-white hover:border-gray-950 active:bg-gray-950 active:text-white transition-all flex items-center justify-center space-x-3">
                                     <span>Lihat Detail</span>
                                     <i class="fas fa-arrow-right"></i>
                                 </a>
