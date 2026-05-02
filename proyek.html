@@ -29,13 +29,13 @@
 
     <div class="max-w-7xl mx-auto px-16 pt-16 pb-12 text-center">
         <h1 class="text-5xl font-black text-gray-900 mb-4">Semua Proyek</h1>
-        <p class="text-gray-500">Berikut adalah kumpulan proyek yang pernah saya handle.</p>
+        <p class="text-gray-500">Kumpulan Proyek Terbaru</p>
     </div>
 
     <div class="max-w-7xl mx-auto px-16 mb-12 flex justify-between items-center">
         <div class="relative w-96">
-            <i class="fas fa-search absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
-            <input type="text" id="searchProyek" placeholder="Cari proyek atau layanan..." class="w-full pl-12 pr-4 py-3 bg-gray-50 rounded-full border border-gray-200 focus:outline-none focus:border-gray-950 text-sm transition-all">
+            <i class="fas fa-search absolute left-5 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
+            <input type="text" id="searchProyek" placeholder="Cari proyek..." class="w-full pl-12 pr-4 py-3 bg-gray-50 rounded-full border border-gray-200 focus:outline-none focus:border-gray-950 text-sm transition-all">
         </div>
         <div class="flex space-x-2" id="filterContainer">
             <button onclick="filterProyek('Semua')" class="filter-btn bg-gray-950 text-white px-6 py-2.5 rounded-full text-sm font-semibold transition">Semua</button>
@@ -45,96 +45,82 @@
     </div>
 
     <div class="max-w-7xl mx-auto px-16 pb-32">
-        <div id="grid-proyek" class="grid grid-cols-3 gap-10">
+        <div id="container-proyek" class="grid grid-cols-3 gap-8">
             </div>
+        <div id="no-results" class="hidden text-center py-20 text-gray-400 font-medium">
+            Proyek tidak ditemukan...
+        </div>
     </div>
 
     <script src="database-proyek.js"></script>
-    
+
     <script>
-        const gridContainer = document.getElementById('grid-proyek');
+        const container = document.getElementById('container-proyek');
         const searchInput = document.getElementById('searchProyek');
+        const noResults = document.getElementById('no-results');
 
-        // FUNGSI RENDER
         function renderProyek(data) {
-            gridContainer.innerHTML = ""; 
-            
+            container.innerHTML = "";
             if (data.length === 0) {
-                gridContainer.innerHTML = `<div class="col-span-3 text-center py-20 text-gray-400 font-medium">Data proyek tidak ditemukan...</div>`;
-                return;
-            }
-
-            data.forEach(proyek => {
-                const card = `
-                    <div class="bg-white rounded-[35px] overflow-hidden shadow-sm hover:shadow-2xl transition-all duration-500 border border-gray-100 group flex flex-col">
-                        
-                        <div style="background-color: ${proyek.warna}" class="h-52 flex items-center justify-center p-10 text-center text-white font-black text-2xl relative">
-                            <span class="absolute top-5 right-8 text-[10px] tracking-[0.2em] uppercase opacity-60 font-bold">${proyek.layanan}</span>
-                            <h3 class="leading-tight drop-shadow-sm">${proyek.nama}</h3>
-                        </div>
-
-                        <div class="p-10 flex flex-col flex-grow">
+                noResults.classList.remove('hidden');
+            } else {
+                noResults.classList.add('hidden');
+                data.forEach(proyek => {
+                    container.innerHTML += `
+                        <div class="bg-white rounded-[35px] overflow-hidden shadow-sm hover:shadow-2xl transition-all duration-500 border border-gray-100 flex flex-col group">
                             
-                            <div class="flex items-center space-x-4 mb-5 text-[10px] font-bold text-gray-400 uppercase tracking-widest">
-                                <span>${proyek.tanggal}</span><span>•</span><span class="truncate">${proyek.klien}</span>
+                            <div style="background-color: ${proyek.warna}" class="h-52 flex items-center justify-center p-10 text-center text-white font-black text-2xl relative">
+                                <span class="absolute top-5 right-8 text-[10px] tracking-[0.2em] uppercase opacity-60 font-bold">${proyek.layanan}</span>
+                                <h3 class="leading-tight drop-shadow-sm">${proyek.nama}</h3>
                             </div>
                             
-                            <h4 class="text-xl font-bold mb-4 text-gray-900 group-hover:text-gray-700 transition">${proyek.nama}</h4>
-                            <p class="text-gray-400 text-sm mb-10 leading-relaxed flex-grow">${proyek.deskripsi}</p>
-                            
-                            <a href="detail-proyek.html?id=${proyek.id}" class="w-full mt-auto py-4 bg-gray-950 text-white rounded-2xl text-[10px] font-bold uppercase tracking-widest hover:bg-gray-800 transition-all flex items-center justify-center space-x-3 shadow-md">
-                                <span>Lihat Detail</span>
-                                <i class="fas fa-arrow-right"></i>
-                            </a>
-
+                            <div class="p-10 flex flex-col flex-grow">
+                                <div class="flex items-center space-x-4 mb-5 text-[10px] font-bold text-gray-400 uppercase tracking-widest">
+                                    <span>${proyek.tanggal}</span><span>•</span><span class="truncate">${proyek.klien}</span>
+                                </div>
+                                <h4 class="text-xl font-bold mb-4 text-gray-900 group-hover:text-gray-700 transition">${proyek.nama}</h4>
+                                <p class="text-gray-400 text-sm mb-10 leading-relaxed flex-grow">${proyek.deskripsi}</p>
+                                
+                                <a href="detail-proyek.html?id=${proyek.id}" class="mt-auto w-full py-4 border-2 border-gray-100 rounded-2xl text-[10px] font-bold uppercase tracking-widest text-gray-500 hover:bg-gray-950 hover:text-white hover:border-gray-950 active:bg-gray-950 active:text-white transition-all flex items-center justify-center space-x-3">
+                                    <span>Lihat Detail</span>
+                                    <i class="fas fa-arrow-right"></i>
+                                </a>
+                            </div>
                         </div>
-                    </div>
-                `;
-                gridContainer.innerHTML += card;
-            });
+                    `;
+                });
+            }
         }
 
-        // FUNGSI PENCARIAN (SEARCH)
+        // Fungsi Cari
         searchInput.addEventListener('input', (e) => {
             const val = e.target.value.toLowerCase();
-            const filteredData = databaseProyek.filter(p => 
+            const filtered = databaseProyek.filter(p => 
                 p.nama.toLowerCase().includes(val) || 
                 p.layanan.toLowerCase().includes(val)
             );
-            renderProyek(filteredData);
+            renderProyek(filtered);
         });
 
-        // FUNGSI FILTER TOMBOL KATEGORI
-        function filterProyek(kategori) {
+        // Fungsi Filter
+        function filterProyek(cat) {
             const buttons = document.querySelectorAll('.filter-btn');
             buttons.forEach(btn => {
                 btn.classList.remove('bg-gray-950', 'text-white');
-                btn.classList.add('text-gray-500', 'hover:text-gray-950');
+                btn.classList.add('text-gray-500');
             });
-            event.target.classList.remove('text-gray-500', 'hover:text-gray-950');
+            event.target.classList.remove('text-gray-500');
             event.target.classList.add('bg-gray-950', 'text-white');
 
-            if (kategori === 'Semua') {
+            if (cat === 'Semua') {
                 renderProyek(databaseProyek);
-            } 
-            else if (kategori === 'Website') {
-                const filtered = databaseProyek.filter(p => 
-                    p.layanan.toLowerCase().includes('web') || 
-                    p.layanan.toLowerCase().includes('tool') || 
-                    p.layanan.toLowerCase().includes('utility')
-                );
-                renderProyek(filtered);
-            } 
-            else if (kategori === 'Mobile App') {
-                const filtered = databaseProyek.filter(p => 
-                    p.layanan.toLowerCase().includes('mobile') || 
-                    p.layanan.toLowerCase().includes('app')
-                );
+            } else {
+                const filtered = databaseProyek.filter(p => p.layanan.includes(cat));
                 renderProyek(filtered);
             }
         }
 
-        // Render saat halaman dibuka
+        // Render pertama kali
         renderProyek(databaseProyek);
     </script>
 </body>
