@@ -35,12 +35,12 @@
     <div class="max-w-7xl mx-auto px-16 mb-12 flex justify-between items-center">
         <div class="relative w-96">
             <i class="fas fa-search absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
-            <input type="text" id="searchProyek" placeholder="Cari proyek..." class="w-full pl-12 pr-4 py-3 rounded-full border border-gray-200 focus:outline-none focus:border-gray-950 text-sm">
+            <input type="text" id="searchProyek" placeholder="Cari proyek atau layanan..." class="w-full pl-12 pr-4 py-3 bg-gray-50 rounded-full border border-gray-200 focus:outline-none focus:border-gray-950 text-sm transition-all">
         </div>
-        <div class="flex space-x-2">
-            <button class="bg-gray-950 text-white px-6 py-2 rounded-full text-sm font-semibold">Semua</button>
-            <button class="text-gray-500 hover:text-gray-950 px-6 py-2 rounded-full text-sm font-semibold transition">Website</button>
-            <button class="text-gray-500 hover:text-gray-950 px-6 py-2 rounded-full text-sm font-semibold transition">Mobile App</button>
+        <div class="flex space-x-2" id="filterContainer">
+            <button onclick="filterProyek('Semua')" class="filter-btn bg-gray-950 text-white px-6 py-2.5 rounded-full text-sm font-semibold transition">Semua</button>
+            <button onclick="filterProyek('Website')" class="filter-btn text-gray-500 hover:text-gray-950 px-6 py-2.5 rounded-full text-sm font-semibold transition">Website</button>
+            <button onclick="filterProyek('Mobile App')" class="filter-btn text-gray-500 hover:text-gray-950 px-6 py-2.5 rounded-full text-sm font-semibold transition">Mobile App</button>
         </div>
     </div>
 
@@ -53,22 +53,40 @@
     
     <script>
         const gridContainer = document.getElementById('grid-proyek');
+        const searchInput = document.getElementById('searchProyek');
+        
+        // Palet warna otomatis untuk banner teks proyek
+        const bannerColors = ['#2D3E50', '#7B61FF', '#007BFF', '#0EA5E9', '#10B981', '#F43F5E', '#171717'];
 
-        function renderProyek() {
-            // Memastikan data terambil dari database-proyek.js
-            databaseProyek.forEach(proyek => {
+        // FUNGSI RENDER (MENAMPILKAN DATA)
+        function renderProyek(data) {
+            gridContainer.innerHTML = ""; // Bersihkan kontainer
+            
+            if (data.length === 0) {
+                gridContainer.innerHTML = `<div class="col-span-3 text-center py-20 text-gray-400 font-medium">Data proyek tidak ditemukan...</div>`;
+                return;
+            }
+
+            data.forEach((proyek, index) => {
+                // Mengambil warna secara bergantian dari palet warna
+                const bgColor = bannerColors[index % bannerColors.length];
+                
                 const card = `
                     <div class="bg-white p-6 rounded-[40px] border border-gray-100 shadow-sm hover:shadow-2xl transition-all duration-500 group">
-                        <div class="bg-gray-100 rounded-[24px] overflow-hidden aspect-[4/3] mb-8 relative border border-gray-50">
-                            <div class="absolute top-0 left-0 w-full bg-white h-8 flex items-center px-4 space-x-1.5 border-b border-gray-100 z-10">
-                                <div class="w-2 h-2 rounded-full bg-red-400"></div>
-                                <div class="w-2 h-2 rounded-full bg-yellow-400"></div>
-                                <div class="w-2 h-2 rounded-full bg-green-400"></div>
+                        
+                        <div class="rounded-[24px] overflow-hidden aspect-[4/3] mb-8 relative border border-gray-50 flex items-center justify-center p-6 text-center group-hover:scale-[1.02] transition duration-500 shadow-inner" style="background-color: ${bgColor};">
+                            
+                            <div class="absolute top-0 left-0 w-full bg-white/90 backdrop-blur-sm h-10 flex items-center px-5 space-x-2 border-b border-gray-200 z-10">
+                                <div class="w-2.5 h-2.5 rounded-full bg-red-400"></div>
+                                <div class="w-2.5 h-2.5 rounded-full bg-yellow-400"></div>
+                                <div class="w-2.5 h-2.5 rounded-full bg-green-400"></div>
                             </div>
-                            <img src="${proyek.gambar}" alt="${proyek.nama}" class="w-full h-full object-cover grayscale group-hover:grayscale-0 group-hover:scale-105 transition duration-700">
+                            
+                            <h3 class="text-3xl font-black text-white leading-tight drop-shadow-lg mt-6">${proyek.nama}</h3>
                         </div>
+
                         <div class="px-2">
-                            <h3 class="text-2xl font-bold text-gray-900">${proyek.nama}</h3>
+                            <h3 class="text-2xl font-bold text-gray-900 group-hover:text-gray-700 transition">${proyek.nama}</h3>
                             <p class="text-gray-400 text-sm mt-3 mb-8 leading-relaxed">${proyek.layanan}</p>
                             <a href="detail-proyek.html?id=${proyek.id}" class="inline-flex items-center space-x-3 text-[10px] font-black uppercase tracking-widest text-gray-950 group-hover:translate-x-2 transition-transform">
                                 <span>Lihat Detail</span>
@@ -81,8 +99,52 @@
             });
         }
 
-        // Jalankan fungsi saat halaman dimuat
-        renderProyek();
+        // FUNGSI PENCARIAN (SEARCH)
+        searchInput.addEventListener('input', (e) => {
+            const val = e.target.value.toLowerCase();
+            const filteredData = databaseProyek.filter(p => 
+                p.nama.toLowerCase().includes(val) || 
+                p.layanan.toLowerCase().includes(val)
+            );
+            renderProyek(filteredData);
+        });
+
+        // FUNGSI FILTER TOMBOL KATEGORI
+        function filterProyek(kategori) {
+            // 1. Ubah gaya tombol (aktif/tidak aktif)
+            const buttons = document.querySelectorAll('.filter-btn');
+            buttons.forEach(btn => {
+                btn.classList.remove('bg-gray-950', 'text-white');
+                btn.classList.add('text-gray-500', 'hover:text-gray-950');
+            });
+            event.target.classList.remove('text-gray-500', 'hover:text-gray-950');
+            event.target.classList.add('bg-gray-950', 'text-white');
+
+            // 2. Filter data berdasarkan pilihan
+            if (kategori === 'Semua') {
+                renderProyek(databaseProyek);
+            } 
+            else if (kategori === 'Website') {
+                // Menyaring layanan yang mengandung kata kunci web/tool/utility
+                const filtered = databaseProyek.filter(p => 
+                    p.layanan.toLowerCase().includes('web') || 
+                    p.layanan.toLowerCase().includes('tool') || 
+                    p.layanan.toLowerCase().includes('utility')
+                );
+                renderProyek(filtered);
+            } 
+            else if (kategori === 'Mobile App') {
+                // Menyaring layanan yang mengandung kata kunci mobile/app
+                const filtered = databaseProyek.filter(p => 
+                    p.layanan.toLowerCase().includes('mobile') || 
+                    p.layanan.toLowerCase().includes('app')
+                );
+                renderProyek(filtered);
+            }
+        }
+
+        // Render semua proyek saat pertama kali halaman dibuka
+        renderProyek(databaseProyek);
     </script>
 </body>
 </html>
