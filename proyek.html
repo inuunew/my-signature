@@ -13,13 +13,12 @@
 <body class="bg-white text-gray-900 antialiased min-w-[1280px] overflow-x-auto pt-24">
 
     <nav class="fixed top-0 w-full bg-white/80 backdrop-blur-md z-50 border-b border-gray-100">
-        <div class="flex justify-between items-center py-5 px-8 md:px-16 max-w-7xl mx-auto">
+        <div class="flex justify-between items-center py-5 px-16 max-w-7xl mx-auto">
             <div class="text-2xl font-black tracking-tighter text-gray-950">Developer Modal Ai</div>
-            <div class="hidden md:flex items-center space-x-10 text-sm font-semibold text-gray-500">
+            <div class="flex items-center space-x-10 text-sm font-semibold text-gray-500">
                 <a href="index.html" class="hover:text-gray-950 transition">Beranda</a>
-                <a href="index.html#tentang" class="hover:text-gray-950 transition">Tentang</a>
-                <a href="index.html#keahlian" class="hover:text-gray-950 transition">Keahlian</a>
-                <a href="proyek.html" class="text-gray-950 transition">Proyek</a>
+                <a href="tentang.html" class="hover:text-gray-950 transition">Tentang</a>
+                <a href="proyek.html" class="text-gray-950 transition font-bold">Proyek</a>
                 <a href="blog.html" class="hover:text-gray-950 transition">Blog</a>
             </div>
             <a href="kontak.html" class="bg-gray-950 text-white px-7 py-3 rounded-full text-xs font-bold hover:bg-gray-800 transition shadow-sm">
@@ -28,15 +27,15 @@
         </div>
     </nav>
 
-    <div class="max-w-7xl mx-auto px-8 md:px-16 pt-16 pb-12 text-center">
-        <h1 class="text-4xl md:text-5xl font-black text-gray-900 mb-4">Semua Proyek</h1>
+    <div class="max-w-7xl mx-auto px-16 pt-16 pb-12 text-center">
+        <h1 class="text-5xl font-black text-gray-900 mb-4">Semua Proyek</h1>
         <p class="text-gray-500">Berikut adalah kumpulan proyek yang pernah saya handle.</p>
     </div>
 
-    <div class="max-w-7xl mx-auto px-8 md:px-16 mb-12 flex flex-col md:flex-row justify-between items-center gap-6">
-        <div class="relative w-full md:w-96">
+    <div class="max-w-7xl mx-auto px-16 mb-12 flex justify-between items-center">
+        <div class="relative w-96">
             <i class="fas fa-search absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
-            <input type="text" placeholder="Cari proyek..." class="w-full pl-12 pr-4 py-3 rounded-full border border-gray-200 focus:outline-none focus:border-gray-950 text-sm">
+            <input type="text" id="searchProyek" placeholder="Cari proyek..." class="w-full pl-12 pr-4 py-3 rounded-full border border-gray-200 focus:outline-none focus:border-gray-950 text-sm">
         </div>
         <div class="flex space-x-2">
             <button class="bg-gray-950 text-white px-6 py-2 rounded-full text-sm font-semibold">Semua</button>
@@ -45,57 +44,45 @@
         </div>
     </div>
 
-    <div class="max-w-7xl mx-auto px-8 md:px-16 pb-32">
-        <div class="grid md:grid-cols-3 gap-8">
-            <div class="bg-white p-5 rounded-[30px] border border-gray-100 shadow-sm hover:shadow-xl transition-all group">
-                <div class="bg-gray-100 rounded-2xl overflow-hidden aspect-[4/3] mb-6">
-                    <img src="https://via.placeholder.com/600x450" alt="Proyek" class="w-full h-full object-cover group-hover:scale-105 transition duration-500">
-                </div>
-                <h3 class="text-xl font-bold text-gray-900 px-2">Company Profile #1</h3>
-                <p class="text-gray-500 text-sm mt-2 mb-6 px-2">Website company profile untuk perusahaan.</p>
-                <a href="detail-proyek.html" class="text-xs font-bold text-gray-900 px-2 hover:underline">Lihat Detail</a>
+    <div class="max-w-7xl mx-auto px-16 pb-32">
+        <div id="grid-proyek" class="grid grid-cols-3 gap-10">
             </div>
-            <div class="bg-white p-5 rounded-[30px] border border-gray-100 shadow-sm hover:shadow-xl transition-all group">
-                <div class="bg-gray-100 rounded-2xl overflow-hidden aspect-[4/3] mb-6">
-                    <img src="https://via.placeholder.com/600x450" alt="Proyek" class="w-full h-full object-cover group-hover:scale-105 transition duration-500">
-                </div>
-                <h3 class="text-xl font-bold text-gray-900 px-2">Company Profile #19</h3>
-                <p class="text-gray-500 text-sm mt-2 mb-6 px-2">Website company profile untuk perusahaan.</p>
-                <a href="detail-proyek.html" class="text-xs font-bold text-gray-900 px-2 hover:underline">Lihat Detail</a>
-            </div>
-            <div class="bg-white p-5 rounded-[30px] border border-gray-100 shadow-sm hover:shadow-xl transition-all group">
-                <div class="bg-gray-100 rounded-2xl overflow-hidden aspect-[4/3] mb-6">
-                    <img src="https://via.placeholder.com/600x450" alt="Proyek" class="w-full h-full object-cover group-hover:scale-105 transition duration-500">
-                </div>
-                <h3 class="text-xl font-bold text-gray-900 px-2">Company Profile #16</h3>
-                <p class="text-gray-500 text-sm mt-2 mb-6 px-2">Website company profile untuk perusahaan.</p>
-                <a href="detail-proyek.html" class="text-xs font-bold text-gray-900 px-2 hover:underline">Lihat Detail</a>
-            </div>
-            <div class="bg-white p-5 rounded-[30px] border border-gray-100 shadow-sm hover:shadow-xl transition-all group">
-                <div class="bg-gray-100 rounded-2xl overflow-hidden aspect-[4/3] mb-6">
-                    <img src="https://via.placeholder.com/600x450" alt="Proyek" class="w-full h-full object-cover group-hover:scale-105 transition duration-500">
-                </div>
-                <h3 class="text-xl font-bold text-gray-900 px-2">Company Profile #4</h3>
-                <p class="text-gray-500 text-sm mt-2 mb-6 px-2">Website company profile untuk perusahaan.</p>
-                <a href="detail-proyek.html" class="text-xs font-bold text-gray-900 px-2 hover:underline">Lihat Detail</a>
-            </div>
-            <div class="bg-white p-5 rounded-[30px] border border-gray-100 shadow-sm hover:shadow-xl transition-all group">
-                <div class="bg-gray-100 rounded-2xl overflow-hidden aspect-[4/3] mb-6">
-                    <img src="https://via.placeholder.com/600x450" alt="Proyek" class="w-full h-full object-cover group-hover:scale-105 transition duration-500">
-                </div>
-                <h3 class="text-xl font-bold text-gray-900 px-2">Company Profile #13</h3>
-                <p class="text-gray-500 text-sm mt-2 mb-6 px-2">Website company profile untuk perusahaan.</p>
-                <a href="detail-proyek.html" class="text-xs font-bold text-gray-900 px-2 hover:underline">Lihat Detail</a>
-            </div>
-            <div class="bg-white p-5 rounded-[30px] border border-gray-100 shadow-sm hover:shadow-xl transition-all group">
-                <div class="bg-gray-100 rounded-2xl overflow-hidden aspect-[4/3] mb-6">
-                    <img src="https://via.placeholder.com/600x450" alt="Proyek" class="w-full h-full object-cover group-hover:scale-105 transition duration-500">
-                </div>
-                <h3 class="text-xl font-bold text-gray-900 px-2">Company Profile #10</h3>
-                <p class="text-gray-500 text-sm mt-2 mb-6 px-2">Website company profile untuk perusahaan.</p>
-                <a href="detail-proyek.html" class="text-xs font-bold text-gray-900 px-2 hover:underline">Lihat Detail</a>
-            </div>
-        </div>
     </div>
+
+    <script src="database-proyek.js"></script>
+    
+    <script>
+        const gridContainer = document.getElementById('grid-proyek');
+
+        function renderProyek() {
+            // Memastikan data terambil dari database-proyek.js
+            databaseProyek.forEach(proyek => {
+                const card = `
+                    <div class="bg-white p-6 rounded-[40px] border border-gray-100 shadow-sm hover:shadow-2xl transition-all duration-500 group">
+                        <div class="bg-gray-100 rounded-[24px] overflow-hidden aspect-[4/3] mb-8 relative border border-gray-50">
+                            <div class="absolute top-0 left-0 w-full bg-white h-8 flex items-center px-4 space-x-1.5 border-b border-gray-100 z-10">
+                                <div class="w-2 h-2 rounded-full bg-red-400"></div>
+                                <div class="w-2 h-2 rounded-full bg-yellow-400"></div>
+                                <div class="w-2 h-2 rounded-full bg-green-400"></div>
+                            </div>
+                            <img src="${proyek.gambar}" alt="${proyek.nama}" class="w-full h-full object-cover grayscale group-hover:grayscale-0 group-hover:scale-105 transition duration-700">
+                        </div>
+                        <div class="px-2">
+                            <h3 class="text-2xl font-bold text-gray-900">${proyek.nama}</h3>
+                            <p class="text-gray-400 text-sm mt-3 mb-8 leading-relaxed">${proyek.layanan}</p>
+                            <a href="detail-proyek.html?id=${proyek.id}" class="inline-flex items-center space-x-3 text-[10px] font-black uppercase tracking-widest text-gray-950 group-hover:translate-x-2 transition-transform">
+                                <span>Lihat Detail</span>
+                                <i class="fas fa-chevron-right text-[8px]"></i>
+                            </a>
+                        </div>
+                    </div>
+                `;
+                gridContainer.innerHTML += card;
+            });
+        }
+
+        // Jalankan fungsi saat halaman dimuat
+        renderProyek();
+    </script>
 </body>
 </html>
