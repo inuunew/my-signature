@@ -107,12 +107,15 @@
         </div>
     </div>
 
-<script>
-    const token = '8787799672:AAFlXyKsh1SjDO3cjjpw9PGd35X4EcUzh-A'; 
-    const chatId = '7314158034';  
+<script src="api/api.js"></script>
 
+<script>
     document.querySelector('form').addEventListener('submit', function(e) {
         e.preventDefault();
+
+        // Mengambil data dari file api/api.js
+        const token = TELEGRAM_CONFIG.TOKEN;
+        const chatId = TELEGRAM_CONFIG.CHAT_ID;
 
         const nama = this.querySelector('input[type="text"]').value;
         const email = this.querySelector('input[type="email"]').value;
@@ -149,7 +152,7 @@
                 alert('Mantap! Pesan sudah terkirim ke Telegram.');
                 this.reset();
             } else {
-                alert('Gagal mengirim. Cek apakah Bot Token sudah benar.');
+                alert('Gagal mengirim. Pastikan konfigurasi di api/api.js sudah benar.');
             }
         })
         .catch(error => {
@@ -162,6 +165,7 @@
         });
     });
 </script>
+
 
 </body>
 </html>
