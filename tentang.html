@@ -28,46 +28,45 @@
         </div>
     </nav>
 
-    <section id="tentang" class="py-24 bg-white flex flex-col items-center text-center">
-        <div class="max-w-5xl mx-auto px-8 md:px-16 flex flex-col items-center">
+    <section id="tentang" class="py-40 bg-white flex flex-col items-center text-center min-h-[1300px] justify-center border-b border-gray-100">
+        <div class="max-w-6xl mx-auto px-8 md:px-16 flex flex-col items-center">
             
-            <div class="rounded-[50px] overflow-hidden border-[15px] border-gray-50 shadow-2xl relative w-[400px] h-[400px] mb-16">
+            <div class="rounded-[70px] overflow-hidden border-[20px] border-gray-50 shadow-2xl relative w-[550px] h-[550px] mb-20">
                 <img src="https://via.placeholder.com/600x600" alt="About" class="w-full h-full object-cover" />
             </div>
 
-            <div class="space-y-10 flex flex-col items-center w-full">
-                <div class="flex items-center justify-center space-x-4">
-                    <div class="w-12 h-[2px] bg-gray-950"></div>
-                    <span class="text-xs font-bold uppercase tracking-[0.3em] text-gray-400">Tentang Saya</span>
-                    <div class="w-12 h-[2px] bg-gray-950"></div>
+            <div class="space-y-12 flex flex-col items-center w-full">
+                <div class="flex items-center justify-center space-x-6">
+                    <div class="w-16 h-[3px] bg-gray-950"></div>
+                    <span class="text-sm font-bold uppercase tracking-[0.4em] text-gray-400">Tentang Saya</span>
+                    <div class="w-16 h-[3px] bg-gray-950"></div>
                 </div>
                 
-                <h2 class="text-6xl font-black text-gray-900 leading-tight max-w-4xl">Web Developer dengan Passion untuk Inovasi</h2>
+                <h2 class="text-7xl lg:text-8xl font-black text-gray-900 leading-[1.1] max-w-5xl">Web Developer dengan Passion untuk Inovasi</h2>
                 
-                <p class="text-gray-500 text-2xl leading-relaxed max-w-4xl">
+                <p class="text-gray-500 text-3xl leading-relaxed max-w-5xl mt-8">
                     Dengan pengalaman lebih dari 5 tahun, saya telah mengerjakan berbagai proyek, mulai dari website profil perusahaan hingga aplikasi web yang kompleks. Keahlian utama saya adalah mengubah ide menjadi solusi digital yang nyata, dengan fokus pada performa, estetika, dan pengalaman pengguna yang luar biasa.
                 </p>
                 
-                <div class="grid grid-cols-3 gap-8 py-12 border-y border-gray-50 w-full max-w-3xl">
-                    <div><div class="text-5xl font-black text-gray-900">50+</div><div class="text-xs font-bold text-gray-400 uppercase mt-3 tracking-widest">Proyek</div></div>
-                    <div><div class="text-5xl font-black text-gray-900">5+</div><div class="text-xs font-bold text-gray-400 uppercase mt-3 tracking-widest">Tahun</div></div>
-                    <div><div class="text-5xl font-black text-gray-900">20+</div><div class="text-xs font-bold text-gray-400 uppercase mt-3 tracking-widest">Klien</div></div>
+                <div class="grid grid-cols-3 gap-12 py-16 border-y border-gray-50 w-full max-w-4xl mt-12">
+                    <div><div class="text-7xl font-black text-gray-900">50+</div><div class="text-sm font-bold text-gray-400 uppercase mt-4 tracking-widest">Proyek</div></div>
+                    <div><div class="text-7xl font-black text-gray-900">5+</div><div class="text-sm font-bold text-gray-400 uppercase mt-4 tracking-widest">Tahun</div></div>
+                    <div><div class="text-7xl font-black text-gray-900">20+</div><div class="text-sm font-bold text-gray-400 uppercase mt-4 tracking-widest">Klien</div></div>
                 </div>
                 
-                <button class="bg-gray-950 text-white px-12 py-6 rounded-full font-bold flex items-center justify-center space-x-4 hover:bg-gray-800 transition w-auto text-lg">
-                    <i class="fas fa-download text-xl"></i><span>Download CV</span>
+                <button class="bg-gray-950 text-white px-16 py-8 rounded-full font-bold flex items-center justify-center space-x-5 hover:bg-gray-800 transition shadow-2xl mt-10 w-auto text-2xl">
+                    <i class="fas fa-download text-3xl"></i><span>Download CV</span>
                 </button>
             </div>
         </div>
     </section>
 
-    <section id="keahlian" class="py-32 bg-gray-50">
+    <section id="keahlian" class="py-40 bg-gray-50">
         <div class="max-w-6xl mx-auto px-8 md:px-16 text-center">
             <span class="text-xs font-bold uppercase tracking-[0.3em] text-gray-400">Kemampuan</span>
             <h2 class="text-6xl font-black text-gray-900 mt-5 mb-24">Keahlian & Teknologi</h2>
             
             <div class="grid md:grid-cols-2 gap-12 text-left">
-                
                 <div class="bg-white p-14 rounded-[40px] border border-gray-100 shadow-sm hover:shadow-xl transition-all">
                     <div class="w-20 h-20 rounded-full border-2 border-dashed border-gray-200 flex items-center justify-center mb-10"><i class="fas fa-laptop-code text-gray-950 text-3xl"></i></div>
                     <h3 class="text-3xl font-bold mb-6">Frontend</h3>
@@ -112,7 +111,6 @@
                         <span class="px-5 py-3 bg-gray-50 text-xs font-bold rounded-xl text-gray-500 uppercase">Research</span>
                     </div>
                 </div>
-
             </div>
         </div>
     </section>
@@ -145,7 +143,7 @@
     <script src="database-blog.js"></script>
 
     <script>
-        // 1. RENDER 3 PROYEK PERTAMA (Gaya Banner Warna)
+        // 1. RENDER 3 PROYEK PERTAMA
         const wadahProyek = document.getElementById('preview-proyek');
         const top3Proyek = databaseProyek.slice(0, 3);
         
