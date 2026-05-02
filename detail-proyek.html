@@ -25,16 +25,16 @@
         </div>
     </nav>
 
-    <main id="root-detail" class="max-w-5xl mx-auto px-16 py-16">
+    <main id="root-detail" class="max-w-6xl mx-auto px-16 py-16">
         <div class="animate-pulse flex flex-col items-center">
-            <div class="h-10 bg-gray-100 w-1/2 rounded mb-8"></div>
-            <div class="h-96 bg-gray-100 w-full rounded-[50px]"></div>
+            <div class="h-16 bg-gray-100 w-1/2 rounded mb-8"></div>
+            <div class="h-[500px] bg-gray-100 w-full rounded-[50px]"></div>
         </div>
     </main>
 
     <div class="text-center pb-32">
-        <a href="proyek.html" class="bg-gray-950 text-white px-10 py-4 rounded-full font-bold hover:bg-gray-800 transition">
-           <i class="fas fa-arrow-left mr-3"></i> Kembali ke Semua Proyek
+        <a href="proyek.html" class="bg-gray-950 text-white px-12 py-6 rounded-full font-bold hover:bg-gray-800 transition text-xl inline-flex items-center shadow-lg">
+           <i class="fas fa-arrow-left mr-4 text-xl"></i> Kembali ke Semua Proyek
         </a>
     </div>
 
@@ -49,56 +49,58 @@
         if (proyek) {
             root.innerHTML = `
                 <div class="text-center mb-16">
-                    <h1 class="text-5xl font-black text-gray-900">${proyek.nama}</h1>
+                    <h1 class="text-7xl font-black text-gray-900 leading-tight">${proyek.nama}</h1>
                 </div>
 
-                <div style="background-color: ${proyek.warna}" class="w-full h-96 rounded-[50px] flex items-center justify-center p-16 shadow-2xl mb-20 text-center relative border border-gray-100">
-                    <div class="absolute top-0 left-0 w-full bg-white/90 backdrop-blur-sm h-12 flex items-center px-8 space-x-2 border-b border-gray-200 z-10 rounded-t-[50px]">
-                        <div class="w-3 h-3 rounded-full bg-red-400"></div>
-                        <div class="w-3 h-3 rounded-full bg-yellow-400"></div>
-                        <div class="w-3 h-3 rounded-full bg-green-400"></div>
+                <div style="background-color: ${proyek.warna}" class="w-full h-[500px] rounded-[50px] flex items-center justify-center p-16 shadow-2xl mb-24 text-center relative border border-gray-100">
+                    <div class="absolute top-0 left-0 w-full bg-white/90 backdrop-blur-sm h-16 flex items-center px-10 space-x-3 border-b border-gray-200 z-10 rounded-t-[50px]">
+                        <div class="w-4 h-4 rounded-full bg-red-400"></div>
+                        <div class="w-4 h-4 rounded-full bg-yellow-400"></div>
+                        <div class="w-4 h-4 rounded-full bg-green-400"></div>
                     </div>
-                    <h2 class="text-5xl font-black text-white leading-tight drop-shadow-lg mt-8">${proyek.nama}</h2>
+                    <h2 class="text-6xl lg:text-7xl font-black text-white leading-tight drop-shadow-lg mt-10">${proyek.nama}</h2>
                 </div>
 
-                <div class="grid grid-cols-3 gap-20">
-                    <div class="space-y-10">
-                        <div>
-                            <h4 class="text-[10px] font-black text-gray-400 uppercase tracking-[0.2em] mb-2">Klien</h4>
-                            <p class="text-xl font-bold">${proyek.klien}</p>
-                        </div>
-                        <div>
-                            <h4 class="text-[10px] font-black text-gray-400 uppercase tracking-[0.2em] mb-2">Tanggal</h4>
-                            <p class="text-xl font-bold">${proyek.tanggal}</p>
-                        </div>
-                        <div>
-                            <h4 class="text-[10px] font-black text-gray-400 uppercase tracking-[0.2em] mb-2">Layanan</h4>
-                            <p class="text-xl font-bold">${proyek.layanan}</p>
-                        </div>
-                        <div>
-                            <h4 class="text-[10px] font-black text-gray-400 uppercase tracking-[0.2em] mb-4">Fitur Utama</h4>
-                            <div class="flex flex-wrap gap-2">
-                                ${proyek.fitur.map(f => `<span class="px-4 py-2 bg-gray-100 text-gray-700 rounded-full text-[10px] font-bold">${f}</span>`).join('')}
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-span-2">
-                        <h2 class="text-3xl font-black mb-6">Tentang Proyek</h2>
-                        <p class="text-gray-500 text-lg leading-relaxed mb-12">${proyek.deskripsi}</p>
+                <div class="max-w-5xl mx-auto flex flex-col space-y-24 text-center">
+                    
+                    <div class="flex flex-col items-center">
+                        <h2 class="text-5xl font-black mb-8 text-gray-900">Tentang Proyek</h2>
+                        <p class="text-gray-500 text-2xl leading-relaxed mb-12 max-w-4xl">${proyek.deskripsi}</p>
                         
-                        <div class="flex space-x-4">
-                            <a href="${proyek.linkPreview}" target="_blank" class="bg-gray-950 text-white px-10 py-5 rounded-full font-bold flex items-center space-x-3 hover:bg-gray-800 transition shadow-lg">
-                                <i class="fas fa-external-link-alt text-sm"></i>
-                                <span>Buka Aplikasi Web</span>
-                            </a>
+                        <a href="${proyek.linkPreview}" target="_blank" class="bg-gray-950 text-white px-14 py-6 rounded-full font-bold flex items-center space-x-4 hover:bg-gray-800 transition shadow-xl text-xl">
+                            <i class="fas fa-external-link-alt text-xl"></i>
+                            <span>Buka Aplikasi Web</span>
+                        </a>
+                    </div>
+
+                    <div class="grid grid-cols-3 gap-12 py-16 border-y border-gray-100">
+                        <div>
+                            <h4 class="text-sm font-black text-gray-400 uppercase tracking-widest mb-4">Klien</h4>
+                            <p class="text-3xl font-bold text-gray-900">${proyek.klien}</p>
+                        </div>
+                        <div>
+                            <h4 class="text-sm font-black text-gray-400 uppercase tracking-widest mb-4">Tanggal</h4>
+                            <p class="text-3xl font-bold text-gray-900">${proyek.tanggal}</p>
+                        </div>
+                        <div>
+                            <h4 class="text-sm font-black text-gray-400 uppercase tracking-widest mb-4">Layanan</h4>
+                            <p class="text-3xl font-bold text-gray-900">${proyek.layanan}</p>
                         </div>
                     </div>
+
+                    <div class="flex flex-col items-center">
+                        <h2 class="text-5xl font-black mb-10 text-gray-900">Fitur Utama</h2>
+                        <div class="flex flex-wrap justify-center gap-4 max-w-4xl">
+                            ${proyek.fitur.map(f => `<span class="px-8 py-4 bg-gray-100 text-gray-700 rounded-full text-lg font-bold shadow-sm">${f}</span>`).join('')}
+                        </div>
+                    </div>
+
                 </div>
             `;
-            // Set Page Title
+            // Mengubah Judul Tab Browser
             document.title = `${proyek.nama} | InuuTyzDev`;
         } else {
-            root.innerHTML = `<h1 class="text-center text-4xl font-bold">Proyek tidak ditemukan.</h1>`;
+            root.innerHTML = `<h1 class="text-center text-5xl font-bold text-gray-900">Proyek tidak ditemukan.</h1>`;
         }
     </script>
 </body>
