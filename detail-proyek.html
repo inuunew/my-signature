@@ -2,7 +2,6 @@
 <html lang="id">
 <head>
     <meta charset="UTF-8">
-    
     <title>Detail Proyek | InuuTyzDev</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" />
@@ -11,15 +10,15 @@
         body { font-family: 'Inter', sans-serif; }
     </style>
 </head>
-
-<body class="bg-gray-50 text-gray-900 antialiased pt-24 min-h-screen flex flex-col">
+<body class="bg-white text-gray-900 antialiased min-w-[1280px] overflow-x-auto pt-24">
 
     <nav class="fixed top-0 w-full bg-white/80 backdrop-blur-md z-50 border-b border-gray-100">
         <div class="flex justify-between items-center py-5 px-16 max-w-7xl mx-auto">
-            <div class="text-2xl font-black tracking-tighter text-gray-950">Dn</div>
+            <div class="text-2xl font-black tracking-tighter text-gray-950">Developer Modal Ai</div>
             <div class="flex items-center space-x-10 text-sm font-semibold text-gray-500">
                 <a href="index.html" class="hover:text-gray-950 transition">Beranda</a>
-                <a href="proyek.html" class="hover:text-gray-950 transition">Proyek</a>
+                <a href="tentang.html" class="hover:text-gray-950 transition">Tentang</a>
+                <a href="proyek.html" class="hover:text-gray-950 transition font-bold">Proyek</a>
                 <a href="blog.html" class="hover:text-gray-950 transition">Blog</a>
             </div>
             <a href="kontak.html" class="bg-gray-950 text-white px-7 py-3 rounded-full text-xs font-bold transition">Hubungi Saya</a>
@@ -29,7 +28,7 @@
     <main id="root-detail" class="max-w-5xl mx-auto px-16 py-16">
         <div class="animate-pulse flex flex-col items-center">
             <div class="h-10 bg-gray-100 w-1/2 rounded mb-8"></div>
-            <div class="h-96 bg-gray-100 w-full rounded-[40px]"></div>
+            <div class="h-96 bg-gray-100 w-full rounded-[50px]"></div>
         </div>
     </main>
 
@@ -42,13 +41,9 @@
     <script src="database-proyek.js"></script>
 
     <script>
-        // Mendapatkan ID dari URL (?id=1)
         const params = new URLSearchParams(window.location.search);
         const idProyek = params.get('id');
-
-        // Mencari proyek yang cocok di database
         const proyek = databaseProyek.find(p => p.id === idProyek);
-
         const root = document.getElementById('root-detail');
 
         if (proyek) {
@@ -57,13 +52,13 @@
                     <h1 class="text-5xl font-black text-gray-900">${proyek.nama}</h1>
                 </div>
 
-                <div class="bg-gray-50 rounded-[50px] overflow-hidden shadow-2xl border border-gray-100 mb-20">
-                    <div class="bg-white h-12 w-full flex items-center px-8 space-x-2 border-b border-gray-200">
+                <div style="background-color: ${proyek.warna}" class="w-full h-96 rounded-[50px] flex items-center justify-center p-16 shadow-2xl mb-20 text-center relative border border-gray-100">
+                    <div class="absolute top-0 left-0 w-full bg-white/90 backdrop-blur-sm h-12 flex items-center px-8 space-x-2 border-b border-gray-200 z-10 rounded-t-[50px]">
                         <div class="w-3 h-3 rounded-full bg-red-400"></div>
                         <div class="w-3 h-3 rounded-full bg-yellow-400"></div>
                         <div class="w-3 h-3 rounded-full bg-green-400"></div>
                     </div>
-                    <img src="${proyek.gambar}" class="w-full h-auto object-cover">
+                    <h2 class="text-5xl font-black text-white leading-tight drop-shadow-lg mt-8">${proyek.nama}</h2>
                 </div>
 
                 <div class="grid grid-cols-3 gap-20">
@@ -83,26 +78,25 @@
                         <div>
                             <h4 class="text-[10px] font-black text-gray-400 uppercase tracking-[0.2em] mb-4">Fitur Utama</h4>
                             <div class="flex flex-wrap gap-2">
-                                ${proyek.fitur.map(f => `<span class="px-4 py-2 bg-emerald-50 text-emerald-700 rounded-full text-[10px] font-bold">${f}</span>`).join('')}
+                                ${proyek.fitur.map(f => `<span class="px-4 py-2 bg-gray-100 text-gray-700 rounded-full text-[10px] font-bold">${f}</span>`).join('')}
                             </div>
                         </div>
                     </div>
                     <div class="col-span-2">
                         <h2 class="text-3xl font-black mb-6">Tentang Proyek</h2>
                         <p class="text-gray-500 text-lg leading-relaxed mb-12">${proyek.deskripsi}</p>
+                        
                         <div class="flex space-x-4">
-                            <a href="${proyek.linkPreview}" target="_blank" class="bg-gray-950 text-white px-10 py-5 rounded-full font-bold flex items-center space-x-3">
+                            <a href="${proyek.linkPreview}" target="_blank" class="bg-gray-950 text-white px-10 py-5 rounded-full font-bold flex items-center space-x-3 hover:bg-gray-800 transition shadow-lg">
                                 <i class="fas fa-external-link-alt text-sm"></i>
-                                <span>Live Preview</span>
-                            </a>
-                            <a href="${proyek.linkGithub}" target="_blank" class="border-2 border-gray-950 px-10 py-5 rounded-full font-bold flex items-center space-x-3">
-                                <i class="fab fa-github text-sm"></i>
-                                <span>Source Code</span>
+                                <span>Buka Aplikasi Web</span>
                             </a>
                         </div>
                     </div>
                 </div>
             `;
+            // Set Page Title
+            document.title = `${proyek.nama} | InuuTyzDev`;
         } else {
             root.innerHTML = `<h1 class="text-center text-4xl font-bold">Proyek tidak ditemukan.</h1>`;
         }
