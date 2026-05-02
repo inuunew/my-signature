@@ -12,16 +12,26 @@
 </head>
 <body class="bg-gray-50 text-gray-900 antialiased min-w-[1280px] overflow-x-auto pt-24 min-h-screen flex flex-col">
 
+    <div id="loading-layar" class="fixed inset-0 z-[9999] bg-white flex flex-col items-center justify-center opacity-0 pointer-events-none transition-opacity duration-500">
+        <i class="fas fa-robot text-gray-950 text-8xl mb-10 animate-bounce"></i>
+        <div class="flex space-x-4">
+            <div class="w-4 h-4 bg-gray-950 rounded-full animate-ping"></div>
+            <div class="w-4 h-4 bg-gray-950 rounded-full animate-ping" style="animation-delay: 0.2s;"></div>
+            <div class="w-4 h-4 bg-gray-950 rounded-full animate-ping" style="animation-delay: 0.4s;"></div>
+        </div>
+        <span class="text-gray-950 mt-10 text-sm font-black uppercase tracking-[0.5em] ml-2">Memuat Modul AI...</span>
+    </div>
+
     <nav class="fixed top-0 w-full bg-white/80 backdrop-blur-md z-50 border-b border-gray-100">
         <div class="flex justify-between items-center py-5 px-8 md:px-16 max-w-7xl mx-auto">
             <div class="text-2xl font-black tracking-tighter text-gray-950">Developer Modal Ai</div>
             <div class="hidden md:flex items-center space-x-10 text-sm font-semibold text-gray-500">
-                <a href="index.html" class="hover:text-gray-950 transition">Beranda</a>
-                <a href="tentang.html" class="hover:text-gray-950 transition">Tentang</a>
-                <a href="proyek.html" class="hover:text-gray-950 transition">Proyek</a>
-                <a href="blog.html" class="hover:text-gray-950 transition">Blog</a>
+                <a href="index.html" class="transisi-ai hover:text-gray-950 transition">Beranda</a>
+                <a href="tentang.html" class="transisi-ai hover:text-gray-950 transition">Tentang</a>
+                <a href="proyek.html" class="transisi-ai hover:text-gray-950 transition">Proyek</a>
+                <a href="blog.html" class="transisi-ai hover:text-gray-950 transition">Blog</a>
             </div>
-            <a href="kontak.html" class="bg-gray-950 text-white px-7 py-3 rounded-full text-xs font-bold hover:bg-gray-800 transition shadow-sm">
+            <a href="#" class="bg-gray-950 text-white px-7 py-3 rounded-full text-xs font-bold transition shadow-sm cursor-default">
                 Hubungi Saya
             </a>
         </div>
@@ -110,6 +120,25 @@
 <script src="api/api.js"></script>
 
 <script>
+    // FUNGSI LOADING SCREEN (Event Delegation)
+    document.addEventListener('click', function(event) {
+        const link = event.target.closest('a.transisi-ai');
+        if (link) {
+            if (event.ctrlKey || event.metaKey) return;
+            event.preventDefault(); 
+            const tujuanUrl = link.getAttribute('href');
+            const layarLoading = document.getElementById('loading-layar');
+
+            layarLoading.classList.remove('opacity-0', 'pointer-events-none');
+            layarLoading.classList.add('opacity-100');
+
+            setTimeout(() => {
+                window.location.href = tujuanUrl;
+            }, 600);
+        }
+    });
+
+    // FUNGSI KIRIM PESAN KE TELEGRAM
     document.querySelector('form').addEventListener('submit', function(e) {
         e.preventDefault();
 
@@ -165,7 +194,6 @@
         });
     });
 </script>
-
 
 </body>
 </html>
