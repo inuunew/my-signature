@@ -18,20 +18,15 @@
 </head>
 <body class="bg-white text-gray-900 antialiased min-w-[1280px] overflow-x-auto pt-24">
 
-<div id="loading-layar" class="fixed inset-0 z-[9999] bg-white flex flex-col items-center justify-center opacity-0 pointer-events-none transition-opacity duration-500">
-    
-    <i class="fas fa-robot text-gray-950 text-8xl mb-10 animate-bounce"></i>
-    
-    <div class="flex space-x-4">
-        <div class="w-4 h-4 bg-gray-950 rounded-full animate-ping"></div>
-        <div class="w-4 h-4 bg-gray-950 rounded-full animate-ping" style="animation-delay: 0.2s;"></div>
-        <div class="w-4 h-4 bg-gray-950 rounded-full animate-ping" style="animation-delay: 0.4s;"></div>
+    <div id="loading-layar" class="fixed inset-0 z-[9999] bg-white flex flex-col items-center justify-center opacity-0 pointer-events-none transition-opacity duration-500">
+        <i class="fas fa-robot text-gray-950 text-8xl mb-10 animate-bounce"></i>
+        <div class="flex space-x-4">
+            <div class="w-4 h-4 bg-gray-950 rounded-full animate-ping"></div>
+            <div class="w-4 h-4 bg-gray-950 rounded-full animate-ping" style="animation-delay: 0.2s;"></div>
+            <div class="w-4 h-4 bg-gray-950 rounded-full animate-ping" style="animation-delay: 0.4s;"></div>
+        </div>
+        <span class="text-gray-950 mt-10 text-sm font-black uppercase tracking-[0.5em] ml-2">Memuat Modul AI...</span>
     </div>
-    
-    <span class="text-gray-950 mt-10 text-sm font-black uppercase tracking-[0.5em]">友 | —͟͞͞𝑰𝒏𝒖𝒖𝑻𝒚𝒛𝑫𝒆𝒗</span>
-    
-</div>
-
 
     <nav class="fixed top-0 w-full bg-white/80 backdrop-blur-md z-50 border-b border-gray-100">
         <div class="flex justify-between items-center py-5 px-6 md:px-16 max-w-7xl mx-auto">
@@ -78,11 +73,15 @@
     <script src="database-proyek.js"></script>
 
     <script>
-        // 1. LOGIKA LOADING SCREEN
+        // ==========================================
+        // FUNGSI LOADING SCREEN HANYA UNTUK PINDAH HALAMAN
+        // ==========================================
         document.addEventListener('click', function(event) {
             const link = event.target.closest('a.transisi-ai');
             if (link) {
+                // Abaikan jika buka tab baru (ctrl+click)
                 if (event.ctrlKey || event.metaKey) return;
+                
                 event.preventDefault();
                 
                 const tujuanUrl = link.getAttribute('href');
@@ -97,7 +96,22 @@
             }
         });
 
-        // 2. RENDER DATA PROYEK
+        // ==========================================
+        // FIX: MENGATASI STUCK SAAT TOMBOL KEMBALI (BACK)
+        // ==========================================
+        window.addEventListener('pageshow', function(event) {
+            if (event.persisted) {
+                const layarLoading = document.getElementById('loading-layar');
+                if (layarLoading) {
+                    layarLoading.classList.remove('opacity-100');
+                    layarLoading.classList.add('opacity-0', 'pointer-events-none');
+                }
+            }
+        });
+
+        // ==========================================
+        // LOGIKA RENDER DAN FILTER PROYEK
+        // ==========================================
         const container = document.getElementById('container-proyek');
         const searchInput = document.getElementById('searchProyek');
         const noResults = document.getElementById('no-results');
@@ -136,7 +150,7 @@
             }
         }
 
-        // 3. FUNGSI PENCARIAN
+        // Fungsi Pencarian
         searchInput.addEventListener('input', (e) => {
             const val = e.target.value.toLowerCase();
             const filtered = databaseProyek.filter(p => 
@@ -146,7 +160,7 @@
             renderProyek(filtered);
         });
 
-        // 4. FUNGSI FILTER BERDASARKAN KATEGORI
+        // Fungsi Filter Berdasarkan Kategori
         function filterProyek(cat) {
             const buttons = document.querySelectorAll('.filter-btn');
             
@@ -170,7 +184,6 @@
             if (cat === 'Semua') {
                 renderProyek(databaseProyek);
             } else {
-                // Filter menggunakan properti 'kategori' dari database
                 const filtered = databaseProyek.filter(p => p.kategori === cat);
                 renderProyek(filtered);
             }
