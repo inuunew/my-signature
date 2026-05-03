@@ -202,6 +202,16 @@
     </style>
 </head>
 <body class="flex flex-col items-center justify-center h-[100dvh] w-full overflow-hidden relative">
+    <div id="loading-layar" class="fixed inset-0 z-[9999] bg-white dark:bg-gray-900 flex flex-col items-center justify-center opacity-0 pointer-events-none transition-opacity duration-500">
+        <i class="fas fa-robot text-gray-950 dark:text-white text-[180px] mb-16 animate-bounce"></i>
+        <div class="flex space-x-6">
+            <div class="w-6 h-6 bg-gray-950 dark:bg-white rounded-full animate-ping"></div>
+            <div class="w-6 h-6 bg-gray-950 dark:bg-white rounded-full animate-ping" style="animation-delay: 0.2s;"></div>
+            <div class="w-6 h-6 bg-gray-950 dark:bg-white rounded-full animate-ping" style="animation-delay: 0.4s;"></div>
+        </div>
+        <span class="text-gray-950 dark:text-white mt-10 text-sm font-black uppercase tracking-[0.5em]">友 | —͟͞͞𝑰𝒏𝒖𝒖𝑻𝒚𝒛𝑫𝒆𝒗</span>
+    </div>
+
     
     <div class="inuutyz-lyrics-background" id="inuutyzLyricsBackground"></div>
 
@@ -324,6 +334,7 @@
             }
         }
 
+
         function initializeTheme() {
             const storedTheme = localStorage.getItem('theme');
             if (storedTheme) {
@@ -353,7 +364,8 @@
                 linkElement.href = link.url;
                 // Baris target='_blank' dan rel sudah dihapus agar terbuka di tab yang sama
                 
-                let baseClasses = "py-2 px-4 rounded-full font-bold text-[11px] flex items-center justify-center transition-all duration-300 hover:-translate-y-1 ";
+                let baseClasses = "transisi-ai py-2 px-4 rounded-full font-bold text-[11px] flex items-center justify-center transition-all duration-300 hover:-translate-y-1 ";
+
 
                 
                 if (index === 0) {
