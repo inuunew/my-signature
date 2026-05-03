@@ -67,7 +67,9 @@
     <script src="database-blog.js"></script>
 
     <script>
-        // 1. FUNGSI LOADING SCREEN (Event Delegation)
+        // ==========================================
+        // FUNGSI LOADING SCREEN HANYA UNTUK PINDAH HALAMAN
+        // ==========================================
         document.addEventListener('click', function(event) {
             const link = event.target.closest('a.transisi-ai');
             
@@ -88,7 +90,22 @@
             }
         });
 
-        // 2. LOGIKA RENDER BLOG
+        // ==========================================
+        // FIX: MENGATASI STUCK SAAT TOMBOL KEMBALI (BACK)
+        // ==========================================
+        window.addEventListener('pageshow', function(event) {
+            if (event.persisted) {
+                const layarLoading = document.getElementById('loading-layar');
+                if (layarLoading) {
+                    layarLoading.classList.remove('opacity-100');
+                    layarLoading.classList.add('opacity-0', 'pointer-events-none');
+                }
+            }
+        });
+
+        // ==========================================
+        // LOGIKA RENDER BLOG
+        // ==========================================
         const container = document.getElementById('container-blog');
         const searchInput = document.getElementById('searchInput');
         const noResults = document.getElementById('no-results');
