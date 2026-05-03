@@ -642,6 +642,22 @@
             }
         });
 
+        // ==========================================
+        // FIX: MENGATASI STUCK SAAT TOMBOL KEMBALI (BACK)
+        // ==========================================
+        window.addEventListener('pageshow', function(event) {
+            // event.persisted bernilai TRUE jika halaman dipanggil dari cache (tombol kembali)
+            if (event.persisted) {
+                const layarLoading = document.getElementById('loading-layar');
+                if (layarLoading) {
+                    // Sembunyikan kembali layar loadingnya
+                    layarLoading.classList.remove('opacity-100');
+                    layarLoading.classList.add('opacity-0', 'pointer-events-none');
+                }
+            }
+        });
+
+
     </script>
 </body>
 </html>
