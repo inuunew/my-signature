@@ -11,33 +11,28 @@
     </style>
 </head>
 <body class="bg-gray-50 text-gray-900 antialiased pt-24 min-h-screen flex flex-col min-w-[1280px] overflow-x-auto">
-<div id="loading-layar" class="fixed inset-0 z-[9999] bg-white flex flex-col items-center justify-center opacity-0 pointer-events-none transition-opacity duration-500">
     
-    <i class="fas fa-robot text-gray-950 text-8xl mb-10 animate-bounce"></i>
-    
-    <div class="flex space-x-4">
-        <div class="w-4 h-4 bg-gray-950 rounded-full animate-ping"></div>
-        <div class="w-4 h-4 bg-gray-950 rounded-full animate-ping" style="animation-delay: 0.2s;"></div>
-        <div class="w-4 h-4 bg-gray-950 rounded-full animate-ping" style="animation-delay: 0.4s;"></div>
+    <div id="loading-layar" class="fixed inset-0 z-[9999] bg-white flex flex-col items-center justify-center opacity-0 pointer-events-none transition-opacity duration-500">
+        <i class="fas fa-robot text-gray-950 text-8xl mb-10 animate-bounce"></i>
+        <div class="flex space-x-4">
+            <div class="w-4 h-4 bg-gray-950 rounded-full animate-ping"></div>
+            <div class="w-4 h-4 bg-gray-950 rounded-full animate-ping" style="animation-delay: 0.2s;"></div>
+            <div class="w-4 h-4 bg-gray-950 rounded-full animate-ping" style="animation-delay: 0.4s;"></div>
+        </div>
+        <span class="text-gray-950 mt-10 text-sm font-black uppercase tracking-[0.5em] ml-2">Memuat Modul AI...</span>
     </div>
-    
-    <span class="text-gray-950 mt-10 text-sm font-black uppercase tracking-[0.5em]">友 | —͟͞͞𝑰𝒏𝒖𝒖𝑻𝒚𝒛𝑫𝒆𝒗</span>
-    
-</div>
-
-
 
     <nav class="fixed top-0 w-full bg-white/80 backdrop-blur-md z-50 border-b border-gray-100">
         <div class="flex justify-between items-center py-5 px-8 md:px-16 max-w-7xl mx-auto">
             <div class="text-2xl font-black tracking-tighter text-gray-950">Developer Modal Ai</div>
             <div class="hidden md:flex items-center space-x-10 text-sm font-semibold text-gray-500">
-                <a href="index.html" class="hover:text-gray-950 transition">Beranda</a>
+                <a href="index.html" class="transisi-ai hover:text-gray-950 transition">Beranda</a>
                 <a href="#tentang" class="text-gray-950 transition font-bold">Tentang</a>
                 <a href="#keahlian" class="hover:text-gray-950 transition">Keahlian</a>
                 <a href="#proyek" class="hover:text-gray-950 transition">Proyek</a>
                 <a href="#blog" class="hover:text-gray-950 transition">Blog</a>
             </div>
-            <a href="kontak.html" class="bg-gray-950 text-white px-7 py-3 rounded-full text-xs font-bold hover:bg-gray-800 transition shadow-sm">
+            <a href="kontak.html" class="transisi-ai bg-gray-950 text-white px-7 py-3 rounded-full text-xs font-bold hover:bg-gray-800 transition shadow-sm">
                 Hubungi Saya
             </a>
         </div>
@@ -83,8 +78,6 @@
         </div>
     </div>
 </section>
-
-
 
 <section id="keahlian" class="py-40 bg-gray-50">
     <div class="max-w-[1400px] mx-auto px-8 md:px-16 text-center">
@@ -189,7 +182,7 @@
             <div id="preview-proyek" class="grid md:grid-cols-3 gap-12 text-left">
                 </div>
             
-<a href="proyek.html" class="transisi-ai inline-block mt-20 px-12 py-5 border-2 border-gray-950 rounded-full font-bold hover:bg-gray-950 hover:text-white transition">Lihat Semua Proyek</a>
+            <a href="proyek.html" class="transisi-ai inline-block mt-20 px-12 py-5 border-2 border-gray-950 rounded-full font-bold hover:bg-gray-950 hover:text-white transition">Lihat Semua Proyek</a>
 
         </div>
     </section>
@@ -202,7 +195,7 @@
             <div id="preview-blog" class="grid md:grid-cols-3 gap-10 text-left">
                 </div>
             
-<a href="blog.html" class="transisi-ai inline-block mt-20 px-12 py-5 border-2 border-gray-950 rounded-full font-bold hover:bg-gray-950 hover:text-white transition">Lihat Semua Artikel</a>
+            <a href="blog.html" class="transisi-ai inline-block mt-20 px-12 py-5 border-2 border-gray-950 rounded-full font-bold hover:bg-gray-950 hover:text-white transition">Lihat Semua Artikel</a>
 
         </div>
     </section>
@@ -211,33 +204,6 @@
     <script src="database-blog.js"></script>
 
     <script>
-    // Ambil elemen layar loading
-const layarLoading = document.getElementById('loading-layar');
-
-// Buat fungsi untuk menangani klik transisi
-function mulaiTransisi(event) {
-    // Abaikan jika buka di tab baru (ctrl+click)
-    if (event.ctrlKey || event.metaKey) return;
-
-    event.preventDefault(); // Tahan browser agar tidak langsung pindah
-    
-    const tujuanUrl = event.currentTarget.getAttribute('href');
-
-    // Munculkan layar hitam
-    layarLoading.classList.remove('opacity-0', 'pointer-events-none');
-    layarLoading.classList.add('opacity-100');
-
-    // Tunggu 600ms (0.6 detik) biar animasinya terlihat, lalu pindah halaman
-    setTimeout(() => {
-        window.location.href = tujuanUrl;
-    }, 600);
-}
-
-// Cari semua link yang diberi class 'transisi-ai' dan pasang event klik
-document.querySelectorAll('.transisi-ai').forEach(tombol => {
-    tombol.addEventListener('click', mulaiTransisi);
-});
-
         // 1. RENDER 3 PROYEK PERTAMA
         const wadahProyek = document.getElementById('preview-proyek');
         const top3Proyek = databaseProyek.slice(0, 3);
@@ -255,7 +221,7 @@ document.querySelectorAll('.transisi-ai').forEach(tombol => {
                         </div>
                         <h4 class="text-xl font-bold mb-4 text-gray-900 group-hover:text-gray-700 transition">${proyek.nama}</h4>
                         <p class="text-gray-400 text-sm mb-10 leading-relaxed flex-grow line-clamp-2">${proyek.deskripsi}</p>
-                        <a href="detail-proyek.html?id=${proyek.id}" class="mt-auto w-full py-4 border-2 border-gray-100 rounded-2xl text-[10px] font-bold uppercase tracking-widest text-gray-500 hover:bg-gray-950 hover:text-white hover:border-gray-950 active:bg-gray-950 active:text-white transition-all flex items-center justify-center space-x-3">
+                        <a href="detail-proyek.html?id=${proyek.id}" class="transisi-ai mt-auto w-full py-4 border-2 border-gray-100 rounded-2xl text-[10px] font-bold uppercase tracking-widest text-gray-500 hover:bg-gray-950 hover:text-white hover:border-gray-950 active:bg-gray-950 active:text-white transition-all flex items-center justify-center space-x-3">
                             <span>Lihat Detail</span>
                             <i class="fas fa-arrow-right"></i>
                         </a>
@@ -281,12 +247,53 @@ document.querySelectorAll('.transisi-ai').forEach(tombol => {
                         </div>
                         <h4 class="text-xl font-bold mb-4 text-gray-900">${post.judulArtikel}</h4>
                         <p class="text-gray-400 text-sm mb-10 line-clamp-2 flex-grow">${post.deskripsi}</p>
-                        <a href="artikel.html?id=${post.id}" class="mt-auto w-full py-4 border-2 border-gray-100 rounded-2xl text-[10px] font-bold uppercase tracking-widest text-gray-500 hover:bg-gray-950 hover:text-white hover:border-gray-950 active:bg-gray-950 active:text-white transition-all flex items-center justify-center space-x-3">
+                        <a href="artikel.html?id=${post.id}" class="transisi-ai mt-auto w-full py-4 border-2 border-gray-100 rounded-2xl text-[10px] font-bold uppercase tracking-widest text-gray-500 hover:bg-gray-950 hover:text-white hover:border-gray-950 active:bg-gray-950 active:text-white transition-all flex items-center justify-center space-x-3">
                             <span>Baca Selengkapnya</span><i class="fas fa-arrow-right"></i>
                         </a>
                     </div>
                 </div>
             `;
+        });
+
+        // ==========================================
+        // FUNGSI LOADING SCREEN HANYA UNTUK PINDAH HALAMAN
+        // ==========================================
+        
+        document.addEventListener('click', function(event) {
+            const link = event.target.closest('a.transisi-ai');
+            
+            if (link) {
+                // Jangan jalankan efek jika ini anchor link internal (contoh: #tentang)
+                if (link.getAttribute('href').startsWith('#')) return;
+                
+                // Abaikan jika buka di tab baru
+                if (event.ctrlKey || event.metaKey) return;
+
+                event.preventDefault(); 
+                
+                const tujuanUrl = link.getAttribute('href');
+                const layarLoading = document.getElementById('loading-layar');
+
+                layarLoading.classList.remove('opacity-0', 'pointer-events-none');
+                layarLoading.classList.add('opacity-100');
+
+                setTimeout(() => {
+                    window.location.href = tujuanUrl;
+                }, 600);
+            }
+        });
+
+        // ==========================================
+        // FIX: MENGATASI STUCK SAAT TOMBOL KEMBALI (BACK)
+        // ==========================================
+        window.addEventListener('pageshow', function(event) {
+            if (event.persisted) {
+                const layarLoading = document.getElementById('loading-layar');
+                if (layarLoading) {
+                    layarLoading.classList.remove('opacity-100');
+                    layarLoading.classList.add('opacity-0', 'pointer-events-none');
+                }
+            }
         });
     </script>
 </body>
