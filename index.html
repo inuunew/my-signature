@@ -203,7 +203,7 @@
 </head>
 <body class="flex flex-col items-center justify-center h-[100dvh] w-full overflow-hidden relative">
     
-    <div id="loading-layar" class="fixed inset-0 z-[9999] bg-white dark:bg-gray-900 flex flex-col items-center justify-center opacity-100 transition-opacity duration-500">
+    <div id="loading-layar" class="fixed inset-0 z-[9999] bg-white dark:bg-gray-900 flex flex-col items-center justify-center opacity-0 pointer-events-none transition-opacity duration-500">
         <i class="fas fa-robot text-gray-950 dark:text-white text-[80px] md:text-[130px] mb-10 md:mb-12 animate-bounce"></i>
 
         <div class="flex space-x-4 md:space-x-6">
@@ -619,21 +619,9 @@
         });
 
         // ==========================================
-        // FUNGSI LOADING SCREEN (SISTEM BLOG.HTML)
+        // FUNGSI LOADING SCREEN HANYA UNTUK PINDAH HALAMAN
         // ==========================================
         
-        // 1. Fade Out saat web pertama kali terbuka
-        window.addEventListener('load', () => {
-            const layarLoading = document.getElementById('loading-layar');
-            if(layarLoading) {
-                setTimeout(() => {
-                    layarLoading.classList.remove('opacity-100');
-                    layarLoading.classList.add('opacity-0', 'pointer-events-none');
-                }, 300); // Sedikit jeda agar transisi terasa smooth
-            }
-        });
-
-        // 2. Event Delegation untuk link dengan class 'transisi-ai'
         document.addEventListener('click', function(event) {
             const link = event.target.closest('a.transisi-ai');
             
