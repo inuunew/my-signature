@@ -9,7 +9,7 @@ const databaseProyek = [
     "deskripsi": "Aplikasi web yang memungkinkan pengguna membuat gambar kutipan dengan estetika antarmuka iPhone yang elegan.",
     "fitur": ["Custom Text", "iOS Style UI", "Image Export"],
     "warna": "#2D3E50", // Biru Gelap
-    "linkPreview": "/tools/iphone-quote-creator.html",
+    "linkPreview": "/tools/iqc.html",
     "linkGithub": "#"
   },
   {
@@ -21,7 +21,7 @@ const databaseProyek = [
     "deskripsi": "Alat praktis untuk mengunduh audio dari video TikTok secara cepat dan mudah melalui tautan video.",
     "fitur": ["High Quality Audio", "Fast Process", "MP3 Converter"],
     "warna": "#7B61FF", // Ungu
-    "linkPreview": "/tools/tiktok-audio-downloader.html",
+    "linkPreview": "/tools/ttad.html",
     "linkGithub": "#"
   },
   {
@@ -33,7 +33,7 @@ const databaseProyek = [
     "deskripsi": "Platform pengunduh video TikTok tanpa watermark untuk mendapatkan konten video yang jernih.",
     "fitur": ["No Watermark", "Full HD", "One-Click Download"],
     "warna": "#F43F5E", // Rose/Merah Muda
-    "linkPreview": "/tools/tiktok-video-downloader.html",
+    "linkPreview": "/tools/ttvd.html",
     "linkGithub": "#"
   },
   {
@@ -45,7 +45,7 @@ const databaseProyek = [
     "deskripsi": "Aplikasi pembantu untuk melakukan deployment file HTML secara otomatis ke layanan hosting statis.",
     "fitur": ["Easy Deploy", "Vercel API Integration", "Live Tracking"],
     "warna": "#0EA5E9", // Biru Terang
-    "linkPreview": "/tools/web-deployer-html.html",
+    "linkPreview": "/tools/td.html",
     "linkGithub": "#"
   },
   {
@@ -57,7 +57,7 @@ const databaseProyek = [
     "deskripsi": "Generator kode QR yang fleksibel untuk berbagai kebutuhan seperti URL, teks, hingga konfigurasi Wi-Fi.",
     "fitur": ["Dynamic QR", "Custom Color", "Download SVG/PNG"],
     "warna": "#10B981", // Hijau Emerald
-    "linkPreview": "/tools/qr-code-generate.html",
+    "linkPreview": "/tools/qrg.html",
     "linkGithub": "#"
   },
   {
@@ -69,11 +69,23 @@ const databaseProyek = [
     "deskripsi": "Simulator kubus rubik 3D berbasis web yang interaktif, dibangun menggunakan teknologi grafis modern.",
     "fitur": ["3D Graphics", "Smooth Animation", "Logic Solver"],
     "warna": "#F59E0B", // Kuning Amber
-    "linkPreview": "/tools/rubik-game.html",
+    "linkPreview": "/tools/rubik.html",
     "linkGithub": "#"
   },
   {
     "id": "7",
+    "nama": "Enccode Html",
+    "klien": "Protect Html",
+    "tanggal": "Januari 2026",
+    "layanan": "Protect File Html",
+    "deskripsi": "Amankan website mu dengan cara enc sebelum dideploy.",
+    "fitur": ["Protect", "Fast", "Free"],
+    "warna": "#F59E0B", // Kuning Amber
+    "linkPreview": "/tools/te.html",
+    "linkGithub": "#"
+  },
+  {
+    "id": "8",
     "nama": "Spam NGL",
     "klien": "Personal Project",
     "tanggal": "Desember 2025",
