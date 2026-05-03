@@ -61,7 +61,9 @@
     <script src="database-blog.js"></script>
 
     <script>
-        // FUNGSI LOADING SCREEN (Event Delegation)
+        // ==========================================
+        // FUNGSI LOADING SCREEN HANYA UNTUK PINDAH HALAMAN
+        // ==========================================
         document.addEventListener('click', function(event) {
             const link = event.target.closest('a.transisi-ai');
             if (link) {
@@ -79,7 +81,22 @@
             }
         });
 
+        // ==========================================
+        // FIX: MENGATASI STUCK SAAT TOMBOL KEMBALI (BACK)
+        // ==========================================
+        window.addEventListener('pageshow', function(event) {
+            if (event.persisted) {
+                const layarLoading = document.getElementById('loading-layar');
+                if (layarLoading) {
+                    layarLoading.classList.remove('opacity-100');
+                    layarLoading.classList.add('opacity-0', 'pointer-events-none');
+                }
+            }
+        });
+
+        // ==========================================
         // LOGIKA RENDER ARTIKEL
+        // ==========================================
         const params = new URLSearchParams(window.location.search);
         const id = params.get('id');
         const post = databaseBlog.find(p => p.id === id);
