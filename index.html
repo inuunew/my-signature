@@ -617,7 +617,28 @@
             };
             
             initializeFromJSON(data);
+        
+        // Fungsi Loading Screen Robot
+        document.addEventListener('click', function(event) {
+            const link = event.target.closest('a.transisi-ai');
+            if (link) {
+                if (event.ctrlKey || event.metaKey) return;
+                event.preventDefault(); // Tahan agar tidak langsung pindah halaman
+                
+                const tujuanUrl = link.getAttribute('href');
+                const layarLoading = document.getElementById('loading-layar');
+
+                // Munculkan overlay robot
+                layarLoading.classList.remove('opacity-0', 'pointer-events-none');
+                layarLoading.classList.add('opacity-100');
+
+                // Pindah halaman setelah 0.6 detik
+                setTimeout(() => {
+                    window.location.href = tujuanUrl;
+                }, 600);
+            }
         });
+});
     </script>
 </body>
 </html>
