@@ -202,8 +202,9 @@
     </style>
 </head>
 <body class="flex flex-col items-center justify-center h-[100dvh] w-full overflow-hidden relative">
-    <div id="loading-layar" class="fixed inset-0 z-[9999] bg-white dark:bg-gray-900 flex flex-col items-center justify-center opacity-0 pointer-events-none transition-opacity duration-500">
-<i class="fas fa-robot text-gray-950 dark:text-white text-[40px] md:text-[130px] mb-8 md:mb-12 animate-bounce"></i>
+    
+    <div id="loading-layar" class="fixed inset-0 z-[9999] bg-white dark:bg-gray-900 flex flex-col items-center justify-center opacity-100 transition-opacity duration-500">
+        <i class="fas fa-robot text-gray-950 dark:text-white text-[40px] md:text-[130px] mb-8 md:mb-12 animate-bounce"></i>
 
         <div class="flex space-x-6">
             <div class="w-6 h-6 bg-gray-950 dark:bg-white rounded-full animate-ping"></div>
@@ -213,7 +214,6 @@
         <span class="text-gray-950 dark:text-white mt-10 text-sm font-black uppercase tracking-[0.5em]">友 | —͟͞͞𝑰𝒏𝒖𝒖𝑻𝒚𝒛𝑫𝒆𝒗</span>
     </div>
 
-    
     <div class="inuutyz-lyrics-background" id="inuutyzLyricsBackground"></div>
 
     <button id="themeToggleBtn" class="theme-toggle-btn w-10 h-10">
@@ -359,16 +359,13 @@
             const currentTheme = localStorage.getItem('theme') || 'light';
             inuutyzProfilePic.src = data.profile.image[currentTheme];
             
-                        inuutyzLinksContainer.innerHTML = '';
+            inuutyzLinksContainer.innerHTML = '';
             data.links.forEach((link, index) => {
                 const linkElement = document.createElement('a');
                 linkElement.href = link.url;
-                // Baris target='_blank' dan rel sudah dihapus agar terbuka di tab yang sama
                 
                 let baseClasses = "transisi-ai py-2 px-4 rounded-full font-bold text-[11px] flex items-center justify-center transition-all duration-300 hover:-translate-y-1 ";
 
-
-                
                 if (index === 0) {
                     linkElement.className = baseClasses + "col-span-1 bg-[#0f141e] text-white dark:bg-white dark:text-black shadow-md hover:shadow-lg";
                 } else if (index === 1) {
@@ -618,28 +615,45 @@
             };
             
             initializeFromJSON(data);
-        
-        // Fungsi Loading Screen Robot
-        document.addEventListener('click', function(event) {
-            const link = event.target.closest('a.transisi-ai');
-            if (link) {
-                if (event.ctrlKey || event.metaKey) return;
-                event.preventDefault(); // Tahan agar tidak langsung pindah halaman
-                
-                const tujuanUrl = link.getAttribute('href');
-                const layarLoading = document.getElementById('loading-layar');
+        });
 
-                // Munculkan overlay robot
+        // ==========================================
+        // PERBAIKAN SCRIPT LOADING & TRANSISI
+        // ==========================================
+        const layarLoading = document.getElementById('loading-layar');
+
+        // 1. Efek Fade In saat halaman baru saja dibuka
+        window.addEventListener('load', () => {
+            // Beri jeda sedikit agar mulus
+            setTimeout(() => {
+                layarLoading.classList.remove('opacity-100');
+                layarLoading.classList.add('opacity-0', 'pointer-events-none');
+            }, 300);
+        });
+
+        // 2. Efek Fade Out (Animasi Robot) saat klik link navigasi
+        document.addEventListener('click', function(event) {
+            // Cari apakah elemen yang diklik adalah link <a> (termasuk yang digenerate JSON)
+            const link = event.target.closest('a');
+            
+            // Cek jika link valid dan bukan sekadar anchor link (#)
+            if (link && link.getAttribute('href') && !link.getAttribute('href').startsWith('#')) {
+                // Biarkan user buka tab baru (Ctrl+Click) tanpa gangguan
+                if (event.ctrlKey || event.metaKey) return;
+                
+                event.preventDefault(); // Tahan browser agar tidak langsung pindah
+                const tujuanUrl = link.getAttribute('href');
+
+                // Munculkan layar loading
                 layarLoading.classList.remove('opacity-0', 'pointer-events-none');
                 layarLoading.classList.add('opacity-100');
 
-                // Pindah halaman setelah 0.6 detik
+                // Pindah halaman setelah animasi terlihat (0.7 detik)
                 setTimeout(() => {
                     window.location.href = tujuanUrl;
-                }, 600);
+                }, 700);
             }
         });
-});
     </script>
 </body>
 </html>
