@@ -203,21 +203,6 @@
 </head>
 <body class="flex flex-col items-center justify-center h-[100dvh] w-full overflow-hidden relative">
     
-<div id="loading-layar" class="fixed inset-0 z-[9999] bg-white flex flex-col items-center justify-center opacity-0 pointer-events-none transition-opacity duration-500">
-    
-    <i class="fas fa-robot text-gray-950 text-7xl md:text-[120px] mb-8 md:mb-12 animate-bounce"></i>
-    
-    <div class="flex space-x-3 md:space-x-5">
-        <div class="w-3 h-3 md:w-5 md:h-5 bg-gray-950 rounded-full animate-ping"></div>
-        <div class="w-3 h-3 md:w-5 md:h-5 bg-gray-950 rounded-full animate-ping" style="animation-delay: 0.2s;"></div>
-        <div class="w-3 h-3 md:w-5 md:h-5 bg-gray-950 rounded-full animate-ping" style="animation-delay: 0.4s;"></div>
-    </div>
-    
-    <span class="text-gray-950 mt-8 md:mt-12 text-[10px] md:text-sm font-black uppercase tracking-[0.4em] md:tracking-[0.5em] ml-2">友 | —͟͞͞𝑰𝒏𝒖𝒖𝑻𝒚𝒛𝑫𝒆𝒗</span>
-    
-</div>
-
-
     <div class="inuutyz-lyrics-background" id="inuutyzLyricsBackground"></div>
 
     <button id="themeToggleBtn" class="theme-toggle-btn w-10 h-10">
@@ -229,7 +214,11 @@
         <div class="profile text-center mb-2 w-full flex flex-col items-center fade-up-element" style="animation-delay: 0.1s;">
             
             <div class="relative flex justify-center items-center mb-3 w-[220px] h-[220px]">
-                <img src="" alt="Profile Picture" class="w-full h-full object-cover rounded-full border-4 border-white dark:border-black shadow-[0_15px_30px_-10px_rgba(0,0,0,0.15)] dark:shadow-black/30" id="profilePic">
+                <div class="absolute inset-0 bg-gray-50 dark:bg-gray-800/50 rounded-full shadow-inner transform scale-105 -z-10 transition-colors duration-500"></div>
+                
+                <div class="profile-pic-container w-[140px] h-[140px] relative rounded-full z-10 bg-white dark:bg-gray-900 shadow-sm flex items-center justify-center overflow-hidden border-4 border-white dark:border-gray-800">
+                    <img src="" alt="Profile Picture" class="w-full h-full object-cover rounded-full" id="profilePic">
+                </div>
             </div>
 
             <div class="bg-[#f8f9fa] dark:bg-gray-800 text-gray-500 dark:text-gray-300 text-[8px] font-bold px-3 py-1 rounded-full mb-2 flex items-center gap-1.5 tracking-widest shadow-sm transition-colors duration-500">
@@ -289,39 +278,6 @@
     </button>
 
     <script>
-        // SCRIPT TRANISI AI
-        document.addEventListener('click', function(event) {
-            const link = event.target.closest('a.transisi-ai');
-            if (link) {
-                if (event.ctrlKey || event.metaKey) return;
-                event.preventDefault(); 
-                const tujuanUrl = link.getAttribute('href');
-                const layarLoading = document.getElementById('loading-layar');
-
-                layarLoading.classList.remove('opacity-0', 'pointer-events-none');
-                layarLoading.classList.add('opacity-100');
-
-                // Matikan lagu secara halus (fade out) sebelum pindah
-                if(inuutyzIsPlaying) {
-                    let vol = inuutyzAudioPlayer.volume;
-                    let fadeOut = setInterval(() => {
-                        if (vol > 0.1) {
-                            vol -= 0.1;
-                            inuutyzAudioPlayer.volume = vol;
-                        } else {
-                            clearInterval(fadeOut);
-                            inuutyzAudioPlayer.pause();
-                        }
-                    }, 50);
-                }
-
-                setTimeout(() => {
-                    window.location.href = tujuanUrl;
-                }, 600);
-            }
-        });
-
-        // MUSIC PLAYER & PROFILE LOGIC
         let inuutyzUserData = null;
         let inuutyzCurrentLyricIndex = -1;
         let inuutyzSongDuration = 60;
@@ -391,12 +347,14 @@
             const currentTheme = localStorage.getItem('theme') || 'light';
             inuutyzProfilePic.src = data.profile.image[currentTheme];
             
-            inuutyzLinksContainer.innerHTML = '';
+                        inuutyzLinksContainer.innerHTML = '';
             data.links.forEach((link, index) => {
                 const linkElement = document.createElement('a');
                 linkElement.href = link.url;
+                // Baris target='_blank' dan rel sudah dihapus agar terbuka di tab yang sama
                 
                 let baseClasses = "py-2 px-4 rounded-full font-bold text-[11px] flex items-center justify-center transition-all duration-300 hover:-translate-y-1 ";
+
                 
                 if (index === 0) {
                     linkElement.className = baseClasses + "col-span-1 bg-[#0f141e] text-white dark:bg-white dark:text-black shadow-md hover:shadow-lg";
@@ -406,14 +364,6 @@
                     linkElement.className = baseClasses + "col-span-2 bg-transparent border border-gray-200 dark:border-gray-700 text-[#0f141e] dark:text-white hover:border-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800";
                 }
                 
-                // Logika pintar: Buka tab baru jika link eksternal, beri animasi loading jika link internal
-                if (!link.url.startsWith('http')) {
-                    linkElement.classList.add('transisi-ai');
-                } else {
-                    linkElement.target = '_blank';
-                    linkElement.rel = 'noopener noreferrer';
-                }
-
                 linkElement.textContent = link.title;
                 inuutyzLinksContainer.appendChild(linkElement);
             });
@@ -501,10 +451,7 @@
             inuutyzIsPlaying = !inuutyzIsPlaying;
             if (inuutyzIsPlaying) {
                 inuutyzPlayPauseIcon.className = 'fas fa-pause';
-                if (inuutyzAudioPlayer.src) {
-                    inuutyzAudioPlayer.volume = 1; // Pastikan volume penuh saat diplay
-                    inuutyzAudioPlayer.play();
-                }
+                if (inuutyzAudioPlayer.src) inuutyzAudioPlayer.play();
             } else {
                 inuutyzPlayPauseIcon.className = 'fas fa-play';
                 if (inuutyzAudioPlayer.src) inuutyzAudioPlayer.pause();
