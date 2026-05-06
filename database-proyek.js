@@ -103,5 +103,18 @@ const databaseProyek = [
     "warna": "#171717", // Hitam
     "linkPreview": "/tools/spam-ngl.html",
     "linkGithub": "#"
+  },
+  {
+    "id": "9",
+    "nama": "AI Assistant",
+    "klien": "Personal Project",
+    "tanggal": "Mei 2026",
+    "layanan": "Web Application",
+    "kategori": "Website", 
+    "deskripsi": "Asisten pintar interaktif berbasis AI yang dilengkapi dengan memori riwayat obrolan dan antarmuka modern yang responsif.",
+    "fitur": ["Gemini API Integration", "Session History", "Modern UI/UX"],
+    "warna": "#8B5CF6", // Ungu (Aksen utama UI)
+    "linkPreview": "/tools/ai.html",
+    "linkGithub": "#"
   }
 ];
