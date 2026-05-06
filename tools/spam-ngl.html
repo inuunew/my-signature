@@ -1,249 +1,483 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="id">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Spam NGL TANPA LIMIT</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            background-color: #f5f5f5;
-            color: #333;
-            max-width: 600px;
-            margin: 0 auto;
-            padding: 20px;
-        }
-        .container {
-            background-color: #fff;
-            padding: 20px;
-            border-radius: 8px;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-        }
-        h1 {
-            text-align: center;
-            margin-bottom: 20px;
-            color: #444;
-        }
-        .form-group {
-            margin-bottom: 15px;
-        }
-        label {
-            display: block;
-            margin-bottom: 5px;
-            font-weight: bold;
-        }
-        input, textarea {
-            width: 100%;
-            padding: 10px;
-            border: 1px solid #ddd;
-            border-radius: 4px;
-            box-sizing: border-box;
-            font-size: 14px;
-        }
-        .button-group {
-            display: flex;
-            gap: 10px;
-            margin-top: 15px;
-        }
-        button {
-            flex: 1;
-            padding: 12px;
-            border: none;
-            border-radius: 4px;
-            font-weight: bold;
-            cursor: pointer;
-            transition: opacity 0.3s;
-        }
-        button:active {
-            transform: scale(0.98);
-        }
-        #startBtn {
-            background-color: #4CAF50;
-            color: white;
-        }
-        #stopBtn {
-            background-color: #f44336;
-            color: white;
-        }
-        button:disabled {
-            background-color: #cccccc;
-            cursor: not-allowed;
-            opacity: 0.7;
-        }
-        #results {
-            margin-top: 20px;
-            max-height: 300px;
-            overflow-y: auto;
-            padding: 10px;
-            border: 1px solid #eee;
-            border-radius: 4px;
-        }
-        .message {
-            padding: 10px;
-            margin-bottom: 10px;
-            border-radius: 4px;
-            background-color: #f9f9f9;
-            border-left: 3px solid #ddd;
-        }
-        .success {
-            border-left-color: #4CAF50;
-        }
-        .error {
-            border-left-color: #f44336;
-        }
-        .counter {
-            font-size: 12px;
-            color: #666;
-            margin-top: 5px;
-            text-align: center;
-            padding: 5px;
-        }
-    </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>NuuTools - Spam NGL</title>
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@600;800&family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #000000; 
+      --card: #1a1a1a;
+      --text: #ffffff; 
+      --muted: #888888;
+      --primary: #ff0000; 
+      --secondary: #AD4AE7;
+      --accent: #666666;
+    }
+    
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: 'Poppins', sans-serif;
+    }
+    
+    body {
+      background:radial-gradient(circle at 20% 20%,rgba(255,255,255,.1),transparent 30%),
+                 radial-gradient(circle at 80% 10%,rgba(255,255,255,.08),transparent 25%),
+                 radial-gradient(circle at 50% 90%,rgba(255,255,255,.05),transparent 30%),
+                 var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      overflow-x: hidden;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 20px 35px 35px;
+    }
+    
+    /* Header & Logo */
+    .header {
+      display: flex;
+      align-items: center;
+      gap: 15px;
+      margin-bottom: 30px;
+      margin-top: 20px;
+    }
+    
+    .main-logo-container {
+      position: relative;
+      width: 80px;
+      height: 80px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    
+    .main-logo-ring {
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      border-radius: 50%;
+      background: conic-gradient(#ffffff 0%, #ff0000 30%, #AD4AE7 60%, #ffffff 100%);
+      animation: rotate 3s linear infinite;
+      padding: 4px;
+    }
+    
+    .main-logo {
+      width: 72px;
+      height: 72px;
+      border-radius: 50%;
+      object-fit: cover;
+      display: block;
+      z-index: 1;
+      position: relative;
+      background: #1a1a1a;
+      border: 2px solid rgba(255,255,255,0.1);
+    }
+
+    @keyframes rotate {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+    
+    .main-app-title {
+      font-family: 'Orbitron', sans-serif;
+      font-size: 28px;
+      font-weight: 800;
+      color: #fff;
+      text-shadow: 0 0 12px rgba(255,255,255,0.5);
+    }
+    
+    .main-access-info {
+      font-size: 12px;
+      text-align: center;
+      color: #fff;
+      background: rgba(255,255,255,0.1);
+      padding: 8px 14px;
+      border-radius: 10px;
+      margin-top: 5px;
+      position: relative;
+      z-index: 1;
+      border: 1px solid rgba(255,255,255,0.1);
+    }
+    
+    .main-access-info::before {
+      content: '';
+      position: absolute;
+      top: -2px; left: -2px; right: -2px; bottom: -2px;
+      background: linear-gradient(45deg, #ffffff 0%, #ff0000 30%, #AD4AE7 60%, #ffffff 100%);
+      border-radius: 12px;
+      z-index: -1;
+      animation: borderGlow 3s linear infinite;
+      background-size: 400% 400%;
+    }
+    
+    @keyframes borderGlow {
+      0% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
+    }
+    
+    /* Main Container */
+    .container {
+      background: rgba(26, 26, 26, 0.95);
+      backdrop-filter: blur(15px);
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      border-radius: 18px;
+      padding: 30px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.6);
+      max-width: 450px;
+      width: 100%;
+      position: relative;
+      overflow: hidden;
+      animation: fadeIn 0.8s ease;
+      margin-bottom: 30px;
+    }
+    
+    .container::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0; height: 3px;
+      background: linear-gradient(90deg, var(--primary), var(--secondary));
+      border-radius: 18px 18px 0 0;
+    }
+    
+    .section-title {
+      font-family: 'Orbitron', sans-serif;
+      font-size: 22px;
+      font-weight: 700;
+      color: #fff;
+      margin-bottom: 25px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      text-shadow: 0 0 15px rgba(255,255,255,0.3);
+    }
+    
+    .section-title i {
+      color: var(--primary);
+      font-size: 24px;
+    }
+    
+    /* Input Styling */
+    .input-group {
+      position: relative;
+      margin-bottom: 20px;
+    }
+    
+    .label {
+      color: #ff0000;
+      font-size: 14px;
+      margin-bottom: 8px;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+    }
+    
+    .label i {
+      margin-right: 8px;
+    }
+    
+    .input-box {
+      width: 100%;
+      padding: 14px 18px;
+      background: rgba(255,255,255,0.08);
+      border: 1px solid rgba(255,255,255,0.2);
+      color: white;
+      border-radius: 12px;
+      outline: none;
+      transition: all 0.3s;
+      font-size: 14px;
+      resize: vertical;
+    }
+    
+    .input-box:focus {
+      border-color: var(--secondary);
+      box-shadow: 0 0 15px rgba(173, 74, 231, 0.5);
+      transform: translateY(-2px);
+    }
+    
+    .input-box::placeholder {
+      color: rgba(255,255,255,0.4);
+    }
+    
+    /* Button Group */
+    .button-group {
+      display: flex;
+      gap: 15px;
+      margin-top: 25px;
+    }
+    
+    .action-btn {
+      flex: 1;
+      padding: 14px;
+      border: none;
+      border-radius: 12px;
+      color: white;
+      font-weight: bold;
+      font-size: 15px;
+      cursor: pointer;
+      transition: all 0.3s;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+    }
+    
+    .btn-start {
+      background: linear-gradient(135deg, var(--primary), var(--secondary));
+      box-shadow: 0 5px 15px rgba(173, 74, 231, 0.4);
+    }
+    
+    .btn-stop {
+      background: rgba(255, 255, 255, 0.1);
+      border: 1px solid rgba(255, 0, 0, 0.5);
+      color: #ff4d4d;
+    }
+    
+    .action-btn:hover:not(:disabled) {
+      transform: translateY(-3px);
+    }
+    
+    .btn-start:hover:not(:disabled) {
+      box-shadow: 0 8px 20px rgba(173, 74, 231, 0.6);
+    }
+    
+    .btn-stop:hover:not(:disabled) {
+      background: rgba(255, 0, 0, 0.2);
+    }
+    
+    .action-btn:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+      transform: none;
+    }
+
+    /* Results Log Console */
+    #results {
+      margin-top: 25px;
+      background: rgba(0, 0, 0, 0.5);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 12px;
+      padding: 15px;
+      height: 200px;
+      overflow-y: auto;
+      font-family: monospace;
+      font-size: 12px;
+    }
+
+    #results::-webkit-scrollbar { width: 6px; }
+    #results::-webkit-scrollbar-track { background: transparent; }
+    #results::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.2); border-radius: 10px; }
+
+    .log-msg {
+      margin-bottom: 8px;
+      padding-left: 10px;
+      border-left: 2px solid var(--muted);
+      color: #ccc;
+    }
+    .log-success { border-left-color: #00ff00; color: #aaffaa; }
+    .log-error { border-left-color: #ff0000; color: #ffaaaa; }
+    .log-info { border-left-color: var(--secondary); color: #fff; }
+    
+    /* Navigation Back Button */
+    .action-back {
+      width: 100%;
+      max-width: 450px;
+      padding: 12px;
+      background: linear-gradient(135deg, var(--primary), var(--secondary));
+      border: none;
+      border-radius: 12px;
+      color: white;
+      font-weight: bold;
+      font-size: 14px;
+      cursor: pointer;
+      transition: all 0.3s;
+      box-shadow: 0 5px 10px rgba(173, 74, 231, 0.3);
+    }
+    .action-back:hover { transform: translateY(-2px); }
+
+    .footer {
+      margin-top: 30px;
+      text-align: center;
+      color: var(--muted);
+      font-size: 14px;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    @media (max-width: 480px) {
+      .container { padding: 20px; }
+      .main-app-title { font-size: 24px; }
+      .section-title { font-size: 18px; }
+    }
+  </style>
 </head>
 <body>
-    <div class="container">
-        <h1>Spam NGL</h1>
-        
-        <div class="form-group">
-            <label for="nglLink">NGL Link:</label>
-            <input type="url" id="nglLink" placeholder="https://ngl.link/username" required>
-        </div>
-        
-        <div class="form-group">
-            <label for="message">Message:</label>
-            <textarea id="message" rows="4" placeholder="Type your message here..." required></textarea>
-        </div>
-        
-        <div class="form-group">
-            <label for="delay">Delay (ms):</label>
-            <input type="number" id="delay" value="1000" min="100" required>
-        </div>
-        
-        <div class="button-group">
-            <button id="startBtn">START</button>
-            <button id="stopBtn" disabled>STOP</button>
-        </div>
-        
-        <div id="results"></div>
+
+  <div class="header">
+    <div class="main-logo-container">
+      <div class="main-logo-ring"></div>
+      <img src="https://j.top4top.io/p_3718mckkw0.jpeg" class="main-logo" alt="NuuTools Logo">
     </div>
+    <div>
+      <div class="main-app-title">NuuTools</div>
+      <div class="main-access-info"><b>Spam NGL</b></div>
+    </div>
+  </div>
 
-    <script>
-        let isRunning = false;
-        let stopRequested = false;
-        let counter = 0;
+  <div class="container">
+    <h2 class="section-title">
+      <i class="fas fa-paper-plane"></i>
+      Auto Sender
+    </h2>
+    
+    <div class="input-group">
+      <div class="label"><i class="fas fa-link"></i> NGL Target Link</div>
+      <input type="url" class="input-box" id="nglLink" placeholder="https://ngl.link/username" required>
+    </div>
+    
+    <div class="input-group">
+      <div class="label"><i class="fas fa-comment-dots"></i> Pesan (Message)</div>
+      <textarea class="input-box" id="message" rows="3" placeholder="Ketik pesan yang ingin dispam..." required></textarea>
+    </div>
+    
+    <div class="input-group">
+      <div class="label"><i class="fas fa-stopwatch"></i> Delay (ms)</div>
+      <input type="number" class="input-box" id="delay" value="1000" min="1000" required>
+    </div>
+    
+    <div class="button-group">
+      <button class="action-btn btn-start" id="startBtn">
+        <i class="fas fa-rocket"></i> START
+      </button>
+      <button class="action-btn btn-stop" id="stopBtn" disabled>
+        <i class="fas fa-stop-circle"></i> STOP
+      </button>
+    </div>
+    
+    <div id="results">
+        <div class="log-msg log-info">Sistem siap. Masukkan target dan tekan START.</div>
+    </div>
+  </div>
+
+  <button class="action-back" onclick="window.location.href='/proyek.html'">
+    👉 Kembali ke Halaman Proyek 👈
+  </button>
+
+  <div class="footer">
+    © 2026 - NuuTools by InuuTyzDev.
+  </div>
+
+<script>
+    let isRunning = false;
+    let stopRequested = false;
+    let counter = 0;
+    
+    document.getElementById('startBtn').addEventListener('click', startSpamming);
+    document.getElementById('stopBtn').addEventListener('click', stopSpamming);
+    
+    function addLog(text, type = 'info') {
+        const resultsDiv = document.getElementById('results');
+        const logElement = document.createElement('div');
+        logElement.className = `log-msg log-${type}`;
+        logElement.textContent = text;
+        resultsDiv.appendChild(logElement);
         
-        document.getElementById('startBtn').addEventListener('click', startSpamming);
-        document.getElementById('stopBtn').addEventListener('click', stopSpamming);
+        // Anti-Lag: Max 30 log
+        while (resultsDiv.children.length > 30) {
+            resultsDiv.removeChild(resultsDiv.firstChild);
+        }
+        resultsDiv.scrollTop = resultsDiv.scrollHeight;
+        return logElement;
+    }
+
+    async function startSpamming() {
+        const nglLink = document.getElementById('nglLink').value.trim();
+        const message = document.getElementById('message').value.trim();
+        const delay = parseInt(document.getElementById('delay').value);
         
-        async function startSpamming() {
-            const nglLink = document.getElementById('nglLink').value.trim();
-            const message = document.getElementById('message').value.trim();
-            const delay = parseInt(document.getElementById('delay').value);
+        if (!nglLink || !message || isNaN(delay)) {
+            alert('⚠️ Harap isi semua kolom dengan benar!');
+            return;
+        }
+
+        if (delay < 1000) {
+            alert('⚠️ Delay minimal adalah 1000ms untuk mencegah perangkat freeze/lag.');
+            document.getElementById('delay').value = 1000;
+            return;
+        }
+        
+        let username;
+        try {
+            const url = new URL(nglLink);
+            username = url.pathname.split('/')[1];
+            if (!username) throw new Error();
+        } catch (e) {
+            alert('⚠️ Link NGL tidak valid!\nFormat yang benar: https://ngl.link/username');
+            return;
+        }
+        
+        // UI Setup
+        isRunning = true;
+        stopRequested = false;
+        counter = 0;
+        document.getElementById('startBtn').disabled = true;
+        document.getElementById('stopBtn').disabled = false;
+        
+        document.getElementById('results').innerHTML = '';
+        addLog(`Memulai pengiriman ke target: @${username}`, 'info');
+        
+        while (isRunning && !stopRequested) {
+            counter++;
+            const timestamp = new Date().toLocaleTimeString();
+            let currentLog = addLog(`[${counter}] ${timestamp} - Mengirim...`, 'info');
             
-            if (!nglLink || !message || isNaN(delay) || delay < 100) {
-                alert('Please fill all fields correctly!\nMinimum delay: 100ms');
-                return;
-            }
-            
-            let username;
             try {
-                const url = new URL(nglLink);
-                username = url.pathname.split('/')[1];
-                if (!username) throw new Error();
-            } catch (e) {
-                alert('Invalid NGL link!\nCorrect format: https://ngl.link/username');
-                return;
+                const deviceId = 'anon-' + Math.random().toString(36).substr(2, 9) + Date.now();
+                
+                await fetch('https://ngl.link/api/submit', {
+                    method: 'POST',
+                    mode: 'no-cors', // Bypass CORS Opaque Response
+                    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                    body: `username=${encodeURIComponent(username)}&question=${encodeURIComponent(message)}&deviceId=${deviceId}&gameSlug=&referrer=`
+                });
+                
+                // Jika tidak dilempar ke catch, asumsikan request berhasil menembus network
+                currentLog.className = 'log-msg log-success';
+                currentLog.textContent = `[${counter}] ${timestamp} - Berhasil terkirim!`;
+                
+            } catch (error) {
+                currentLog.className = 'log-msg log-error';
+                currentLog.textContent = `[${counter}] ${timestamp} - Error: Koneksi gagal`;
             }
             
-            // UI Setup
-            isRunning = true;
-            stopRequested = false;
-            counter = 0;
-            document.getElementById('startBtn').disabled = true;
-            document.getElementById('stopBtn').disabled = false;
-            
-            const resultsDiv = document.getElementById('results');
-            resultsDiv.innerHTML = '<div class="message">Starting spam to ' + username + '...</div>';
-            
-            while (isRunning && !stopRequested) {
-                counter++;
-                try {
-                    const timestamp = new Date().toLocaleTimeString();
-                    
-                    // Create message element
-                    const msgElement = document.createElement('div');
-                    msgElement.className = 'message';
-                    msgElement.innerHTML = `${counter} - ${timestamp} - Sending...`;
-                    resultsDiv.appendChild(msgElement);
-                    
-                    // Generate unique device ID
-                    const deviceId = 'anon-' + Math.random().toString(36).substr(2, 9) + Date.now();
-                    
-                    // Send request dengan mode no-cors untuk mem-bypass pemblokiran browser
-                    await fetch('https://ngl.link/api/submit', {
-                        method: 'POST',
-                        mode: 'no-cors',
-                        headers: {
-                            'Content-Type': 'application/x-www-form-urlencoded',
-                        },
-                        body: `username=${encodeURIComponent(username)}&question=${encodeURIComponent(message)}&deviceId=${deviceId}&gameSlug=&referrer=`
-                    });
-                    
-                    // Langsung anggap sukses karena no-cors membuat response tidak terbaca JSON-nya
-                    msgElement.classList.add('success');
-                    msgElement.textContent = `${counter} - ${timestamp} - Sent successfully!`;
-                    
-                } catch (error) {
-                    const errorElement = document.querySelector('#results div:last-child');
-                    if(errorElement) {
-                        errorElement.classList.add('error');
-                        errorElement.textContent = `${counter} - Error: Koneksi terputus`;
-                    }
-                }
-                
-                // Add counter
-                const counterElement = document.createElement('div');
-                counterElement.className = 'counter';
-                counterElement.textContent = `Sent: ${counter} messages`;
-                resultsDiv.appendChild(counterElement);
-
-                // Anti-Lag: Menghapus log lama agar browser tidak freeze (Max simpan 20 baris)
-                while (resultsDiv.children.length > 20) {
-                    resultsDiv.removeChild(resultsDiv.firstChild);
-                }
-                
-                // Scroll to bottom
-                resultsDiv.scrollTop = resultsDiv.scrollHeight;
-                
-                // Delay
-                if (!stopRequested) {
-                    await new Promise(resolve => setTimeout(resolve, delay));
-                }
+            if (!stopRequested) {
+                await new Promise(resolve => setTimeout(resolve, delay));
             }
-            
-            // Final status
-            const finalElement = document.createElement('div');
-            finalElement.className = 'message';
-            finalElement.textContent = `${stopRequested ? 'STOPPED' : 'COMPLETED'} - Total: ${counter} messages sent`;
-            resultsDiv.appendChild(finalElement);
-            resultsDiv.scrollTop = resultsDiv.scrollHeight;
-            
-            // Reset UI
-            isRunning = false;
-            document.getElementById('startBtn').disabled = false;
-            document.getElementById('stopBtn').disabled = true;
         }
         
-        function stopSpamming() {
-            if (isRunning) {
-                stopRequested = true;
-                document.getElementById('stopBtn').disabled = true;
-                const resultsDiv = document.getElementById('results');
-                resultsDiv.innerHTML += '<div class="message">Stopping after ' + counter + ' messages...</div>';
-                // Scroll saat pesan STOP muncul
-                resultsDiv.scrollTop = resultsDiv.scrollHeight;
-            }
+        addLog(`=== SESI SELESAI | Total: ${counter} pesan ===`, 'info');
+        
+        // Reset UI
+        isRunning = false;
+        document.getElementById('startBtn').disabled = false;
+        document.getElementById('stopBtn').disabled = true;
+    }
+    
+    function stopSpamming() {
+        if (isRunning) {
+            stopRequested = true;
+            document.getElementById('stopBtn').disabled = true;
+            addLog('Menghentikan proses... (Menunggu delay terakhir)', 'error');
         }
-    </script>
+    }
+</script>
 </body>
 </html>
