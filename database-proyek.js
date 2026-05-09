@@ -116,5 +116,19 @@ const databaseProyek = [
     "warna": "#8B5CF6", // Ungu (Aksen utama UI)
     "linkPreview": "/tools/ai.html",
     "linkGithub": "#"
+  },
+  {
+    "id": "10",
+    "nama": "music player",
+    "klien": "Personal Project",
+    "tanggal": "Mei 2026",
+    "layanan": "Web Application",
+    "kategori": "Website", 
+    "deskripsi": "music player spotify download lagu.",
+    "fitur": ["Api integration", "download full", "Modern UI/UX"],
+    "warna": "#8B5CF6", // Ungu (Aksen utama UI)
+    "linkPreview": "/tools/music.html",
+    "linkGithub": "#"
   }
+  
 ];
