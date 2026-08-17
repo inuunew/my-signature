@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Alight Motion Premium Tools</title>
+    <style>
+        :root {
+            --primary: #2563eb;
+            --primary-hover: #1d4ed8;
+            --bg: #f8fafc;
+            --card: #ffffff;
+            --text: #0f172a;
+            --border: #e2e8f0;
+        }
+        * { box-sizing: border-box; }
+        body {
+            font-family: system-ui, -apple-system, sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            margin: 0;
+            padding: 20px;
+        }
+        .container { max-width: 650px; margin: 0 auto; }
+        h1 { text-align: center; color: var(--primary); margin-bottom: 5px; }
+        p.subtitle { text-align: center; color: #64748b; margin-bottom: 25px; font-size: 14px; }
+        
+        .tab-buttons { display: flex; gap: 8px; margin-bottom: 20px; }
+        .tab-btn {
+            flex: 1; padding: 10px; background: #e2e8f0; color: #475569;
+            border: none; border-radius: 8px; font-weight: bold; cursor: pointer;
+        }
+        .tab-btn.active { background: var(--primary); color: white; }
+
+        .card {
+            background: var(--card); border-radius: 12px; padding: 20px;
+            box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); margin-bottom: 20px;
+            border: 1px solid var(--border);
+        }
+        .form-group { margin-bottom: 15px; }
+        label { display: block; font-size: 14px; font-weight: bold; margin-bottom: 6px; }
+        input[type="text"], input[type="email"] {
+            width: 100%; padding: 12px; border: 1px solid var(--border);
+            border-radius: 8px; font-size: 15px; outline: none;
+        }
+        input:focus { border-color: var(--primary); }
+        button.btn-submit {
+            width: 100%; padding: 12px; background: var(--primary); color: white;
+            border: none; border-radius: 8px; font-weight: bold; font-size: 16px; cursor: pointer;
+        }
+        button.btn-submit:hover { background: var(--primary-hover); }
+
+        .response-box {
+            display: none; padding: 12px; border-radius: 8px; font-size: 14px;
+            margin-top: 15px; white-space: pre-wrap; word-break: break-all;
+        }
+        .response-box.success { background: #dcfce7; color: #15803d; border: 1px solid #bbf7d0; }
+        .response-box.error { background: #fee2e2; color: #b91c1c; border: 1px solid #fecaca; }
+
+        .loading { text-align: center; display: none; color: var(--primary); font-weight: bold; margin: 10px 0; }
+
+        /* Stats Section */
+        .stats-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 15px; }
+        .stat-item { background: #f1f5f9; padding: 12px; border-radius: 8px; text-align: center; }
+        .stat-value { font-size: 20px; font-weight: bold; color: var(--primary); }
+        .stat-label { font-size: 12px; color: #64748b; }
+        .recent-list { font-size: 13px; list-style: none; padding: 0; margin: 0; }
+        .recent-list li { padding: 8px 0; border-bottom: 1px solid var(--border); }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>Alight Motion Tools</h1>
+    <p class="subtitle">Layanan Otomatisasi Alight Motion Premium</p>
+
+    <div class="tab-buttons">
+        <button class="tab-btn active" onclick="switchTab('sendTab')">1. Kirim Link</button>
+        <button class="tab-btn" onclick="switchTab('verifyTab')">2. Verifikasi Link</button>
+        <button class="tab-btn" onclick="switchTab('statsTab')">Statistik</button>
+    </div>
+
+    <!-- Form Send Link -->
+    <div class="card" id="sendTab">
+        <h3>Kirim Link Verifikasi</h3>
+        <div class="form-group">
+            <label>Alamat Email Alight Motion</label>
+            <input type="email" id="sendEmail" placeholder="contoh@gmail.com">
+        </div>
+        <button class="btn-submit" onclick="handleSend()">Kirim Email</button>
+        <div class="loading" id="sendLoading">Sedang menyelesaikan PoW & mengirim request...</div>
+        <div class="response-box" id="sendResult"></div>
+    </div>
+
+    <!-- Form Verify Link -->
+    <div class="card" id="verifyTab" style="display: none;">
+        <h3>Verifikasi Link (OOB Link)</h3>
+        <div class="form-group">
+            <label>Alamat Email Alight Motion</label>
+            <input type="email" id="verifyEmail" placeholder="contoh@gmail.com">
+        </div>
+        <div class="form-group">
+            <label>Link Verifikasi (dari Email)</label>
+            <input type="text" id="verifyLink" placeholder="Paste link dari email di sini...">
+        </div>
+        <button class="btn-submit" onclick="handleVerify()">Verifikasi Akun</button>
+        <div class="loading" id="verifyLoading">Sedang memproses verifikasi...</div>
+        <div class="response-box" id="verifyResult"></div>
+    </div>
+
+    <!-- Stats View -->
+    <div class="card" id="statsTab" style="display: none;">
+        <h3>Statistik Layanan</h3>
+        <button class="btn-submit" style="margin-bottom: 15px; padding: 8px;" onclick="loadStats()">Refresh Stats</button>
+        <div class="loading" id="statsLoading">Memuat data...</div>
+        <div id="statsContent"></div>
+    </div>
+</div>
+
+<script>
+    function switchTab(tabId) {
+        ['sendTab', 'verifyTab', 'statsTab'].forEach(id => {
+            document.getElementById(id).style.display = (id === tabId) ? 'block' : 'none';
+        });
+        document.querySelectorAll('.tab-btn').forEach((btn, idx) => {
+            btn.classList.toggle('active', 
+                (tabId === 'sendTab' && idx === 0) || 
+                (tabId === 'verifyTab' && idx === 1) || 
+                (tabId === 'statsTab' && idx === 2)
+            );
+        });
+        if (tabId === 'statsTab') loadStats();
+    }
+
+    async function handleSend() {
+        const email = document.getElementById('sendEmail').value.trim();
+        const resBox = document.getElementById('sendResult');
+        const loading = document.getElementById('sendLoading');
+
+        if (!email) return alert('Email tidak boleh kosong');
+
+        resBox.style.display = 'none';
+        loading.style.display = 'block';
+
+        try {
+            const res = await fetch('/api/amprem?action=send', {
+                method: 'POST',
+                headers: { 'content-type': 'application/json' },
+                body: JSON.stringify({ email })
+            });
+            const data = await res.json();
+            
+            resBox.className = 'response-box ' + (res.ok ? 'success' : 'error');
+            resBox.textContent = JSON.stringify(data, null, 2);
+            resBox.style.display = 'block';
+        } catch (err) {
+            resBox.className = 'response-box error';
+            resBox.textContent = 'Gagal memproses request: ' + err.message;
+            resBox.style.display = 'block';
+        } finally {
+            loading.style.display = 'none';
+        }
+    }
+
+    async function handleVerify() {
+        const email = document.getElementById('verifyEmail').value.trim();
+        const link = document.getElementById('verifyLink').value.trim();
+        const resBox = document.getElementById('verifyResult');
+        const loading = document.getElementById('verifyLoading');
+
+        if (!email || !link) return alert('Email dan Link wajib diisi');
+
+        resBox.style.display = 'none';
+        loading.style.display = 'block';
+
+        try {
+            const res = await fetch('/api/amprem?action=verify', {
+                method: 'POST',
+                headers: { 'content-type': 'application/json' },
+                body: JSON.stringify({ email, link })
+            });
+            const data = await res.json();
+
+            resBox.className = 'response-box ' + (res.ok ? 'success' : 'error');
+            resBox.textContent = JSON.stringify(data, null, 2);
+            resBox.style.display = 'block';
+        } catch (err) {
+            resBox.className = 'response-box error';
+            resBox.textContent = 'Gagal memproses verifikasi: ' + err.message;
+            resBox.style.display = 'block';
+        } finally {
+            loading.style.display = 'none';
+        }
+    }
+
+    async function loadStats() {
+        const loading = document.getElementById('statsLoading');
+        const container = document.getElementById('statsContent');
+
+        loading.style.display = 'block';
+        container.innerHTML = '';
+
+        try {
+            const res = await fetch('/api/amprem?action=stats');
+            const data = await res.json();
+
+            container.innerHTML = `
+                <div class="stats-grid">
+                    <div class="stat-item">
+                        <div class="stat-value">${data.stats?.total || 0}</div>
+                        <div class="stat-label">Total Permintaan</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-value">${data.stats?.success || 0}</div>
+                        <div class="stat-label">Berhasil</div>
+                    </div>
+                </div>
+                <h4>Aktivitas Terbaru:</h4>
+                <ul class="recent-list">
+                    ${(data.recent || []).map(r => `<li><strong>${r.email || 'Anonim'}</strong> - ${r.action || ''} (${r.status || ''})</li>`).join('')}
+                </ul>
+            `;
+        } catch (err) {
+            container.innerHTML = `<p style="color:red;">Gagal memuat statistik: ${err.message}</p>`;
+        } finally {
+            loading.style.display = 'none';
+        }
+    }
+</script>
+
+</body>
+</html>
