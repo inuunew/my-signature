@@ -12,128 +12,62 @@
             --card: #ffffff;
             --text: #1f2937;
         }
+        * { box-sizing: border-box; }
         body {
             font-family: system-ui, -apple-system, sans-serif;
             background: var(--bg);
             color: var(--text);
             margin: 0;
-            padding: 20px;
+            padding: 15px;
         }
-        .container {
-            max-width: 800px;
-            margin: 0 auto;
-        }
-        h1 {
-            text-align: center;
-            color: var(--primary);
-        }
-        .search-form {
-            display: flex;
-            gap: 10px;
-            margin-bottom: 25px;
-        }
+        .container { max-width: 800px; margin: 0 auto; }
+        h1 { text-align: center; color: var(--primary); margin-bottom: 20px; }
+        .search-form { display: flex; gap: 8px; margin-bottom: 20px; }
         input[type="text"] {
-            flex: 1;
-            padding: 12px 16px;
-            border: 1px solid #d1d5db;
-            border-radius: 8px;
-            font-size: 16px;
-            outline: none;
+            flex: 1; padding: 12px; border: 1px solid #d1d5db;
+            border-radius: 8px; font-size: 15px; outline: none;
         }
-        input[type="text"]:focus {
-            border-color: var(--primary);
-        }
+        input[type="text"]:focus { border-color: var(--primary); }
         button {
-            padding: 12px 24px;
-            background: var(--primary);
-            color: white;
-            border: none;
-            border-radius: 8px;
-            font-weight: bold;
-            cursor: pointer;
+            padding: 12px 20px; background: var(--primary); color: white;
+            border: none; border-radius: 8px; font-weight: bold; cursor: pointer;
         }
         button:hover { background: var(--primary-dark); }
-        .loading {
-            text-align: center;
-            display: none;
-            margin: 20px 0;
-            font-weight: bold;
-        }
-        .grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
-            gap: 15px;
-        }
+        .section-title { font-size: 18px; margin-bottom: 12px; font-weight: bold; }
+        .loading { text-align: center; display: none; margin: 20px 0; font-weight: bold; }
+        .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 15px; }
         .card {
-            background: var(--card);
-            border-radius: 10px;
-            overflow: hidden;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
-            display: flex;
-            flex-direction: column;
+            background: var(--card); border-radius: 10px; overflow: hidden;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05); display: flex; flex-direction: column;
         }
-        .card img {
-            width: 100%;
-            height: 130px;
-            object-fit: cover;
-        }
-        .card-content {
-            padding: 12px;
-            display: flex;
-            flex-direction: column;
-            flex: 1;
-        }
-        .card-title {
-            font-size: 15px;
-            font-weight: bold;
-            margin: 0 0 5px 0;
-        }
-        .card-version {
-            font-size: 13px;
-            color: #6b7280;
-            margin-bottom: 12px;
-            flex: 1;
-        }
+        .card img { width: 100%; height: 120px; object-fit: cover; background: #e5e7eb; }
+        .card-content { padding: 12px; display: flex; flex-direction: column; flex: 1; }
+        .card-title { font-size: 14px; font-weight: bold; margin-bottom: 4px; }
+        .card-version { font-size: 12px; color: #6b7280; margin-bottom: 10px; flex: 1; }
+        
         .detail-card {
-            display: none;
-            background: var(--card);
-            padding: 20px;
-            border-radius: 10px;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            display: none; background: var(--card); padding: 20px;
+            border-radius: 10px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);
         }
-        .detail-header {
-            display: flex;
-            gap: 15px;
-            align-items: center;
-            margin-bottom: 20px;
-        }
-        .detail-header img {
-            width: 80px;
-            height: 80px;
-            border-radius: 12px;
-        }
+        .detail-header { display: flex; gap: 15px; align-items: center; margin-bottom: 15px; }
+        .detail-header img { width: 75px; height: 75px; border-radius: 12px; background: #e5e7eb; }
+        .desc-box { background: #f9fafb; padding: 12px; border-radius: 6px; font-size: 14px; margin-bottom: 15px; color: #4b5563; }
+        
+        .screenshots { display: flex; gap: 8px; overflow-x: auto; margin-bottom: 20px; padding-bottom: 5px; }
+        .screenshots img { height: 140px; border-radius: 6px; object-fit: cover; }
+        
         .dl-item {
-            background: #f9fafb;
-            border: 1px solid #e5e7eb;
-            padding: 12px;
-            border-radius: 6px;
-            margin-bottom: 8px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
+            background: #f9fafb; border: 1px solid #e5e7eb; padding: 12px;
+            border-radius: 6px; margin-bottom: 8px; display: flex;
+            justify-content: space-between; align-items: center; gap: 10px;
         }
-        .btn-back {
-            background: #6b7280;
-            margin-bottom: 15px;
+        .btn-dl {
+            background: var(--primary); color: white; padding: 8px 14px;
+            border-radius: 6px; text-decoration: none; font-weight: bold; font-size: 14px; white-space: nowrap;
         }
-        .error {
-            color: #dc2626;
-            background: #fee2e2;
-            padding: 12px;
-            border-radius: 6px;
-            display: none;
-            margin-bottom: 15px;
-        }
+        .btn-back { background: #6b7280; margin-bottom: 15px; }
+        .error { color: #dc2626; background: #fee2e2; padding: 12px; border-radius: 6px; display: none; margin-bottom: 15px; }
+        .placeholder { display: flex; align-items: center; justify-content: center; background: #e5e7eb; color: #9ca3af; font-size: 12px; }
     </style>
 </head>
 <body>
@@ -142,29 +76,59 @@
     <h1>APKMODY Downloader</h1>
 
     <div class="search-form">
-        <input type="text" id="searchInput" placeholder="Cari game/aplikasi atau masukkan URL APKMODY...">
-        <button onclick="handleSubmit()">Cari</button>
+        <input type="text" id="searchInput" placeholder="Cari aplikasi/game...">
+        <button onclick="handleSearch()">Cari</button>
     </div>
 
     <div class="error" id="error"></div>
-    <div class="loading" id="loading">Memuat data dari server...</div>
+    <div class="loading" id="loading">Memuat data...</div>
 
-    <!-- Hasil Search -->
-    <div class="grid" id="results"></div>
+    <!-- Halaman Utama / Hasil Search -->
+    <div id="mainView">
+        <div class="section-title" id="gridTitle">Rekomendasi / Terbaru</div>
+        <div class="grid" id="results"></div>
+    </div>
 
-    <!-- Detail & File Download -->
+    <!-- Detail View -->
     <div class="detail-card" id="detail">
-        <button class="btn-back" onclick="showResults()">⬅ Kembali</button>
+        <button class="btn-back" onclick="showMainView()">⬅ Kembali</button>
         <div class="detail-header" id="detailHeader"></div>
-        <h3>Daftar File Download:</h3>
+        
+        <div class="section-title">Deskripsi</div>
+        <div class="desc-box" id="detailDesc"></div>
+
+        <div class="section-title" id="ssTitle">Screenshot</div>
+        <div class="screenshots" id="detailScreenshots"></div>
+
+        <div class="section-title">Daftar File Download</div>
         <div id="downloadList"></div>
     </div>
 </div>
 
 <script>
-    async function handleSubmit() {
+    const PLACEHOLDER = 'https://via.placeholder.com/300x150?text=No+Image';
+
+    window.onload = () => {
+        loadHome();
+    };
+
+    async function loadHome() {
+        showLoading(true);
+        try {
+            const res = await fetch('/api/apkmody?action=home');
+            const data = await res.json();
+            document.getElementById('gridTitle').textContent = 'Rekomendasi / Terbaru';
+            renderGrid(data.items || []);
+        } catch (err) {
+            showError('Gagal memuat halaman utama');
+        } finally {
+            showLoading(false);
+        }
+    }
+
+    async function handleSearch() {
         const query = document.getElementById('searchInput').value.trim();
-        if (!query) return;
+        if (!query) return loadHome();
 
         showLoading(true);
         hideError();
@@ -174,7 +138,10 @@
             if (query.startsWith('http')) {
                 await loadDetail(query);
             } else {
-                await loadSearch(query);
+                const res = await fetch(`/api/apkmody?action=search&q=${encodeURIComponent(query)}`);
+                const data = await res.json();
+                document.getElementById('gridTitle').textContent = `Hasil Pencarian: "${query}"`;
+                renderGrid(data.items || []);
             }
         } catch (err) {
             showError(err.message);
@@ -183,28 +150,24 @@
         }
     }
 
-    async function loadSearch(q) {
-        const res = await fetch(`/api/apkmody?action=search&q=${encodeURIComponent(q)}`);
-        const data = await res.json();
-        if (!res.ok) throw new Error(data.error || 'Gagal mencari');
-
+    function renderGrid(items) {
         const container = document.getElementById('results');
         container.innerHTML = '';
-        container.style.display = 'grid';
-
-        if (!data.items || data.items.length === 0) {
-            container.innerHTML = '<p>Hasil tidak ditemukan.</p>';
+        
+        if (items.length === 0) {
+            container.innerHTML = '<p>Tidak ada data ditemukan.</p>';
             return;
         }
 
-        data.items.forEach(item => {
+        items.forEach(item => {
             const card = document.createElement('div');
             card.className = 'card';
+            const imgSrc = item.cover || PLACEHOLDER;
             card.innerHTML = `
-                <img src="${item.cover || 'https://via.placeholder.com/200'}" alt="cover">
+                <img src="${imgSrc}" onerror="this.src='${PLACEHOLDER}'" alt="cover">
                 <div class="card-content">
                     <div class="card-title">${item.title}</div>
-                    <div class="card-version">${item.version}</div>
+                    <div class="card-version">${item.version || ''}</div>
                     <button onclick="loadDetail('${item.url}')">Detail & Download</button>
                 </div>
             `;
@@ -220,21 +183,38 @@
             const data = await res.json();
             if (!res.ok) throw new Error(data.error || 'Gagal memuat detail');
 
-            document.getElementById('results').style.display = 'none';
-            const detailCard = document.getElementById('detail');
-            detailCard.style.display = 'block';
+            document.getElementById('mainView').style.display = 'none';
+            document.getElementById('detail').style.display = 'block';
 
             document.getElementById('detailHeader').innerHTML = `
-                <img src="${data.icon || 'https://via.placeholder.com/80'}" alt="icon">
+                <img src="${data.icon || PLACEHOLDER}" onerror="this.src='${PLACEHOLDER}'" alt="icon">
                 <div>
-                    <h2 style="margin:0;">${data.title}</h2>
-                    <small>Versi: ${data.version || '-'} | Mod: ${data.mod || '-'}</small>
+                    <h2 style="margin:0 0 5px 0; font-size:18px;">${data.title}</h2>
+                    <div style="font-size:13px; color:#6b7280;">
+                        ${data.version ? `<strong>Versi:</strong> ${data.version}<br>` : ''}
+                        ${data.mod ? `<strong>Mod:</strong> ${data.mod}` : ''}
+                    </div>
                 </div>
             `;
 
+            document.getElementById('detailDesc').textContent = data.description;
+
+            const ssContainer = document.getElementById('detailScreenshots');
+            ssContainer.innerHTML = '';
+            if (data.screenshots && data.screenshots.length > 0) {
+                document.getElementById('ssTitle').style.display = 'block';
+                data.screenshots.forEach(src => {
+                    const img = document.createElement('img');
+                    img.src = src;
+                    img.onerror = () => img.remove();
+                    ssContainer.appendChild(img);
+                });
+            } else {
+                document.getElementById('ssTitle').style.display = 'none';
+            }
+
             const dlContainer = document.getElementById('downloadList');
             dlContainer.innerHTML = '';
-
             if (!data.downloads || data.downloads.length === 0) {
                 dlContainer.innerHTML = '<p style="color:red;">File download tidak ditemukan.</p>';
             } else {
@@ -242,11 +222,11 @@
                     const item = document.createElement('div');
                     item.className = 'dl-item';
                     item.innerHTML = `
-                        <div>
-                            <strong>${file.fileName}</strong><br>
-                            <small>Ukuran: ${file.size || 'N/A'}</small>
+                        <div style="overflow:hidden;">
+                            <strong style="font-size:14px; word-break:break-all;">${file.fileName}</strong><br>
+                            <small style="color:#6b7280;">Ukuran: ${file.size}</small>
                         </div>
-                        <a href="${file.url}" target="_blank" style="background:var(--primary);color:white;padding:8px 12px;border-radius:6px;text-decoration:none;font-weight:bold;">Unduh</a>
+                        <a href="${file.url}" target="_blank" class="btn-dl">Unduh</a>
                     `;
                     dlContainer.appendChild(item);
                 });
@@ -259,20 +239,20 @@
     }
 
     function showLoading(v) { document.getElementById('loading').style.display = v ? 'block' : 'none'; }
-    function showError(msg) { 
+    function showError(msg) {
         const e = document.getElementById('error');
         e.style.display = 'block';
         e.textContent = msg;
     }
     function hideError() { document.getElementById('error').style.display = 'none'; }
     function hideDetail() { document.getElementById('detail').style.display = 'none'; }
-    function showResults() {
+    function showMainView() {
         document.getElementById('detail').style.display = 'none';
-        document.getElementById('results').style.display = 'grid';
+        document.getElementById('mainView').style.display = 'block';
     }
 
     document.getElementById('searchInput').addEventListener('keypress', (e) => {
-        if (e.key === 'Enter') handleSubmit();
+        if (e.key === 'Enter') handleSearch();
     });
 </script>
 
