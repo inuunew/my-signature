@@ -6,6 +6,12 @@ const FILE_RE = /\.(apk|obb|zip|rar|7z|xapk)$/i
 const SLUG_RE = /\/(games|apps)\/[^/]+/
 const SIZE_RE = /([\d.,]+)\s*(TB|GB|MB|KB)/i
 
+// 🚫 DAFTAR KATA KUNCI BLACKLIST (Tambahkan kata lain jika perlu)
+const BLACKLIST_KEYWORDS = [
+  'camgirls', '18+', 'adult', 'sex', 'hentai', 'porn', 'nude',
+  'strip', 'xx', 'xvideo', 'erotic', 'boobs', 'fuck', 'nsfw'
+]
+
 const headers = {
   'user-agent': 'Mozilla/5.0 (Linux; Android 10; K) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/139.0.0.0 Mobile Safari/537.36',
   'accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
@@ -15,7 +21,13 @@ const headers = {
 const client = axios.create({ baseURL: BASE, timeout: 30000, headers })
 const clean = (s) => String(s || '').replace(/\s+/g, ' ').trim()
 
-// Fungsi mengekstrak URL gambar dari src, data-src, atau srcset
+// Fungsi mengecek apakah teks mengandung kata yang di-blacklist
+function isBlacklisted(text) {
+  if (!text) return false
+  const lower = String(text).toLowerCase()
+  return BLACKLIST_KEYWORDS.some(word => lower.includes(word))
+}
+
 function extractImg($el) {
   if (!$el || !$el.length) return null
   let src = $el.attr('data-src') || $el.attr('data-lazy-src') || $el.attr('src') || ''
@@ -50,7 +62,10 @@ function parseCards($) {
     const title = clean($(el).find('.card-title, .has-normal-font-size, h3').first().text())
     const version = clean($(el).find('.card-excerpt, .has-small-font-size').first().text())
     
-    if (title) items.push({ title, version, cover, url })
+    // 🔍 Filter: Jangan masukkan ke daftar jika kena Blacklist
+    if (title && !isBlacklisted(title) && !isBlacklisted(url)) {
+      items.push({ title, version, cover, url })
+    }
   })
   return items
 }
@@ -112,6 +127,12 @@ module.exports = async function handler(req, res) {
 
     if (action === 'search') {
       if (!q) return res.status(400).json({ error: 'Query (q) diperlukan' })
+      
+      // Blokir jika kata kunci pencarian mengandung kata terlarang
+      if (isBlacklisted(q)) {
+        return res.status(200).json({ items: [] })
+      }
+
       const u = new URL(BASE + '/')
       u.searchParams.set('s', q)
       const body = await fetchPage(u.toString())
@@ -121,10 +142,21 @@ module.exports = async function handler(req, res) {
 
     if (action === 'detail') {
       if (!url) return res.status(400).json({ error: 'URL diperlukan' })
+      
+      // Cek URL secara langsung
+      if (isBlacklisted(url)) {
+        return res.status(403).json({ error: 'Aplikasi ini diblokir oleh sistem (Konten Terlarang).' })
+      }
+
       const body = await fetchPage(url)
       const $ = cheerio.load(body)
       const parsed = parseDetail($)
       
+      // Cek judul atau mod aplikasi setelah di-parse
+      if (isBlacklisted(parsed.title) || isBlacklisted(parsed.mod)) {
+        return res.status(403).json({ error: 'Aplikasi ini diblokir oleh sistem (Konten Terlarang).' })
+      }
+
       const isApp = /\/apps\//.test(url)
       const slug = (url.match(/\/(?:games|apps)\/([^/]+)/) || [])[1] || null
       
