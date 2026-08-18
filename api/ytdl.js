@@ -47,11 +47,15 @@ async function processInsvid(youtubeUrl, format) {
 // PROVIDER 2: SAVETUBE
 // ==========================================
 function getSecretKeyHex() {
-  // Hasil de-obfuscate kode asli
   return "C5D58EF67A" + "6C35BBC4EB" + "7584E4A29F" + "12"
 }
 
 function decryptData(encryptedBase64) {
+  // Pastikan parameter adalah string, jika bukan, tolak
+  if (typeof encryptedBase64 !== 'string') {
+      throw new Error('Data enkripsi tidak valid (bukan string).')
+  }
+  
   const key = Buffer.from(getSecretKeyHex(), 'hex')
   const encryptedBuffer = Buffer.from(encryptedBase64.replace(/\s/g, ''), 'base64')
   const iv = encryptedBuffer.subarray(0, 16)
@@ -70,9 +74,15 @@ const savetubeHeaders = {
 
 async function processSavetube(youtubeUrl, format, quality) {
   const infoRes = await axios.post('https://cdn403.savetube.vip/v2/info', { url: youtubeUrl }, { headers: savetubeHeaders })
-  if (!infoRes?.data) throw new Error('Gagal memuat info video dari Savetube')
   
-  const meta = decryptData(infoRes.data)
+  // FIX: Mengambil properti .data dari dalam JSON (atau teks langsung jika respons berupa string)
+  const encryptedString = infoRes?.data?.data || infoRes?.data;
+  
+  if (!encryptedString) {
+      throw new Error('Gagal memuat string info video dari Savetube')
+  }
+
+  const meta = decryptData(encryptedString)
   const key = meta?.key
   if (!key) throw new Error('Gagal mengekstrak Key dekripsi')
 
