@@ -1,6 +1,5 @@
 const axios = require('axios')
 
-// Fungsi untuk mengekstrak ID YouTube dari berbagai format link
 function extractVideoId(input) {
   try {
     const url = new URL(input)
@@ -14,14 +13,14 @@ function extractVideoId(input) {
   }
 }
 
-async function processInsvid(youtubeUrl, format) {
-  const fileType = format === 'audio' ? 'MP3' : 'MP4'
+async function processInsvid(youtubeUrl) {
   const videoId = extractVideoId(youtubeUrl)
   
   if (!videoId) throw new Error('URL YouTube tidak valid')
 
+  // Langsung hardcode ke MP3 karena server Insvid hanya mendukung ini
   const response = await axios.post('https://ac.insvid.com/converter', {
-    id: videoId, fileType
+    id: videoId, fileType: 'MP3'
   }, {
     headers: {
       'host': 'ac.insvid.com',
@@ -30,31 +29,27 @@ async function processInsvid(youtubeUrl, format) {
     }
   })
 
-  // Memastikan respons dari Insvid sesuai dengan hasil screenshot yang kamu bagikan
   if (response.data?.status === 'ok' && response.data?.link) {
     const downloadUrl = response.data.link;
-    let title = `Video ID: ${videoId}`;
+    let title = `Audio ID: ${videoId}`;
 
-    // Trik Cerdas: Mengekstrak Judul Asli dari parameter 'n' pada link result
+    // Ekstrak Judul Asli dari parameter 'n'
     try {
         const parsedUrl = new URL(downloadUrl);
         const titleParam = parsedUrl.searchParams.get('n');
         if (titleParam) {
             title = decodeURIComponent(titleParam).replace(/\+/g, ' ');
         }
-    } catch (e) {
-        // Abaikan jika gagal mem-parsing URL
-    }
+    } catch (e) {}
 
     return {
       title: title,
-      duration: 'Bervariasi', 
       downloadUrl: downloadUrl,
-      provider: 'Insvid API'
+      provider: 'Insvid (Audio Only)'
     }
   }
   
-  throw new Error('Gagal mendapatkan link download dari server.')
+  throw new Error('Gagal mendapatkan link MP3 dari server.')
 }
 
 module.exports = async function handler(req, res) {
@@ -63,12 +58,11 @@ module.exports = async function handler(req, res) {
   if (req.method === 'OPTIONS') return res.status(200).end()
 
   try {
-    const { url, format = 'audio' } = req.body || {}
+    const { url } = req.body || {}
     
     if (!url) return res.status(400).json({ error: 'URL YouTube wajib diisi' })
 
-    // Memproses permintaan menggunakan Insvid
-    const result = await processInsvid(url, format)
+    const result = await processInsvid(url)
 
     return res.status(200).json({ status: true, data: result })
 
