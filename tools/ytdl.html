@@ -3,11 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>YouTube Downloader</title>
+    <title>YouTube to MP3 Converter</title>
     <style>
         :root {
-            --primary: #ef4444; 
-            --primary-hover: #dc2626;
+            --primary: #10b981; /* Ubah ke warna hijau musik/Spotify agar sesuai tema Audio */
+            --primary-hover: #059669;
             --bg: #f8fafc;
             --card: #ffffff;
             --text: #0f172a;
@@ -15,34 +15,33 @@
         }
         * { box-sizing: border-box; }
         body { font-family: system-ui, sans-serif; background: var(--bg); color: var(--text); margin: 0; padding: 20px; }
-        .container { max-width: 600px; margin: 0 auto; }
+        .container { max-width: 600px; margin: 0 auto; margin-top: 50px; }
         h1 { text-align: center; color: var(--primary); margin-bottom: 5px; }
         p.subtitle { text-align: center; color: #64748b; margin-bottom: 25px; font-size: 14px; }
         
         .card { background: var(--card); border-radius: 12px; padding: 20px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); border: 1px solid var(--border); }
         .form-group { margin-bottom: 15px; }
-        label { display: block; font-size: 14px; font-weight: bold; margin-bottom: 6px; }
-        input[type="text"], select { width: 100%; padding: 12px; border: 1px solid var(--border); border-radius: 8px; font-size: 15px; outline: none; }
-        input:focus, select:focus { border-color: var(--primary); }
+        label { display: block; font-size: 14px; font-weight: bold; margin-bottom: 8px; }
+        input[type="text"] { width: 100%; padding: 14px; border: 1px solid var(--border); border-radius: 8px; font-size: 15px; outline: none; transition: 0.2s; }
+        input:focus { border-color: var(--primary); box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.1); }
         
-        button.btn-submit { width: 100%; padding: 12px; background: var(--primary); color: white; border: none; border-radius: 8px; font-weight: bold; font-size: 16px; cursor: pointer; margin-top: 10px; }
+        button.btn-submit { width: 100%; padding: 14px; background: var(--primary); color: white; border: none; border-radius: 8px; font-weight: bold; font-size: 16px; cursor: pointer; margin-top: 5px; transition: 0.2s; }
         button.btn-submit:hover { background: var(--primary-hover); }
         
         .loading { text-align: center; display: none; color: var(--primary); font-weight: bold; margin: 15px 0; }
         
-        .result-box { display: none; margin-top: 20px; padding: 15px; background: #f1f5f9; border-radius: 8px; border: 1px solid var(--border); }
-        .result-box h4 { margin: 0 0 10px 0; font-size: 16px; line-height: 1.4; }
-        .result-box p { margin: 5px 0; font-size: 14px; color: #475569; }
-        a.btn-download { display: block; text-align: center; margin-top: 15px; padding: 12px; background: #10b981; color: white; text-decoration: none; border-radius: 8px; font-weight: bold; }
-        a.btn-download:hover { background: #059669; }
+        .result-box { display: none; margin-top: 20px; padding: 20px; background: #f1f5f9; border-radius: 8px; border: 1px solid var(--border); text-align: center; }
+        .result-box h4 { margin: 0 0 15px 0; font-size: 16px; line-height: 1.4; color: var(--text); }
+        a.btn-download { display: inline-block; width: 100%; padding: 12px; background: var(--text); color: white; text-decoration: none; border-radius: 8px; font-weight: bold; transition: 0.2s; }
+        a.btn-download:hover { background: #334155; }
         .error-msg { color: #b91c1c; font-size: 14px; text-align: center; margin-top: 15px; font-weight: bold;}
     </style>
 </head>
 <body>
 
 <div class="container">
-    <h1>YT Downloader</h1>
-    <p class="subtitle">Download Video & Audio (Mendukung YT Music & Shorts)</p>
+    <h1>YT to MP3</h1>
+    <p class="subtitle">Ubah video YouTube / YT Music menjadi file MP3 murni.</p>
 
     <div class="card">
         <div class="form-group">
@@ -50,22 +49,13 @@
             <input type="text" id="ytUrl" placeholder="https://youtu.be/... atau https://music.youtube.com/...">
         </div>
 
-        <div class="form-group">
-            <label>Format Media</label>
-            <select id="formatSelect">
-                <option value="audio">Audio (MP3)</option>
-                <option value="video">Video (MP4)</option>
-            </select>
-        </div>
-
-        <button class="btn-submit" onclick="handleDownload()">Mulai Konversi</button>
-        <div class="loading" id="loadingDiv">Mengekstrak Link Download...</div>
+        <button class="btn-submit" onclick="handleDownload()">Unduh MP3</button>
+        <div class="loading" id="loadingDiv">Memproses Audio... Mohon tunggu.</div>
         <div id="errorDiv" class="error-msg"></div>
 
         <div class="result-box" id="resultDiv">
-            <h4 id="resTitle">Judul Video</h4>
-            <p><strong>Provider:</strong> <span id="resProvider">-</span></p>
-            <a href="#" class="btn-download" id="resBtn" target="_blank" rel="noopener noreferrer">Download File</a>
+            <h4 id="resTitle">Judul Audio</h4>
+            <a href="#" class="btn-download" id="resBtn" target="_blank" rel="noopener noreferrer">Download MP3</a>
         </div>
     </div>
 </div>
@@ -73,7 +63,6 @@
 <script>
     async function handleDownload() {
         const url = document.getElementById('ytUrl').value.trim();
-        const format = document.getElementById('formatSelect').value;
         
         const loadingDiv = document.getElementById('loadingDiv');
         const resultDiv = document.getElementById('resultDiv');
@@ -90,18 +79,17 @@
             const res = await fetch('/api/ytdl', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ url, format })
+                body: JSON.stringify({ url }) // Tidak perlu kirim format lagi
             });
             const response = await res.json();
 
             if (response.status && response.data) {
                 document.getElementById('resTitle').textContent = response.data.title;
-                document.getElementById('resProvider').textContent = response.data.provider;
                 document.getElementById('resBtn').href = response.data.downloadUrl;
                 
                 resultDiv.style.display = 'block';
             } else {
-                throw new Error(response.error || 'Gagal memproses video');
+                throw new Error(response.error || 'Gagal memproses audio');
             }
         } catch (err) {
             errorDiv.textContent = err.message;
