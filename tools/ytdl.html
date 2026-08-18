@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>YouTube Downloader Tools</title>
+    <style>
+        :root {
+            --primary: #ef4444; /* Warna Merah YouTube */
+            --primary-hover: #dc2626;
+            --bg: #f8fafc;
+            --card: #ffffff;
+            --text: #0f172a;
+            --border: #e2e8f0;
+        }
+        * { box-sizing: border-box; }
+        body { font-family: system-ui, sans-serif; background: var(--bg); color: var(--text); margin: 0; padding: 20px; }
+        .container { max-width: 600px; margin: 0 auto; }
+        h1 { text-align: center; color: var(--primary); margin-bottom: 5px; }
+        p.subtitle { text-align: center; color: #64748b; margin-bottom: 25px; font-size: 14px; }
+        
+        .card { background: var(--card); border-radius: 12px; padding: 20px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); border: 1px solid var(--border); }
+        .form-group { margin-bottom: 15px; }
+        label { display: block; font-size: 14px; font-weight: bold; margin-bottom: 6px; }
+        input[type="text"], select { width: 100%; padding: 12px; border: 1px solid var(--border); border-radius: 8px; font-size: 15px; outline: none; }
+        input:focus, select:focus { border-color: var(--primary); }
+        
+        .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+        
+        button.btn-submit { width: 100%; padding: 12px; background: var(--primary); color: white; border: none; border-radius: 8px; font-weight: bold; font-size: 16px; cursor: pointer; margin-top: 10px; }
+        button.btn-submit:hover { background: var(--primary-hover); }
+        
+        .loading { text-align: center; display: none; color: var(--primary); font-weight: bold; margin: 15px 0; }
+        
+        .result-box { display: none; margin-top: 20px; padding: 15px; background: #f1f5f9; border-radius: 8px; border: 1px solid var(--border); }
+        .result-box h4 { margin: 0 0 10px 0; font-size: 16px; }
+        .result-box p { margin: 5px 0; font-size: 14px; color: #475569; }
+        a.btn-download { display: block; text-align: center; margin-top: 15px; padding: 12px; background: #10b981; color: white; text-decoration: none; border-radius: 8px; font-weight: bold; }
+        a.btn-download:hover { background: #059669; }
+        .error-msg { color: #b91c1c; font-size: 14px; text-align: center; margin-top: 15px; font-weight: bold;}
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>YT Downloader</h1>
+    <p class="subtitle">Download Video & Audio dengan 2 Server Pilihan</p>
+
+    <div class="card">
+        <div class="form-group">
+            <label>Link Video YouTube</label>
+            <input type="text" id="ytUrl" placeholder="https://youtu.be/xxx atau https://www.youtube.com/watch?v=xxx">
+        </div>
+
+        <div class="form-group">
+            <label>Pilih Server Scraper</label>
+            <select id="serverSelect">
+                <option value="savetube">Server 1 (Savetube - Rekomendasi)</option>
+                <option value="insvid">Server 2 (Insvid - Alternatif)</option>
+            </select>
+        </div>
+
+        <div class="grid-2">
+            <div class="form-group">
+                <label>Format</label>
+                <select id="formatSelect" onchange="updateQualityOptions()">
+                    <option value="audio">Audio (MP3)</option>
+                    <option value="video">Video (MP4)</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label>Kualitas</label>
+                <select id="qualitySelect">
+                    <!-- Opsi kualitas diisi via JS -->
+                </select>
+            </div>
+        </div>
+
+        <button class="btn-submit" onclick="handleDownload()">Mulai Konversi</button>
+        <div class="loading" id="loadingDiv">Memproses Video... Harap tunggu sebentar.</div>
+        <div id="errorDiv" class="error-msg"></div>
+
+        <div class="result-box" id="resultDiv">
+            <h4 id="resTitle">Judul Video</h4>
+            <p><strong>Durasi:</strong> <span id="resDuration">-</span></p>
+            <p><strong>Sumber:</strong> <span id="resProvider">-</span></p>
+            <a href="#" class="btn-download" id="resBtn" target="_blank" rel="noopener noreferrer">Download File</a>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Logika untuk merubah opsi kualitas secara dinamis
+    function updateQualityOptions() {
+        const format = document.getElementById('formatSelect').value;
+        const qualitySelect = document.getElementById('qualitySelect');
+        qualitySelect.innerHTML = '';
+        
+        if (format === 'audio') {
+            qualitySelect.add(new Option('128 kbps (Standard)', '128'));
+            qualitySelect.add(new Option('320 kbps (High)', '320'));
+            qualitySelect.add(new Option('64 kbps (Low)', '64'));
+        } else {
+            qualitySelect.add(new Option('720p (HD)', '720'));
+            qualitySelect.add(new Option('1080p (FHD)', '1080'));
+            qualitySelect.add(new Option('360p (SD)', '360'));
+        }
+    }
+
+    // Inisialisasi opsi dropdown pertama kali halaman dimuat
+    updateQualityOptions();
+
+    async function handleDownload() {
+        const url = document.getElementById('ytUrl').value.trim();
+        const server = document.getElementById('serverSelect').value;
+        const format = document.getElementById('formatSelect').value;
+        const quality = document.getElementById('qualitySelect').value;
+        
+        const loadingDiv = document.getElementById('loadingDiv');
+        const resultDiv = document.getElementById('resultDiv');
+        const errorDiv = document.getElementById('errorDiv');
+
+        if (!url) return alert('Masukkan Link YouTube terlebih dahulu!');
+
+        // Reset state
+        loadingDiv.style.display = 'block';
+        resultDiv.style.display = 'none';
+        errorDiv.textContent = '';
+
+        try {
+            const res = await fetch('/api/ytdl', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ url, server, format, quality })
+            });
+            const response = await res.json();
+
+            if (response.status && response.data) {
+                document.getElementById('resTitle').textContent = response.data.title;
+                document.getElementById('resDuration').textContent = response.data.duration;
+                document.getElementById('resProvider').textContent = response.data.provider;
+                document.getElementById('resBtn').href = response.data.downloadUrl;
+                
+                resultDiv.style.display = 'block';
+            } else {
+                throw new Error(response.error || 'Gagal memproses video');
+            }
+        } catch (err) {
+            errorDiv.textContent = err.message;
+        } finally {
+            loadingDiv.style.display = 'none';
+        }
+    }
+</script>
+
+</body>
+</html>
