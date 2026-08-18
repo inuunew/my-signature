@@ -1,9 +1,6 @@
 const axios = require('axios')
-const crypto = require('crypto')
 
-// ==========================================
-// PROVIDER 1: INSVID CONVERTER
-// ==========================================
+// Fungsi untuk mengekstrak ID YouTube dari berbagai format link
 function extractVideoId(input) {
   try {
     const url = new URL(input)
@@ -20,6 +17,7 @@ function extractVideoId(input) {
 async function processInsvid(youtubeUrl, format) {
   const fileType = format === 'audio' ? 'MP3' : 'MP4'
   const videoId = extractVideoId(youtubeUrl)
+  
   if (!videoId) throw new Error('URL YouTube tidak valid')
 
   const response = await axios.post('https://ac.insvid.com/converter', {
@@ -32,94 +30,45 @@ async function processInsvid(youtubeUrl, format) {
     }
   })
 
+  // Memastikan respons dari Insvid sesuai dengan hasil screenshot yang kamu bagikan
   if (response.data?.status === 'ok' && response.data?.link) {
+    const downloadUrl = response.data.link;
+    let title = `Video ID: ${videoId}`;
+
+    // Trik Cerdas: Mengekstrak Judul Asli dari parameter 'n' pada link result
+    try {
+        const parsedUrl = new URL(downloadUrl);
+        const titleParam = parsedUrl.searchParams.get('n');
+        if (titleParam) {
+            title = decodeURIComponent(titleParam).replace(/\+/g, ' ');
+        }
+    } catch (e) {
+        // Abaikan jika gagal mem-parsing URL
+    }
+
     return {
-      title: `Video ID: ${videoId}`,
-      duration: 'Unknown',
-      downloadUrl: response.data.link,
-      provider: 'Insvid'
+      title: title,
+      duration: 'Bervariasi', 
+      downloadUrl: downloadUrl,
+      provider: 'Insvid API'
     }
   }
-  throw new Error('Gagal mendapatkan link dari server Insvid')
-}
-
-// ==========================================
-// PROVIDER 2: SAVETUBE
-// ==========================================
-function getSecretKeyHex() {
-  return "C5D58EF67A" + "6C35BBC4EB" + "7584E4A29F" + "12"
-}
-
-function decryptData(encryptedBase64) {
-  // Pastikan parameter adalah string, jika bukan, tolak
-  if (typeof encryptedBase64 !== 'string') {
-      throw new Error('Data enkripsi tidak valid (bukan string).')
-  }
   
-  const key = Buffer.from(getSecretKeyHex(), 'hex')
-  const encryptedBuffer = Buffer.from(encryptedBase64.replace(/\s/g, ''), 'base64')
-  const iv = encryptedBuffer.subarray(0, 16)
-  const ciphertext = encryptedBuffer.subarray(16)
-  const decipher = crypto.createDecipheriv('aes-128-cbc', key, iv)
-  let decrypted = decipher.update(ciphertext, null, 'utf8') + decipher.final('utf8')
-  return JSON.parse(decrypted)
+  throw new Error('Gagal mendapatkan link download dari server.')
 }
 
-const savetubeHeaders = {
-  'host': 'cdn403.savetube.vip',
-  'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36',
-  'origin': 'https://y2mate.net.co',
-  'referer': 'https://y2mate.net.co/'
-}
-
-async function processSavetube(youtubeUrl, format, quality) {
-  const infoRes = await axios.post('https://cdn403.savetube.vip/v2/info', { url: youtubeUrl }, { headers: savetubeHeaders })
-  
-  // FIX: Mengambil properti .data dari dalam JSON (atau teks langsung jika respons berupa string)
-  const encryptedString = infoRes?.data?.data || infoRes?.data;
-  
-  if (!encryptedString) {
-      throw new Error('Gagal memuat string info video dari Savetube')
-  }
-
-  const meta = decryptData(encryptedString)
-  const key = meta?.key
-  if (!key) throw new Error('Gagal mengekstrak Key dekripsi')
-
-  const dlRes = await axios.post('https://cdn403.savetube.vip/download', {
-    downloadType: format, quality, key
-  }, { headers: savetubeHeaders })
-
-  if (dlRes.data?.data?.downloadUrl) {
-    return {
-      title: meta.title || 'Unknown Title',
-      duration: meta.durationLabel || 'Unknown',
-      downloadUrl: dlRes.data.data.downloadUrl,
-      provider: 'Savetube'
-    }
-  }
-  throw new Error('Gagal men-generate link download dari Savetube')
-}
-
-// ==========================================
-// MAIN HANDLER
-// ==========================================
 module.exports = async function handler(req, res) {
   res.setHeader('Access-Control-Allow-Origin', '*')
   res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS')
   if (req.method === 'OPTIONS') return res.status(200).end()
 
   try {
-    const { url, server = 'savetube', format = 'audio', quality = '128' } = req.body || {}
+    const { url, format = 'audio' } = req.body || {}
     
     if (!url) return res.status(400).json({ error: 'URL YouTube wajib diisi' })
 
-    let result
-    if (server === 'insvid') {
-      result = await processInsvid(url, format)
-    } else {
-      result = await processSavetube(url, format, quality)
-    }
+    // Memproses permintaan menggunakan Insvid
+    const result = await processInsvid(url, format)
 
     return res.status(200).json({ status: true, data: result })
 
