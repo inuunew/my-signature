@@ -1,3 +1,19 @@
 {
-  "cleanUrls": true
+"version": 2,
+"functions": {
+"api/anikai.js": {
+"maxDuration": 30,
+"memory": 1024
+}
+},
+"rewrites": [
+{
+"source": "/api/anikai",
+"destination": "/api/anikai.js"
+},
+{
+"source": "/anikai/api/anikai",
+"destination": "/api/anikai.js"
+}
+]
 }
