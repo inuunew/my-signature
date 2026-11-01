@@ -224,14 +224,19 @@
             <div>
               <div class="flex items-center gap-2.5">
                 <span class="w-1.5 h-6 rounded-full bg-brand-500"></span>
-                <h2 class="font-display font-bold text-xl sm:text-2xl text-white">Update Episode Terbaru</h2>
-                <span class="px-2 py-0.5 text-[11px] font-semibold rounded-md bg-brand-500/20 text-brand-400 border border-brand-500/30">LIVE SCRAPE</span>
+                <h2 class="font-display font-bold text-xl sm:text-2xl text-white">Latest Updates</h2>
+                <span id="latest-source-badge" class="px-2 py-0.5 text-[11px] font-semibold rounded-md bg-brand-500/20 text-brand-400 border border-brand-500/30">SYNCING...</span>
               </div>
-              <p class="text-xs text-zinc-400 mt-0.5 ml-4">Diambil dari endpoint <code class="text-brand-400">/updates/</code> & katalog terbaru</p>
+              <p class="text-xs text-zinc-400 mt-0.5 ml-4">Sinkronisasi real-time dari <code class="text-brand-400">anikai.org/home/</code> & <code class="text-brand-400">/updates/</code></p>
             </div>
-            <button onclick="app.navigate('catalog', { sort: 'updated' })" class="text-xs sm:text-sm font-medium text-brand-400 hover:text-brand-300 flex items-center gap-1.5">
-              Lihat Semua <i class="fa-solid fa-arrow-right text-xs"></i>
-            </button>
+            <div class="flex items-center gap-2">
+              <button onclick="app.forceResync()" title="Muat Ulang Data Live" class="px-3 py-1.5 rounded-xl bg-white/5 hover:bg-white/10 text-xs font-medium text-zinc-300 transition flex items-center gap-1.5">
+                <i id="resync-icon" class="fa-solid fa-arrows-rotate text-brand-400"></i> <span class="hidden sm:inline">Refresh Live</span>
+              </button>
+              <button onclick="app.navigate('catalog', { sort: 'updated' })" class="text-xs sm:text-sm font-medium text-brand-400 hover:text-brand-300 flex items-center gap-1.5">
+                Semua <i class="fa-solid fa-arrow-right text-xs"></i>
+              </button>
+            </div>
           </div>
 
           <div id="latest-grid" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4 sm:gap-5">
@@ -514,7 +519,8 @@
       schedule: `${BASE}/schedule.json`,
       episodes: id => `${BASE}/episodes/${id}.json`,
       watch: slugOrId => `${BASE}/watch/${slugOrId}/`,
-      updates: `${BASE}/updates/`
+      updates: `${BASE}/updates/`,
+      home: `${BASE}/home/`
     };
 
     const FIELD_MAP = {
@@ -524,63 +530,76 @@
       rd: 'released', u: 'updated', ca: 'added', le: 'lastEpisode'
     };
 
-    // Daftar CORS Proxy untuk menembus pembatasan browser saat mengambil dari anikai.org
+    // Daftar CORS Proxy berkecepatan tinggi yang ramah terhadap Cloudflare / JSON besar & HTML
     const CORS_PROXIES = [
-      url => url, // Coba direct terlebih dahulu
+      url => `https://api.codetabs.com/v1/proxy?quest=${encodeURIComponent(url)}`,
       url => `https://api.allorigins.win/raw?url=${encodeURIComponent(url)}`,
-      url => `https://corsproxy.io/?${encodeURIComponent(url)}`,
-      url => `https://api.codetabs.com/v1/proxy?quest=${encodeURIComponent(url)}`
-    ];
-
-    // Fallback Katalog Kaya Data jika anikai.org sedang memblokir proxy atau offline
-    const FALLBACK_CATALOG_RAW = [
-      { i: 8223, s: 'blue-box-8223', n: 'Blue Box', e: 'Ao no Hako', j: 'アオのハコ', f: 'TV', st: 'Releasing', g: ['Romance', 'Sports', 'Slice of Life', 'School'], y: 2024, r: 'PG-13', sc: 8.42, tt: 25, sb: 'Sub', rd: '2024-10-03', u: '2025-02-20', ca: '2024-10-01', le: 21 },
-      { i: 4745, s: 'solo-leveling-season-2-arise-from-the-shadow-4745', n: 'Solo Leveling Season 2: Arise from the Shadow', e: 'Ore dake Level Up na Ken Season 2', j: '俺だけレベルアップな件 Season 2', f: 'TV', st: 'Releasing', g: ['Action', 'Adventure', 'Fantasy'], y: 2025, r: 'R-17+', sc: 8.89, tt: 13, sb: 'Sub & Dub', rd: '2025-01-05', u: '2025-02-22', ca: '2025-01-01', le: 8 },
-      { i: 9102, s: 'dandadan-9102', n: 'DAN DA DAN', e: 'Dandadan', j: 'ダンダダン', f: 'TV', st: 'Finished', g: ['Action', 'Comedy', 'Supernatural', 'Sci-Fi'], y: 2024, r: 'R-17+', sc: 8.65, tt: 12, sb: 'Sub & Dub', rd: '2024-10-04', u: '2024-12-20', ca: '2024-10-01', le: 12 },
-      { i: 7501, s: 'frieren-beyond-journeys-end-7501', n: "Frieren: Beyond Journey's End", e: 'Sousou no Frieren', j: '葬送のフリーレン', f: 'TV', st: 'Finished', g: ['Adventure', 'Drama', 'Fantasy'], y: 2023, r: 'PG-13', sc: 9.31, tt: 28, sb: 'Sub & Dub', rd: '2023-09-29', u: '2024-03-22', ca: '2023-09-28', le: 28 },
-      { i: 1024, s: 'one-piece-1024', n: 'One Piece', e: 'One Piece Egghead Arc', j: 'ワンピース', f: 'TV', st: 'Releasing', g: ['Action', 'Adventure', 'Fantasy', 'Comedy'], y: 1999, r: 'PG-13', sc: 8.73, tt: 1122, sb: 'Sub & Dub', rd: '1999-10-20', u: '2025-02-18', ca: '2020-01-01', le: 1122 },
-      { i: 8812, s: 'sakamoto-days-8812', n: 'SAKAMOTO DAYS', e: 'Sakamoto Days', j: 'サカモトデイズ', f: 'TV', st: 'Releasing', g: ['Action', 'Comedy', 'Shounen'], y: 2025, r: 'R-17+', sc: 8.15, tt: 11, sb: 'Sub & Dub', rd: '2025-01-11', u: '2025-02-22', ca: '2025-01-10', le: 7 },
-      { i: 8390, s: 'bleach-thousand-year-blood-war-the-conflict-8390', n: 'Bleach: Thousand-Year Blood War - The Conflict', e: 'Bleach: Sennen Kessen-hen - Soukoku-tan', j: 'BLEACH 千年血戦篇-相剋譚-', f: 'TV', st: 'Finished', g: ['Action', 'Adventure', 'Supernatural'], y: 2024, r: 'R-17+', sc: 8.82, tt: 14, sb: 'Sub & Dub', rd: '2024-10-05', u: '2024-12-28', ca: '2024-10-05', le: 14 },
-      { i: 8944, s: 're-zero-starting-life-in-another-world-season-3-8944', n: 'Re:ZERO -Starting Life in Another World- Season 3', e: 'Re:Zero kara Hajimeru Isekai Seikatsu 3rd Season', j: 'Re:ゼロから始める異世界生活 3rd season', f: 'TV', st: 'Releasing', g: ['Drama', 'Fantasy', 'Psychological', 'Thriller'], y: 2024, r: 'R-17+', sc: 8.61, tt: 16, sb: 'Sub', rd: '2024-10-02', u: '2025-02-19', ca: '2024-10-02', le: 11 },
-      { i: 8711, s: 'dr-stone-science-future-8711', n: 'Dr. STONE: Science Future', e: 'Dr. Stone Season 4', j: 'Dr.STONE SCIENCE FUTURE', f: 'TV', st: 'Releasing', g: ['Adventure', 'Comedy', 'Sci-Fi'], y: 2025, r: 'PG-13', sc: 8.38, tt: 12, sb: 'Sub & Dub', rd: '2025-01-09', u: '2025-02-20', ca: '2025-01-09', le: 7 },
-      { i: 6410, s: 'jujutsu-kaisen-season-2-6410', n: 'Jujutsu Kaisen Season 2', e: 'Jujutsu Kaisen: Shibuya Incident', j: '呪術廻戦 懐玉・玉折／渋谷事変', f: 'TV', st: 'Finished', g: ['Action', 'Supernatural', 'Dark Fantasy'], y: 2023, r: 'R-17+', sc: 8.79, tt: 23, sb: 'Sub & Dub', rd: '2023-07-06', u: '2023-12-28', ca: '2023-07-06', le: 23 },
-      { i: 8519, s: 'the-apothecary-diaries-season-2-8519', n: 'The Apothecary Diaries Season 2', e: 'Kusuriya no Hitorigoto 2nd Season', j: '薬屋のひとりごと 第2期', f: 'TV', st: 'Releasing', g: ['Drama', 'Historical', 'Mystery'], y: 2025, r: 'PG-13', sc: 8.77, tt: 24, sb: 'Sub', rd: '2025-01-10', u: '2025-02-21', ca: '2025-01-10', le: 7 },
-      { i: 8601, s: 'shangri-la-frontier-season-2-8601', n: 'Shangri-La Frontier Season 2', e: 'ShanFro 2nd Season', j: 'シャングリラ・フロンティア 2nd season', f: 'TV', st: 'Releasing', g: ['Action', 'Adventure', 'Fantasy', 'Game'], y: 2024, r: 'PG-13', sc: 8.29, tt: 25, sb: 'Sub & Dub', rd: '2024-10-13', u: '2025-02-16', ca: '2024-10-13', le: 19 },
-      { i: 5112, s: 'demon-slayer-kimetsu-no-yaiba-hashira-training-arc-5112', n: 'Demon Slayer: Kimetsu no Yaiba Hashira Training Arc', e: 'Kimetsu no Yaiba: Hashira Geiko-hen', j: '鬼滅の刃 柱稽古編', f: 'TV', st: 'Finished', g: ['Action', 'Supernatural', 'Historical'], y: 2024, r: 'R-17+', sc: 8.21, tt: 8, sb: 'Sub & Dub', rd: '2024-05-12', u: '2024-06-30', ca: '2024-05-12', le: 8 },
-      { i: 8105, s: 'orb-on-the-movements-of-the-earth-8105', n: 'Orb: On the Movements of the Earth', e: 'Chi.: Chikyuu no Undou ni Tsuite', j: 'チ。―地球の運動について―', f: 'TV', st: 'Releasing', g: ['Drama', 'Historical', 'Seinen'], y: 2024, r: 'R-17+', sc: 8.58, tt: 25, sb: 'Sub', rd: '2024-10-05', u: '2025-02-22', ca: '2024-10-05', le: 22 },
-      { i: 3920, s: 'naruto-shippuden-3920', n: 'Naruto: Shippuden', e: 'Naruto Hurricane Chronicles', j: 'ナルト 疾風伝', f: 'TV', st: 'Finished', g: ['Action', 'Adventure', 'Martial Arts', 'Shounen'], y: 2007, r: 'PG-13', sc: 8.27, tt: 500, sb: 'Sub & Dub', rd: '2007-02-15', u: '2017-03-23', ca: '2020-01-01', le: 500 },
-      { i: 7992, s: 'look-back-7992', n: 'Look Back', e: 'Look Back Movie', j: 'ルックバック', f: 'Movie', st: 'Finished', g: ['Drama', 'Slice of Life'], y: 2024, r: 'PG-13', sc: 8.85, tt: 1, sb: 'Sub & Dub', rd: '2024-06-28', u: '2024-11-08', ca: '2024-11-08', le: 1 }
+      url => `https://corsproxy.io/?url=${encodeURIComponent(url)}`,
+      url => `https://thingproxy.freeboard.io/fetch/${url}`,
+      url => url
     ];
 
     let _catalogCache = null;
     let _isLiveConnection = false;
 
-    async function request(url, mode = 'json') {
-      let lastErr;
-      for (const proxyFn of CORS_PROXIES) {
-        const controller = new AbortController();
-        const timer = setTimeout(() => controller.abort(), 9000);
-        try {
-          const targetUrl = proxyFn(url);
-          const res = await fetch(targetUrl, {
-            signal: controller.signal,
-            headers: {
-              accept: mode === 'json' ? 'application/json, text/plain, */*' : 'text/html,application/xhtml+xml,*/*'
-            }
-          });
-          clearTimeout(timer);
-          if (!res.ok) throw new Error(`HTTP ${res.status}`);
-          if (mode === 'json') {
-            const data = await res.json();
-            return data;
+    // Fetch Satelit: Mencoba proxy secara cerdas dengan timeout yang cukup untuk catalog-index.json
+    async function fetchViaProxy(proxyFn, url, mode = 'json', timeoutMs = 15000) {
+      const controller = new AbortController();
+      const timer = setTimeout(() => controller.abort(), timeoutMs);
+      try {
+        const targetUrl = proxyFn(url);
+        const res = await fetch(targetUrl, {
+          signal: controller.signal,
+          headers: {
+            accept: mode === 'json' ? 'application/json, text/plain, */*' : 'text/html,application/xhtml+xml,*/*'
           }
-          return await res.text();
-        } catch (err) {
-          clearTimeout(timer);
-          lastErr = err;
+        });
+        clearTimeout(timer);
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+        const text = await res.text();
+        if (!text || text.trim().length < 10) throw new Error('Empty response');
+
+        if (mode === 'json') {
+          let parsed;
+          try {
+            parsed = JSON.parse(text);
+          } catch {
+            // Kadang allorigins membungkus dengan { contents: "..." }
+            const wrapper = JSON.parse(text);
+            if (wrapper && wrapper.contents) parsed = JSON.parse(wrapper.contents);
+            else throw new Error('Invalid JSON');
+          }
+          return parsed;
         }
+        // Validasi HTML agar bukan halaman error proxy
+        if (text.includes('article') || text.includes('anime-card') || text.includes('watch-page') || text.includes('anikai')) {
+          return text;
+        }
+        throw new Error('Invalid HTML content');
+      } catch (err) {
+        clearTimeout(timer);
+        throw err;
       }
-      throw new Error(`Gagal mengambil data: ${lastErr?.message || lastErr}`);
+    }
+
+    async function request(url, mode = 'json') {
+      // Jalankan race paralel pada 3 proxy teratas agar sangat cepat & langsung dapat data live asli
+      try {
+        return await Promise.any(
+          CORS_PROXIES.slice(0, 3).map(fn => fetchViaProxy(fn, url, mode, 14000))
+        );
+      } catch {
+        // Jika gagal, coba berurutan satu per satu dengan waktu lebih longgar
+        let lastErr;
+        for (const proxyFn of CORS_PROXIES) {
+          try {
+            return await fetchViaProxy(proxyFn, url, mode, 18000);
+          } catch (e) {
+            lastErr = e;
+          }
+        }
+        throw new Error(`Gagal mengambil data dari ${url}: ${lastErr?.message || 'CORS Blocked'}`);
+      }
     }
 
     function posterSlug(raw) {
@@ -591,8 +610,8 @@
     function normalizeItem(raw) {
       const item = {};
       for (const [k, v] of Object.entries(FIELD_MAP)) item[v] = raw[k] ?? null;
-      item.poster = `https://img.anikai.org/poster/w_360/h_480/${posterSlug(raw)}.webp`;
-      item.banner = `https://img.anikai.org/banner/w_1900/h_400/${posterSlug(raw)}.webp`;
+      item.poster = raw.poster || `https://img.anikai.org/poster/w_360/h_480/${posterSlug(raw)}.webp`;
+      item.banner = raw.banner || `https://img.anikai.org/banner/w_1900/h_400/${posterSlug(raw)}.webp`;
       item.url = `${BASE}/watch/${raw.s}/`;
       return item;
     }
@@ -605,8 +624,8 @@
 
     const escapeRegex = s => s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 
-    async function loadCatalog() {
-      if (_catalogCache) return _catalogCache;
+    async function loadCatalog(forceRefresh = false) {
+      if (_catalogCache && !forceRefresh) return _catalogCache;
       try {
         const raw = await request(ENDPOINTS.catalog, 'json');
         if (!Array.isArray(raw) || !raw.length) throw new Error('Format catalog-index.json tidak valid');
@@ -615,9 +634,9 @@
         app.updateConnectionBadge(true, raw.length);
         return _catalogCache;
       } catch (e) {
-        console.warn('Menggunakan fallback catalog karena CORS/jaringan:', e.message);
-        _catalogCache = FALLBACK_CATALOG_RAW;
-        _isLiveConnection = false;
+        console.warn('Katalog penuh belum termuat, mencoba membangun katalog dari halaman live:', e.message);
+        // Jika catalog-index.json terlalu besar untuk proxy gratis, bangun katalog dari scrape halaman live /updates/ & /home/
+        if (!_catalogCache) _catalogCache = [];
         app.updateConnectionBadge(false, _catalogCache.length);
         return _catalogCache;
       }
@@ -656,153 +675,133 @@
         const byId = catalog.find(x => Number(x.i) === Number(str));
         if (byId) return { raw: byId, item: normalizeItem(byId) };
       }
-      const results = await search(str, { limit: 1 });
-      if (!results.length) throw new Error(`Anime "${str}" tidak ditemukan`);
-      const byName = catalog.find(x => x.i === results[0].id);
-      return { raw: byName, item: normalizeItem(byName) };
-    }
-
-    async function getDetail(input) {
-      const { raw, item } = await resolveAnime(input);
-      try {
-        const html = await request(item.url, 'text');
-        const parser = new DOMParser();
-        const doc = parser.parseFromString(html, 'text/html');
-
-        let ld = null;
-        doc.querySelectorAll('script[type="application/ld+json"]').forEach(el => {
-          try {
-            const parsed = JSON.parse(el.textContent);
-            const graph = parsed['@graph'] || [parsed];
-            const series = graph.find(n => ['TVSeries', 'Movie', 'CreativeWork', 'TVSeason'].includes(n['@type']));
-            if (series && !ld) ld = series;
-          } catch {}
-        });
-
-        const facts = {};
-        doc.querySelectorAll('.detail-facts > div').forEach(el => {
-          const dt = el.querySelector('dt');
-          const dd = el.querySelector('dd');
-          const key = dt ? dt.textContent.replace(/:\s*$/, '').trim() : '';
-          const val = dd ? dd.textContent.trim() : '';
-          if (key) facts[key] = val;
-        });
-
-        const synopsisEl = doc.querySelector('#synopsis-text');
-        const synopsis = (synopsisEl ? synopsisEl.textContent.trim() : '') || ld?.description || null;
-        const watchPage = doc.querySelector('#watch-page');
-        const dataId = watchPage?.getAttribute('data-id') || String(raw.i);
-        const seal = watchPage?.getAttribute('data-seal') || null;
-        const playerHost = watchPage?.getAttribute('data-player') || null;
-        const serverDefault = watchPage?.getAttribute('data-server-default') || null;
-        const trailer = doc.querySelector('#open-trailer')?.getAttribute('data-trailer') || null;
-        const epNotes = doc.querySelectorAll('.episode-note');
-        const epNote = epNotes.length ? epNotes[epNotes.length - 1].textContent.trim() : '';
-        const epFromPage = Number((epNote.match(/(\d+)\s+episodes?/i) || [])[1]) || null;
-
-        return {
-          id: Number(dataId), slug: raw.s, url: item.url, title: ld?.name || item.title,
-          altTitle: ld?.alternateName || item.altTitle, japanese: raw.j, native: raw.na,
-          format: raw.f, status: raw.st, year: raw.y, rating: ld?.contentRating || raw.r,
-          score: raw.sc, totalEpisodes: epFromPage ?? raw.tt, subtitles: raw.sb,
-          released: ld?.datePublished || raw.rd, updated: raw.u, lastEpisode: raw.le,
-          genres: (ld?.genre || raw.g || []).flat(), studios: facts['Studios'] || 'AniKai Studio Partner',
-          duration: facts['Duration'] || '24 min per ep', articleStatus: facts['Status'] || null,
-          dateAired: facts['Date aired'] || raw.rd,
-          synopsis: synopsis || `Nikmati streaming anime ${item.title} (${item.altTitle || item.japanese || ''}) dengan kualitas tinggi. Anime bergenre ${(raw.g || []).join(', ')} yang rilis pada tahun ${raw.y}.`,
-          trailer, poster: ld?.image || item.poster,
-          banner: item.banner, player: { host: playerHost || 'https://anikai.org', seal, serverDefault: serverDefault || 'HD-1' }
-        };
-      } catch {
-        // Fallback jika halaman HTML detail diblokir CORS
-        return {
-          id: Number(raw.i), slug: raw.s, url: item.url, title: item.title,
-          altTitle: item.altTitle, japanese: raw.j, native: raw.na,
-          format: raw.f, status: raw.st, year: raw.y, rating: raw.r || 'PG-13',
-          score: raw.sc, totalEpisodes: raw.tt, subtitles: raw.sb || 'Sub',
-          released: raw.rd, updated: raw.u, lastEpisode: raw.le || raw.tt,
-          genres: (raw.g || []).flat(), studios: 'MAPPA / Pierrot / A-1 Pictures',
-          duration: '24 min per ep', articleStatus: raw.st, dateAired: raw.rd,
-          synopsis: `${item.title} (${item.altTitle || item.japanese || ''}) mengisahkan perjalanan epik penuh aksi dan emosi yang memukau. Dirilis pada tahun ${raw.y} dengan format ${raw.f} dan meraih skor ${raw.sc ?? '-'}. Tonton seluruh episodenya langsung di AniKai Stream.`,
-          trailer: null, poster: item.poster, banner: item.banner,
-          player: { host: 'https://anikai.org', seal: 'live-stream-token', serverDefault: 'AniKai VIP HD' }
-        };
+      if (catalog.length > 0) {
+        try {
+          const results = await search(str, { limit: 1 });
+          if (results.length) {
+            const byName = catalog.find(x => x.i === results[0].id);
+            if (byName) return { raw: byName, item: normalizeItem(byName) };
+          }
+        } catch {}
       }
-    }
-
-    async function getEpisodes(input, { episode } = {}) {
-      const { raw } = await resolveAnime(input);
-      let list = [];
-      try {
-        const rawEps = await request(ENDPOINTS.episodes(raw.i), 'json');
-        if (!Array.isArray(rawEps)) throw new Error('Invalid episodes JSON');
-        list = rawEps
-          .filter(Array.isArray)
-          .map(e => ({ number: Number(e[0]), title: e[1] || `Episode ${e[0]}`, date: e[2] || null, filler: !!e[3], recap: !!e[4] }))
-          .sort((a, b) => a.number - b.number);
-      } catch {
-        // Generate daftar episode akurat sesuai jumlah episode di katalog
-        const count = Math.min(Number(raw.le || raw.tt || 12), 100);
-        list = Array.from({ length: count }, (_, idx) => ({
-          number: idx + 1,
-          title: `Episode ${idx + 1}`,
-          date: raw.u || raw.rd || '2025',
-          filler: idx > 0 && idx % 17 === 0,
-          recap: false
-        }));
-      }
-
-      let selected = null;
-      if (episode != null) {
-        selected = list.find(e => e.number === Number(episode));
-      }
-      return {
-        anime: { id: raw.i, slug: raw.s, title: raw.n, url: `${BASE}/watch/${raw.s}/` },
-        total: list.length, latest: list.at(-1) || null, selected, episodes: list
+      // Jika item berasal dari scrape langsung /home/ atau /updates/ dan belum ada di _catalogCache
+      const numId = Number((slug.match(/-(\d+)$/) || [])[1]) || 0;
+      const syntheticRaw = {
+        i: numId,
+        s: slug,
+        n: slug.replace(/-\d+$/, '').replace(/-/g, ' ').replace(/\b\w/g, c => c.toUpperCase()),
+        f: 'TV',
+        st: 'Releasing',
+        y: 2026
       };
+      return { raw: syntheticRaw, item: normalizeItem(syntheticRaw) };
+    }
+
+    // Helper untuk mengekstrak kartu anime dari HTML (/updates/ maupun /home/)
+    function parseAnimeCardsFromHtml(html) {
+      const parser = new DOMParser();
+      const doc = parser.parseFromString(html, 'text/html');
+      const out = [];
+      const seen = new Set();
+
+      doc.querySelectorAll('article.anime-card, .anime-card').forEach(el => {
+        const link = el.querySelector('a.poster-link') || el.querySelector('a[href*="/watch/"]');
+        const href = link?.getAttribute('href') || '';
+        const slugMatch = href.match(/\/watch\/([^/?#]+)/);
+        const slug = slugMatch ? slugMatch[1] : '';
+        const id = Number(el.getAttribute('data-id')) || Number((href.match(/-(\d+)\/?$/) || [])[1]) || null;
+
+        const titleEl = el.querySelector('.card-title a') || el.querySelector('.card-title') || el.querySelector('h3, h2');
+        const title = titleEl?.textContent.trim() || link?.getAttribute('title') || '';
+        if (!title || seen.has(slug || title)) return;
+        seen.add(slug || title);
+
+        const jp = titleEl?.getAttribute('data-title-jp') || null;
+        const epBadge = el.querySelector('.episode-badge, .ep-badge, [class*="episode"]')?.textContent.trim() || '';
+        const epNum = Number((epBadge.match(/(\d+)/) || [])[1]) || null;
+
+        const metas = el.querySelectorAll('.card-meta span');
+        let year = null;
+        metas.forEach(m => {
+          const val = Number(m.textContent.trim());
+          if (val >= 1960 && val <= 2030) year = val;
+        });
+
+        const format = el.querySelector('.card-format')?.textContent.trim() || 'TV';
+        const imgEl = el.querySelector('img');
+        let poster = imgEl?.getAttribute('data-src') || imgEl?.getAttribute('src') || null;
+        if (poster && poster.startsWith('/')) poster = `${BASE}${poster}`;
+        if (!poster && slug && id) {
+          const pSlug = slug.endsWith(`-${id}`) ? slug : `${slug}-${id}`;
+          poster = `https://img.anikai.org/poster/w_360/h_480/${pSlug}.webp`;
+        }
+
+        const itemObj = {
+          id,
+          slug: slug || (id ? `${fold(title).replace(/[^a-z0-9]+/g, '-')}-${id}` : fold(title).replace(/[^a-z0-9]+/g, '-')),
+          title,
+          japanese: jp,
+          episode: epNum,
+          lastEpisode: epNum,
+          year,
+          format,
+          poster,
+          url: href ? (href.startsWith('http') ? href : `${BASE}${href}`) : `${BASE}/watch/${slug}/`
+        };
+
+        out.push(itemObj);
+
+        // Sinkronkan juga ke _catalogCache bila belum ada
+        if (_catalogCache && id && !_catalogCache.some(x => Number(x.i) === Number(id))) {
+          _catalogCache.unshift({
+            i: id, s: itemObj.slug, n: title, j: jp, f: format, y: year,
+            le: epNum, tt: epNum, st: 'Releasing', poster: itemObj.poster
+          });
+        }
+      });
+
+      return out;
     }
 
     async function getLatest({ limit = 20 } = {}) {
-      try {
-        const html = await request(ENDPOINTS.updates, 'text');
-        const parser = new DOMParser();
-        const doc = parser.parseFromString(html, 'text/html');
-        const out = [];
-        doc.querySelectorAll('article.anime-card').forEach(el => {
-          const link = el.querySelector('a.poster-link');
-          const href = link?.getAttribute('href') || '';
-          const id = Number(el.getAttribute('data-id')) || Number((href.match(/-(\d+)\/?$/) || [])[1]) || null;
-          const titleEl = el.querySelector('.card-title a');
-          const title = titleEl?.textContent.trim() || '';
-          const jp = titleEl?.getAttribute('data-title-jp') || null;
-          const epBadge = el.querySelector('.episode-badge')?.textContent.trim() || '';
-          const epNum = Number((epBadge.match(/(\d+)/) || [])[1]) || null;
-          const metas = el.querySelectorAll('.card-meta span');
-          const year = Number(metas[1]?.textContent.trim()) || null;
-          const format = el.querySelector('.card-format')?.textContent.trim() || null;
-          const poster = el.querySelector('img')?.getAttribute('src') || null;
-          if (title) {
-            out.push({ id, title, japanese: jp, episode: epNum, year, format, poster, url: href ? `${BASE}${href}` : null });
+      // 1. Prioritaskan scrape langsung dari /updates/ atau /home/ persis seperti kode anikai.js & screenshot browser user
+      for (const targetEndpoint of [ENDPOINTS.updates, ENDPOINTS.home]) {
+        try {
+          const html = await request(targetEndpoint, 'text');
+          const out = parseAnimeCardsFromHtml(html);
+          if (out.length > 0) {
+            _isLiveConnection = true;
+            const badge = document.getElementById('latest-source-badge');
+            if (badge) {
+              badge.textContent = 'LIVE ANIKAI.ORG';
+              badge.className = 'px-2 py-0.5 text-[11px] font-semibold rounded-md bg-emerald-500/20 text-emerald-400 border border-emerald-500/30';
+            }
+            return out.slice(0, limit);
           }
-        });
-        if (out.length > 0) return out.slice(0, limit);
-        throw new Error('Empty updates DOM');
-      } catch {
-        // Fallback otomatis ke filterCatalog sort='updated'
-        const latestFromCatalog = await filterCatalog({ sort: 'updated', limit });
-        return latestFromCatalog.map(item => ({
-          id: item.id,
-          slug: item.slug,
-          title: item.title,
-          japanese: item.japanese,
-          episode: item.lastEpisode || item.episodes || 1,
-          year: item.year,
-          format: item.format,
-          score: item.score,
-          poster: item.poster,
-          url: item.url
-        }));
+        } catch (err) {
+          console.warn(`Scrape ${targetEndpoint} gagal, mencoba alternatif:`, err.message);
+        }
       }
+
+      // 2. Jika endpoint HTML lambat, gunakan catalog-index.json yang diurutkan berdasarkan 'updated' (u)
+      const latestFromCatalog = await filterCatalog({ sort: 'updated', limit });
+      const badge = document.getElementById('latest-source-badge');
+      if (badge) {
+        badge.textContent = 'CATALOG SYNC';
+        badge.className = 'px-2 py-0.5 text-[11px] font-semibold rounded-md bg-brand-500/20 text-brand-400 border border-brand-500/30';
+      }
+      return latestFromCatalog.map(item => ({
+        id: item.id,
+        slug: item.slug,
+        title: item.title,
+        japanese: item.japanese,
+        episode: item.lastEpisode || item.episodes || 1,
+        year: item.year,
+        format: item.format,
+        score: item.score,
+        poster: item.poster,
+        url: item.url
+      }));
     }
 
     async function getSchedule({ all = false, limit = 20 } = {}) {
@@ -810,17 +809,22 @@
         const raw = await request(ENDPOINTS.schedule, 'json');
         if (!Array.isArray(raw)) throw new Error('Invalid schedule.json');
         const now = Date.now();
-        const mapped = raw.map(s => ({
-          title: s.title, japanese: s.japanese || null, episode: s.episode ?? null,
-          airAt: s.at || null, airTimestamp: s.at ? new Date(s.at).getTime() : null,
-          poster: s.poster || null, url: s.url ? `${BASE}${s.url}` : null
-        }));
+        const mapped = raw.map(s => {
+          let poster = s.poster || null;
+          if (poster && poster.startsWith('/')) poster = `${BASE}${poster}`;
+          const m = String(s.url || '').match(/\/watch\/([^/?#]+)/);
+          return {
+            slug: m ? m[1] : null,
+            title: s.title, japanese: s.japanese || null, episode: s.episode ?? null,
+            airAt: s.at || null, airTimestamp: s.at ? new Date(s.at).getTime() : null,
+            poster, url: s.url ? (s.url.startsWith('http') ? s.url : `${BASE}${s.url}`) : null
+          };
+        });
         const filtered = all ? mapped : mapped.filter(x => x.airTimestamp && x.airTimestamp >= now - 3600000);
         filtered.sort((a, b) => (a.airTimestamp || 0) - (b.airTimestamp || 0));
         if (filtered.length) return filtered.slice(0, limit);
         return mapped.slice(0, limit);
       } catch {
-        // Buat jadwal dinamis dari anime berstatus Releasing di katalog
         const catalog = await loadCatalog();
         const releasing = catalog.filter(x => fold(x.st) === 'releasing').slice(0, limit);
         const now = Date.now();
@@ -891,10 +895,25 @@
         this.renderSkeletonGrid('latest-grid', 12);
         this.renderSkeletonGrid('top-rated-grid', 8);
 
-        // Load catalog & home data
-        await loadCatalog();
-        await this.populateFilterDropdowns();
-        await this.loadHomePage();
+        // Jalankan getLatest() dan loadCatalog() secara paralel agar Latest Updates tampil secepat mungkin dengan data live anikai.org
+        await Promise.allSettled([
+          this.loadHomePage(),
+          loadCatalog().then(() => this.populateFilterDropdowns())
+        ]);
+      },
+
+      async forceResync() {
+        const icon = document.getElementById('resync-icon');
+        if (icon) icon.classList.add('fa-spin');
+        this.showToast('Menyinkronkan ulang data langsung dari anikai.org...');
+        _catalogCache = null;
+        this.renderSkeletonGrid('latest-grid', 12);
+        await Promise.allSettled([
+          loadCatalog(true).then(() => this.populateFilterDropdowns()),
+          this.loadHomePage()
+        ]);
+        if (icon) icon.classList.remove('fa-spin');
+        this.showToast('Sinkronisasi selesai!');
       },
 
       updateConnectionBadge(isLive, count) {
@@ -941,7 +960,10 @@
       // Kartu Anime Standar
       createAnimeCard(item, badgeText = null) {
         const idOrSlug = item.slug || item.id || item.title;
-        const epText = badgeText || (item.episode ? `EP ${item.episode}` : (item.lastEpisode ? `EP ${item.lastEpisode}` : (item.episodes ? `${item.episodes} EP` : 'HD')));
+      // Kartu Anime Standar (Disesuaikan dengan desain asli anikai.org/home/)
+      createAnimeCard(item, badgeText = null) {
+        const idOrSlug = item.slug || item.id || item.url || item.title;
+        const epText = badgeText || (item.episode ? `EP ${item.episode}` : (item.lastEpisode ? `EP ${item.lastEpisode}` : (item.episodes ? `${item.episodes} EP` : 'TV')));
         const score = item.score ? Number(item.score).toFixed(2) : null;
         const format = item.format || 'TV';
         const year = item.year || '';
@@ -956,21 +978,17 @@
                 alt="${safeTitle}" 
                 loading="lazy"
                 onerror="this.onerror=null;this.src='${this.getFallbackPoster(item.title)}'"
-                class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
+                class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
               >
-              <div class="absolute inset-0 bg-gradient-to-t from-black/90 via-black/20 to-transparent opacity-80 group-hover:opacity-95 transition-opacity"></div>
+              <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent opacity-60 group-hover:opacity-90 transition-opacity"></div>
               
-              <!-- Top Badges -->
-              <div class="absolute top-2.5 left-2.5 right-2.5 flex items-center justify-between gap-1">
-                <span class="px-2 py-0.5 rounded-lg bg-brand-600/95 text-white font-bold text-[11px] shadow-md backdrop-blur-md">
-                  ${epText}
-                </span>
-                ${score ? `
+              ${score ? `
+                <div class="absolute top-2.5 right-2.5">
                   <span class="px-2 py-0.5 rounded-lg bg-black/75 text-amber-400 font-semibold text-[11px] flex items-center gap-1 backdrop-blur-md border border-white/10">
                     <i class="fa-solid fa-star text-[9px]"></i>${score}
                   </span>
-                ` : ''}
-              </div>
+                </div>
+              ` : ''}
 
               <!-- Center Play Hover Icon -->
               <div class="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all duration-300">
@@ -978,27 +996,34 @@
                   <i class="fa-solid fa-play ml-0.5"></i>
                 </div>
               </div>
-
-              <!-- Bottom Meta inside Poster -->
-              <div class="absolute bottom-2.5 left-2.5 right-2.5 flex items-center justify-between text-[11px] text-zinc-300 font-medium">
-                <span class="px-1.5 py-0.5 rounded bg-white/10 backdrop-blur-sm">${format}</span>
-                <span>${year}</span>
-              </div>
             </div>
 
-            <h3 class="mt-2.5 font-semibold text-sm text-zinc-100 group-hover:text-brand-400 line-clamp-1 transition-colors" title="${safeTitle}">
+            <!--Judul dan Meta di bawah poster persis seperti tampilan anikai.org -->
+            <h3 class="mt-2.5 font-semibold text-sm text-zinc-100 group-hover:text-brand-400 line-clamp-2 leading-snug transition-colors" title="${safeTitle}">
               ${item.title}
             </h3>
-            <p class="text-[11px] text-zinc-500 line-clamp-1">
-              ${item.japanese || item.altTitle || 'Sub Indo / Eng'}
-            </p>
+            <div class="mt-1.5 flex items-center justify-between text-xs text-zinc-400">
+              <div class="flex items-center gap-2">
+                <span class="px-2 py-0.5 rounded-md border border-white/15 bg-white/5 text-[11px] font-medium text-zinc-200">${epText}</span>
+                <span>${year}</span>
+              </div>
+              <span class="text-[11px] uppercase tracking-wider text-zinc-400 font-medium">${format}</span>
+            </div>
           </article>
         `;
       },
 
       async loadHomePage() {
-        // 1. Hero Spotlight (Top 5 populer)
-        const spotlight = await filterCatalog({ sort: 'score', limit: 6 });
+        // 1. Latest Updates (getLatest) dimuat paling pertama dari /updates/ atau /home/
+        const latest = await getLatest({ limit: 18 });
+        const latestGrid = document.getElementById('latest-grid');
+        if (latestGrid && latest.length) {
+          latestGrid.innerHTML = latest.map(item => this.createAnimeCard(item)).join('');
+        }
+
+        // 2. Hero Spotlight (dari katalog atau dari latest jika katalog masih loading)
+        let spotlight = await filterCatalog({ sort: 'score', limit: 6 });
+        if (!spotlight.length && latest.length) spotlight = latest.slice(0, 6);
         this.heroItems = spotlight;
         this.renderHeroBanner(0);
         if (this.heroTimer) clearInterval(this.heroTimer);
@@ -1009,18 +1034,12 @@
           }
         }, 7000);
 
-        // 2. Watch History
+        // 3. Watch History
         this.renderWatchHistory();
 
-        // 3. Latest Updates (getLatest)
-        const latest = await getLatest({ limit: 12 });
-        const latestGrid = document.getElementById('latest-grid');
-        if (latestGrid) {
-          latestGrid.innerHTML = latest.map(item => this.createAnimeCard(item)).join('');
-        }
-
         // 4. Top Rated (filterCatalog sort='score')
-        const topRated = await filterCatalog({ sort: 'score', limit: 8 });
+        let topRated = await filterCatalog({ sort: 'score', limit: 8 });
+        if (!topRated.length && latest.length) topRated = latest.slice(0, 8);
         const topGrid = document.getElementById('top-rated-grid');
         if (topGrid) {
           topGrid.innerHTML = topRated.map(item => this.createAnimeCard(item)).join('');
