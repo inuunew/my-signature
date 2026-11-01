@@ -504,14 +504,14 @@
   </footer>
 
   <!-- =========================================================================
-       JAVASCRIPT: ANIKAI SCRAPER MODULE + FRONTEND STREAMING APPLICATION
+       JAVASCRIPT: FRONTEND CLIENT (TERHUBUNG KE BACKEND VERCEL /api/anikai)
        ========================================================================= -->
   <script>
     /**
-     * BAGIAN 1: ADAPTASI PERSIS SCRAPER ANIKAI.ORG KE BROWSER
-     * Mempertahankan seluruh struktur fungsi & mapping dari kode asli:
-     * FIELD_MAP, normalizeItem, posterSlug, fold, search, resolveAnime,
-     * getDetail, getEpisodes, getLatest, getSchedule, getGenres, filterCatalog
+     * BAGIAN 1: KONEKTOR KE BACKEND VERCEL (/api/anikai) + FALLBACK PROXY
+     * Ketika dideploy ke Vercel bersama folder `api/anikai.js`, frontend otomatis
+     * memanggil endpoint `/api/anikai?action=...` tanpa masalah CORS.
+     * Jika dijalankan di preview lokal tanpa backend, otomatis fallback ke proxy.
      */
     const BASE = 'https://anikai.org';
     const ENDPOINTS = {
@@ -530,76 +530,66 @@
       rd: 'released', u: 'updated', ca: 'added', le: 'lastEpisode'
     };
 
-    // Daftar CORS Proxy berkecepatan tinggi yang ramah terhadap Cloudflare / JSON besar & HTML
+    // Endpoint Backend Vercel (mendukung root /api/anikai maupun subpath ./api/anikai)
+    const BACKEND_CANDIDATES = ['/api/anikai', './api/anikai'];
+    let _activeBackendUrl = null;
+    let _backendAvailable = null; // null = belum dites, true = Vercel API aktif, false = mode direct proxy
+
+    async function callVercelBackend(action, params = {}) {
+      if (_backendAvailable === false) throw new Error('Backend Vercel tidak aktif');
+      const qs = new URLSearchParams({ action, ...Object.fromEntries(Object.entries(params).filter(([_, v]) => v != null && v !== '')) }).toString();
+      const urlsToTry = _activeBackendUrl ? [_activeBackendUrl] : BACKEND_CANDIDATES;
+
+      for (const base of urlsToTry) {
+        const controller = new AbortController();
+        const timer = setTimeout(() => controller.abort(), 18000);
+        try {
+          const res = await fetch(`${base}?${qs}`, { signal: controller.signal });
+          clearTimeout(timer);
+          if (!res.ok) continue;
+          const json = await res.json();
+          if (json && json.ok) {
+            _activeBackendUrl = base;
+            _backendAvailable = true;
+            return json.data;
+          }
+        } catch {
+          clearTimeout(timer);
+        }
+      }
+      if (_backendAvailable === null) _backendAvailable = false;
+      throw new Error('Endpoint /api/anikai tidak merespons');
+    }
+
+    // Fallback Proxy bila dibuka di preview editor tanpa backend Node.js
     const CORS_PROXIES = [
       url => `https://api.codetabs.com/v1/proxy?quest=${encodeURIComponent(url)}`,
       url => `https://api.allorigins.win/raw?url=${encodeURIComponent(url)}`,
-      url => `https://corsproxy.io/?url=${encodeURIComponent(url)}`,
-      url => `https://thingproxy.freeboard.io/fetch/${url}`,
-      url => url
+      url => `https://corsproxy.io/?url=${encodeURIComponent(url)}`
     ];
 
     let _catalogCache = null;
-    let _isLiveConnection = false;
 
-    // Fetch Satelit: Mencoba proxy secara cerdas dengan timeout yang cukup untuk catalog-index.json
     async function fetchViaProxy(proxyFn, url, mode = 'json', timeoutMs = 15000) {
       const controller = new AbortController();
       const timer = setTimeout(() => controller.abort(), timeoutMs);
       try {
-        const targetUrl = proxyFn(url);
-        const res = await fetch(targetUrl, {
-          signal: controller.signal,
-          headers: {
-            accept: mode === 'json' ? 'application/json, text/plain, */*' : 'text/html,application/xhtml+xml,*/*'
-          }
-        });
+        const res = await fetch(proxyFn(url), { signal: controller.signal });
         clearTimeout(timer);
         if (!res.ok) throw new Error(`HTTP ${res.status}`);
         const text = await res.text();
         if (!text || text.trim().length < 10) throw new Error('Empty response');
-
-        if (mode === 'json') {
-          let parsed;
-          try {
-            parsed = JSON.parse(text);
-          } catch {
-            // Kadang allorigins membungkus dengan { contents: "..." }
-            const wrapper = JSON.parse(text);
-            if (wrapper && wrapper.contents) parsed = JSON.parse(wrapper.contents);
-            else throw new Error('Invalid JSON');
-          }
-          return parsed;
-        }
-        // Validasi HTML agar bukan halaman error proxy
-        if (text.includes('article') || text.includes('anime-card') || text.includes('watch-page') || text.includes('anikai')) {
-          return text;
-        }
-        throw new Error('Invalid HTML content');
+        if (mode === 'json') return JSON.parse(text);
+        if (text.includes('anime-card') || text.includes('watch-page') || text.includes('anikai')) return text;
+        throw new Error('Invalid HTML');
       } catch (err) {
         clearTimeout(timer);
         throw err;
       }
     }
 
-    async function request(url, mode = 'json') {
-      // Jalankan race paralel pada 3 proxy teratas agar sangat cepat & langsung dapat data live asli
-      try {
-        return await Promise.any(
-          CORS_PROXIES.slice(0, 3).map(fn => fetchViaProxy(fn, url, mode, 14000))
-        );
-      } catch {
-        // Jika gagal, coba berurutan satu per satu dengan waktu lebih longgar
-        let lastErr;
-        for (const proxyFn of CORS_PROXIES) {
-          try {
-            return await fetchViaProxy(proxyFn, url, mode, 18000);
-          } catch (e) {
-            lastErr = e;
-          }
-        }
-        throw new Error(`Gagal mengambil data dari ${url}: ${lastErr?.message || 'CORS Blocked'}`);
-      }
+    async function requestDirect(url, mode = 'json') {
+      return await Promise.any(CORS_PROXIES.map(fn => fetchViaProxy(fn, url, mode, 15000)));
     }
 
     function posterSlug(raw) {
@@ -627,192 +617,202 @@
     async function loadCatalog(forceRefresh = false) {
       if (_catalogCache && !forceRefresh) return _catalogCache;
       try {
-        const raw = await request(ENDPOINTS.catalog, 'json');
-        if (!Array.isArray(raw) || !raw.length) throw new Error('Format catalog-index.json tidak valid');
-        _catalogCache = raw;
-        _isLiveConnection = true;
-        app.updateConnectionBadge(true, raw.length);
-        return _catalogCache;
-      } catch (e) {
-        console.warn('Katalog penuh belum termuat, mencoba membangun katalog dari halaman live:', e.message);
-        // Jika catalog-index.json terlalu besar untuk proxy gratis, bangun katalog dari scrape halaman live /updates/ & /home/
-        if (!_catalogCache) _catalogCache = [];
-        app.updateConnectionBadge(false, _catalogCache.length);
-        return _catalogCache;
-      }
+        const status = await callVercelBackend('status');
+        if (status && status.totalCatalog) {
+          app.updateConnectionBadge(true, status.totalCatalog, 'Vercel Serverless API');
+        }
+      } catch {}
+      try {
+        const raw = await requestDirect(ENDPOINTS.catalog, 'json');
+        if (Array.isArray(raw) && raw.length) {
+          _catalogCache = raw;
+          app.updateConnectionBadge(true, raw.length, _backendAvailable ? 'Vercel Serverless API' : 'Live Proxy');
+          return _catalogCache;
+        }
+      } catch {}
+      if (!_catalogCache) _catalogCache = [];
+      return _catalogCache;
     }
 
     async function search(keyword, { limit = 10 } = {}) {
       if (!keyword || !keyword.trim()) throw new Error('Keyword pencarian kosong');
-      const catalog = await loadCatalog();
-      const q = fold(keyword);
-      const scored = [];
-      for (const raw of catalog) {
-        const fields = [raw.n, raw.e, raw.j, raw.na].map(fold);
-        let best = Infinity;
-        for (const f of fields) {
-          if (!f) continue;
-          if (f === q) best = Math.min(best, 0);
-          else if (f.startsWith(q)) best = Math.min(best, 1);
-          else if (new RegExp(`\\b${escapeRegex(q)}`).test(f)) best = Math.min(best, 2);
-          else if (f.includes(q)) best = Math.min(best, 3);
+      try {
+        return await callVercelBackend('search', { q: keyword, limit });
+      } catch {
+        const catalog = await loadCatalog();
+        const q = fold(keyword);
+        const scored = [];
+        for (const raw of catalog) {
+          const fields = [raw.n, raw.e, raw.j, raw.na].map(fold);
+          let best = Infinity;
+          for (const f of fields) {
+            if (!f) continue;
+            if (f === q) best = Math.min(best, 0);
+            else if (f.startsWith(q)) best = Math.min(best, 1);
+            else if (new RegExp(`\\b${escapeRegex(q)}`).test(f)) best = Math.min(best, 2);
+            else if (f.includes(q)) best = Math.min(best, 3);
+          }
+          if (best !== Infinity) scored.push({ rank: best, score: raw.sc || 0, raw });
         }
-        if (best !== Infinity) scored.push({ rank: best, score: raw.sc || 0, raw });
+        scored.sort((a, b) => a.rank - b.rank || (b.score || 0) - (a.score || 0) || (b.raw.y || 0) - (a.raw.y || 0));
+        return scored.slice(0, limit).map(x => normalizeItem(x.raw));
       }
-      scored.sort((a, b) => a.rank - b.rank || (b.score || 0) - (a.score || 0) || (b.raw.y || 0) - (a.raw.y || 0));
-      return scored.slice(0, limit).map(x => normalizeItem(x.raw));
     }
 
     async function resolveAnime(input) {
-      const catalog = await loadCatalog();
       const str = String(input ?? '').trim();
-      if (!str) throw new Error('Input anime kosong');
       const m = str.match(/\/watch\/([^/?#]+)/);
       const slug = m ? m[1] : str;
-      const hit = catalog.find(x => x.s === slug || posterSlug(x) === slug);
+      const catalog = await loadCatalog();
+      const hit = catalog.find(x => x.s === slug || posterSlug(x) === slug || String(x.i) === slug);
       if (hit) return { raw: hit, item: normalizeItem(hit) };
-      if (/^\d+$/.test(str)) {
-        const byId = catalog.find(x => Number(x.i) === Number(str));
-        if (byId) return { raw: byId, item: normalizeItem(byId) };
-      }
-      if (catalog.length > 0) {
-        try {
-          const results = await search(str, { limit: 1 });
-          if (results.length) {
-            const byName = catalog.find(x => x.i === results[0].id);
-            if (byName) return { raw: byName, item: normalizeItem(byName) };
-          }
-        } catch {}
-      }
-      // Jika item berasal dari scrape langsung /home/ atau /updates/ dan belum ada di _catalogCache
       const numId = Number((slug.match(/-(\d+)$/) || [])[1]) || 0;
-      const syntheticRaw = {
+      const synthetic = {
         i: numId,
         s: slug,
         n: slug.replace(/-\d+$/, '').replace(/-/g, ' ').replace(/\b\w/g, c => c.toUpperCase()),
-        f: 'TV',
-        st: 'Releasing',
-        y: 2026
+        f: 'TV', st: 'Releasing', y: 2026
       };
-      return { raw: syntheticRaw, item: normalizeItem(syntheticRaw) };
+      return { raw: synthetic, item: normalizeItem(synthetic) };
     }
 
-    // Helper untuk mengekstrak kartu anime dari HTML (/updates/ maupun /home/)
-    function parseAnimeCardsFromHtml(html) {
-      const parser = new DOMParser();
-      const doc = parser.parseFromString(html, 'text/html');
-      const out = [];
-      const seen = new Set();
-
-      doc.querySelectorAll('article.anime-card, .anime-card').forEach(el => {
-        const link = el.querySelector('a.poster-link') || el.querySelector('a[href*="/watch/"]');
-        const href = link?.getAttribute('href') || '';
-        const slugMatch = href.match(/\/watch\/([^/?#]+)/);
-        const slug = slugMatch ? slugMatch[1] : '';
-        const id = Number(el.getAttribute('data-id')) || Number((href.match(/-(\d+)\/?$/) || [])[1]) || null;
-
-        const titleEl = el.querySelector('.card-title a') || el.querySelector('.card-title') || el.querySelector('h3, h2');
-        const title = titleEl?.textContent.trim() || link?.getAttribute('title') || '';
-        if (!title || seen.has(slug || title)) return;
-        seen.add(slug || title);
-
-        const jp = titleEl?.getAttribute('data-title-jp') || null;
-        const epBadge = el.querySelector('.episode-badge, .ep-badge, [class*="episode"]')?.textContent.trim() || '';
-        const epNum = Number((epBadge.match(/(\d+)/) || [])[1]) || null;
-
-        const metas = el.querySelectorAll('.card-meta span');
-        let year = null;
-        metas.forEach(m => {
-          const val = Number(m.textContent.trim());
-          if (val >= 1960 && val <= 2030) year = val;
-        });
-
-        const format = el.querySelector('.card-format')?.textContent.trim() || 'TV';
-        const imgEl = el.querySelector('img');
-        let poster = imgEl?.getAttribute('data-src') || imgEl?.getAttribute('src') || null;
-        if (poster && poster.startsWith('/')) poster = `${BASE}${poster}`;
-        if (!poster && slug && id) {
-          const pSlug = slug.endsWith(`-${id}`) ? slug : `${slug}-${id}`;
-          poster = `https://img.anikai.org/poster/w_360/h_480/${pSlug}.webp`;
-        }
-
-        const itemObj = {
-          id,
-          slug: slug || (id ? `${fold(title).replace(/[^a-z0-9]+/g, '-')}-${id}` : fold(title).replace(/[^a-z0-9]+/g, '-')),
-          title,
-          japanese: jp,
-          episode: epNum,
-          lastEpisode: epNum,
-          year,
-          format,
-          poster,
-          url: href ? (href.startsWith('http') ? href : `${BASE}${href}`) : `${BASE}/watch/${slug}/`
-        };
-
-        out.push(itemObj);
-
-        // Sinkronkan juga ke _catalogCache bila belum ada
-        if (_catalogCache && id && !_catalogCache.some(x => Number(x.i) === Number(id))) {
-          _catalogCache.unshift({
-            i: id, s: itemObj.slug, n: title, j: jp, f: format, y: year,
-            le: epNum, tt: epNum, st: 'Releasing', poster: itemObj.poster
+    async function getDetail(input) {
+      try {
+        return await callVercelBackend('detail', { input });
+      } catch {
+        const { raw, item } = await resolveAnime(input);
+        let ld = null, synopsis = null, facts = {}, dataId = String(raw.i), seal = null, playerHost = null, serverDefault = null, trailer = null, epFromPage = null;
+        try {
+          const html = await requestDirect(item.url, 'text');
+          const doc = new DOMParser().parseFromString(html, 'text/html');
+          doc.querySelectorAll('script[type="application/ld+json"]').forEach(el => {
+            try {
+              const parsed = JSON.parse(el.textContent);
+              const graph = parsed['@graph'] || [parsed];
+              const series = graph.find(n => ['TVSeries', 'Movie', 'CreativeWork', 'TVSeason'].includes(n['@type']));
+              if (series && !ld) ld = series;
+            } catch {}
           });
-        }
-      });
+          doc.querySelectorAll('.detail-facts > div').forEach(el => {
+            const key = el.querySelector('dt')?.textContent.replace(/:\s*$/, '').trim();
+            const val = el.querySelector('dd')?.textContent.trim();
+            if (key) facts[key] = val;
+          });
+          synopsis = doc.querySelector('#synopsis-text')?.textContent.trim() || ld?.description || null;
+          const wp = doc.querySelector('#watch-page');
+          if (wp) {
+            dataId = wp.getAttribute('data-id') || dataId;
+            seal = wp.getAttribute('data-seal') || null;
+            playerHost = wp.getAttribute('data-player') || null;
+            serverDefault = wp.getAttribute('data-server-default') || null;
+          }
+          trailer = doc.querySelector('#open-trailer')?.getAttribute('data-trailer') || null;
+        } catch {}
+        return {
+          id: Number(dataId), slug: raw.s, url: item.url, title: ld?.name || item.title,
+          altTitle: ld?.alternateName || item.altTitle, japanese: raw.j, native: raw.na,
+          format: raw.f, status: raw.st, year: raw.y, rating: ld?.contentRating || raw.r,
+          score: raw.sc, totalEpisodes: epFromPage ?? raw.tt, subtitles: raw.sb,
+          released: ld?.datePublished || raw.rd, updated: raw.u, lastEpisode: raw.le,
+          genres: (ld?.genre || raw.g || []).flat(), studios: facts['Studios'] || null,
+          duration: facts['Duration'] || null, articleStatus: facts['Status'] || null,
+          dateAired: facts['Date aired'] || null, synopsis, trailer, poster: ld?.image || item.poster,
+          banner: item.banner, player: { host: playerHost, seal, serverDefault }
+        };
+      }
+    }
 
-      return out;
+    async function getEpisodes(input, { episode } = {}) {
+      try {
+        return await callVercelBackend('episodes', { input, ep: episode });
+      } catch {
+        const { raw } = await resolveAnime(input);
+        try {
+          const rawEps = await requestDirect(ENDPOINTS.episodes(raw.i), 'json');
+          const list = rawEps
+            .filter(Array.isArray)
+            .map(e => ({ number: Number(e[0]), title: e[1] || `Episode ${e[0]}`, date: e[2] || null, filler: !!e[3], recap: !!e[4] }))
+            .sort((a, b) => a.number - b.number);
+          return {
+            anime: { id: raw.i, slug: raw.s, title: raw.n, url: `${BASE}/watch/${raw.s}/` },
+            total: list.length, latest: list.at(-1) || null, selected: null, episodes: list
+          };
+        } catch {
+          const count = Number(raw.le || raw.tt || 12);
+          const list = Array.from({ length: count }, (_, i) => ({ number: i + 1, title: `Episode ${i + 1}`, date: null, filler: false, recap: false }));
+          return {
+            anime: { id: raw.i, slug: raw.s, title: raw.n, url: `${BASE}/watch/${raw.s}/` },
+            total: list.length, latest: list.at(-1) || null, selected: null, episodes: list
+          };
+        }
+      }
     }
 
     async function getLatest({ limit = 20 } = {}) {
-      // 1. Prioritaskan scrape langsung dari /updates/ atau /home/ persis seperti kode anikai.js & screenshot browser user
-      for (const targetEndpoint of [ENDPOINTS.updates, ENDPOINTS.home]) {
+      const badge = document.getElementById('latest-source-badge');
+      // 1. Coba panggil Backend Serverless Vercel (/api/anikai?action=latest)
+      try {
+        const data = await callVercelBackend('latest', { limit });
+        if (Array.isArray(data) && data.length > 0) {
+          if (badge) {
+            badge.textContent = 'VERCEL SERVERLESS API';
+            badge.className = 'px-2 py-0.5 text-[11px] font-semibold rounded-md bg-emerald-500/20 text-emerald-400 border border-emerald-500/30';
+          }
+          return data;
+        }
+      } catch {}
+
+      // 2. Fallback Scrape Langsung via Proxy jika dijalankan tanpa backend Vercel
+      for (const endpoint of [ENDPOINTS.updates, ENDPOINTS.home]) {
         try {
-          const html = await request(targetEndpoint, 'text');
-          const out = parseAnimeCardsFromHtml(html);
+          const html = await requestDirect(endpoint, 'text');
+          const doc = new DOMParser().parseFromString(html, 'text/html');
+          const out = [];
+          doc.querySelectorAll('article.anime-card').forEach(el => {
+            const link = el.querySelector('a.poster-link');
+            const href = link?.getAttribute('href') || '';
+            const slugMatch = href.match(/\/watch\/([^/?#]+)/);
+            const slug = slugMatch ? slugMatch[1] : null;
+            const id = Number(el.getAttribute('data-id')) || Number((href.match(/-(\d+)\/?$/) || [])[1]) || null;
+            const titleEl = el.querySelector('.card-title a');
+            const title = titleEl?.textContent.trim() || '';
+            if (!title) return;
+            const jp = titleEl?.getAttribute('data-title-jp') || null;
+            const epBadge = el.querySelector('.episode-badge')?.textContent.trim() || '';
+            const epNum = Number((epBadge.match(/(\d+)/) || [])[1]) || null;
+            const metas = el.querySelectorAll('.card-meta span');
+            const year = Number(metas[1]?.textContent.trim()) || null;
+            const format = el.querySelector('.card-format')?.textContent.trim() || 'TV';
+            const imgEl = el.querySelector('img');
+            let poster = imgEl?.getAttribute('src') || imgEl?.getAttribute('data-src') || null;
+            if (poster && poster.startsWith('/')) poster = `${BASE}${poster}`;
+            out.push({
+              id, slug, title, japanese: jp, episode: epNum, year, format, poster,
+              url: href ? (href.startsWith('http') ? href : `${BASE}${href}`) : null
+            });
+          });
           if (out.length > 0) {
-            _isLiveConnection = true;
-            const badge = document.getElementById('latest-source-badge');
             if (badge) {
               badge.textContent = 'LIVE ANIKAI.ORG';
               badge.className = 'px-2 py-0.5 text-[11px] font-semibold rounded-md bg-emerald-500/20 text-emerald-400 border border-emerald-500/30';
             }
             return out.slice(0, limit);
           }
-        } catch (err) {
-          console.warn(`Scrape ${targetEndpoint} gagal, mencoba alternatif:`, err.message);
-        }
+        } catch {}
       }
-
-      // 2. Jika endpoint HTML lambat, gunakan catalog-index.json yang diurutkan berdasarkan 'updated' (u)
-      const latestFromCatalog = await filterCatalog({ sort: 'updated', limit });
-      const badge = document.getElementById('latest-source-badge');
-      if (badge) {
-        badge.textContent = 'CATALOG SYNC';
-        badge.className = 'px-2 py-0.5 text-[11px] font-semibold rounded-md bg-brand-500/20 text-brand-400 border border-brand-500/30';
-      }
-      return latestFromCatalog.map(item => ({
-        id: item.id,
-        slug: item.slug,
-        title: item.title,
-        japanese: item.japanese,
-        episode: item.lastEpisode || item.episodes || 1,
-        year: item.year,
-        format: item.format,
-        score: item.score,
-        poster: item.poster,
-        url: item.url
-      }));
+      return [];
     }
 
     async function getSchedule({ all = false, limit = 20 } = {}) {
       try {
-        const raw = await request(ENDPOINTS.schedule, 'json');
-        if (!Array.isArray(raw)) throw new Error('Invalid schedule.json');
+        return await callVercelBackend('schedule', { all: all ? 'true' : 'false', limit });
+      } catch {
+        const raw = await requestDirect(ENDPOINTS.schedule, 'json');
         const now = Date.now();
         const mapped = raw.map(s => {
+          const m = String(s.url || '').match(/\/watch\/([^/?#]+)/);
           let poster = s.poster || null;
           if (poster && poster.startsWith('/')) poster = `${BASE}${poster}`;
-          const m = String(s.url || '').match(/\/watch\/([^/?#]+)/);
           return {
             slug: m ? m[1] : null,
             title: s.title, japanese: s.japanese || null, episode: s.episode ?? null,
@@ -822,58 +822,46 @@
         });
         const filtered = all ? mapped : mapped.filter(x => x.airTimestamp && x.airTimestamp >= now - 3600000);
         filtered.sort((a, b) => (a.airTimestamp || 0) - (b.airTimestamp || 0));
-        if (filtered.length) return filtered.slice(0, limit);
-        return mapped.slice(0, limit);
-      } catch {
-        const catalog = await loadCatalog();
-        const releasing = catalog.filter(x => fold(x.st) === 'releasing').slice(0, limit);
-        const now = Date.now();
-        return releasing.map((raw, idx) => {
-          const item = normalizeItem(raw);
-          const futureTime = new Date(now + (idx + 1) * 5400000).toISOString();
-          return {
-            id: item.id,
-            slug: item.slug,
-            title: item.title,
-            japanese: item.japanese,
-            episode: (Number(item.lastEpisode || 1) + 1),
-            airAt: futureTime,
-            airTimestamp: new Date(futureTime).getTime(),
-            poster: item.poster,
-            url: item.url
-          };
-        });
+        return filtered.slice(0, limit);
       }
     }
 
     async function getGenres() {
-      const catalog = await loadCatalog();
-      const counter = new Map();
-      for (const raw of catalog) {
-        for (const g of raw.g || []) counter.set(g, (counter.get(g) || 0) + 1);
+      try {
+        return await callVercelBackend('genres');
+      } catch {
+        const catalog = await loadCatalog();
+        const counter = new Map();
+        for (const raw of catalog) {
+          for (const g of raw.g || []) counter.set(g, (counter.get(g) || 0) + 1);
+        }
+        return [...counter.entries()]
+          .map(([genre, total]) => ({ genre, total }))
+          .sort((a, b) => b.total - a.total);
       }
-      return [...counter.entries()]
-        .map(([genre, total]) => ({ genre, total }))
-        .sort((a, b) => b.total - a.total);
     }
 
     async function filterCatalog(opts = {}) {
       const { genre, year, format, status, minScore = 0, sort = 'updated', limit = 24 } = opts;
-      const catalog = await loadCatalog();
-      const list = catalog.filter(raw => {
-        if (genre && !(raw.g || []).some(g => fold(g) === fold(genre))) return false;
-        if (year && Number(raw.y) !== Number(year)) return false;
-        if (format && fold(raw.f) !== fold(format)) return false;
-        if (status && fold(raw.st) !== fold(status)) return false;
-        if (Number(raw.sc || 0) < Number(minScore)) return false;
-        return true;
-      });
-      const key = { updated: 'u', released: 'rd', added: 'ca', score: 'sc', count: 'tt' }[sort] || 'u';
-      list.sort((a, b) => {
-        if (key === 'sc' || key === 'tt') return Number(b[key] || 0) - Number(a[key] || 0);
-        return String(b[key] || '').localeCompare(String(a[key] || ''));
-      });
-      return list.slice(0, limit).map(normalizeItem);
+      try {
+        return await callVercelBackend('filter', { genre, year, format, status, minScore, sort, limit });
+      } catch {
+        const catalog = await loadCatalog();
+        const list = catalog.filter(raw => {
+          if (genre && !(raw.g || []).some(g => fold(g) === fold(genre))) return false;
+          if (year && Number(raw.y) !== Number(year)) return false;
+          if (format && fold(raw.f) !== fold(format)) return false;
+          if (status && fold(raw.st) !== fold(status)) return false;
+          if (Number(raw.sc || 0) < Number(minScore)) return false;
+          return true;
+        });
+        const key = { updated: 'u', released: 'rd', added: 'ca', score: 'sc', count: 'tt' }[sort] || 'u';
+        list.sort((a, b) => {
+          if (key === 'sc' || key === 'tt') return Number(b[key] || 0) - Number(a[key] || 0);
+          return String(b[key] || '').localeCompare(String(a[key] || ''));
+        });
+        return list.slice(0, limit).map(normalizeItem);
+      }
     }
 
     /**
@@ -895,46 +883,44 @@
         this.renderSkeletonGrid('latest-grid', 12);
         this.renderSkeletonGrid('top-rated-grid', 8);
 
-        // Jalankan getLatest() dan loadCatalog() secara paralel agar Latest Updates tampil secepat mungkin dengan data live anikai.org
         await Promise.allSettled([
           this.loadHomePage(),
-          loadCatalog().then(() => this.populateFilterDropdowns())
+          this.populateFilterDropdowns()
         ]);
       },
 
       async forceResync() {
         const icon = document.getElementById('resync-icon');
         if (icon) icon.classList.add('fa-spin');
-        this.showToast('Menyinkronkan ulang data langsung dari anikai.org...');
+        this.showToast('Menyinkronkan ulang data dari server...');
         _catalogCache = null;
         this.renderSkeletonGrid('latest-grid', 12);
         await Promise.allSettled([
-          loadCatalog(true).then(() => this.populateFilterDropdowns()),
-          this.loadHomePage()
+          this.loadHomePage(),
+          this.populateFilterDropdowns()
         ]);
         if (icon) icon.classList.remove('fa-spin');
         this.showToast('Sinkronisasi selesai!');
       },
 
-      updateConnectionBadge(isLive, count) {
+      updateConnectionBadge(isLive, count, modeLabel = 'Vercel Serverless API') {
         const dot = document.getElementById('scraper-status-dot');
         const txt = document.getElementById('scraper-status-text');
         const modalCount = document.getElementById('modal-catalog-count');
         const modalMode = document.getElementById('modal-connection-mode');
 
-        if (modalCount) modalCount.textContent = `${count.toLocaleString('id-ID')} Anime`;
+        if (modalCount && count) modalCount.textContent = `${Number(count).toLocaleString('id-ID')} Anime`;
         if (isLive) {
           dot.className = 'w-2.5 h-2.5 rounded-full bg-emerald-400 shadow-sm shadow-emerald-400';
-          txt.textContent = `Live (${count})`;
-          if (modalMode) modalMode.textContent = 'Live Proxy (anikai.org)';
+          txt.textContent = count ? `Live (${count})` : 'Live API';
+          if (modalMode) modalMode.textContent = modeLabel;
         } else {
           dot.className = 'w-2.5 h-2.5 rounded-full bg-brand-400';
-          txt.textContent = `Ready (${count})`;
-          if (modalMode) modalMode.textContent = 'Hybrid Cache Mode';
+          txt.textContent = 'Ready';
+          if (modalMode) modalMode.textContent = modeLabel;
         }
       },
 
-      // Fallback Poster SVG jika gambar dari img.anikai.org gagal dimuat
       getFallbackPoster(title = 'Anime') {
         const cleanTitle = encodeURIComponent(String(title).slice(0, 22));
         return `https://placehold.co/360x480/1c1c24/a78bfa?text=${cleanTitle}`;
@@ -957,9 +943,6 @@
         `).join('');
       },
 
-      // Kartu Anime Standar
-      createAnimeCard(item, badgeText = null) {
-        const idOrSlug = item.slug || item.id || item.title;
       // Kartu Anime Standar (Disesuaikan dengan desain asli anikai.org/home/)
       createAnimeCard(item, badgeText = null) {
         const idOrSlug = item.slug || item.id || item.url || item.title;
@@ -1180,20 +1163,33 @@
 
       // POPULATE FILTER DROPDOWNS DARI KATALOG
       async populateFilterDropdowns() {
-        const genres = await getGenres();
-        const genreSelect = document.getElementById('filter-genre');
-        if (genreSelect) {
-          genreSelect.innerHTML = `<option value="">Semua Genre (${genres.length})</option>` +
-            genres.map(g => `<option value="${g.genre}">${g.genre} (${g.total})</option>`).join('');
-        }
+        try {
+          const genres = await getGenres();
+          const genreSelect = document.getElementById('filter-genre');
+          if (genreSelect && Array.isArray(genres)) {
+            genreSelect.innerHTML = `<option value="">Semua Genre (${genres.length})</option>` +
+              genres.map(g => `<option value="${g.genre}">${g.genre} (${g.total})</option>`).join('');
+          }
+        } catch {}
 
-        const catalog = await loadCatalog();
-        const years = [...new Set(catalog.map(x => x.y).filter(Boolean))].sort((a, b) => b - a);
-        const yearSelect = document.getElementById('filter-year');
-        if (yearSelect) {
-          yearSelect.innerHTML = `<option value="">Semua Tahun</option>` +
-            years.slice(0, 35).map(y => `<option value="${y}">${y}</option>`).join('');
-        }
+        try {
+          let years = [];
+          try {
+            const yData = await callVercelBackend('years');
+            if (yData && Array.isArray(yData.years)) {
+              years = yData.years;
+              this.updateConnectionBadge(true, yData.totalCatalog, 'Vercel Serverless API');
+            }
+          } catch {
+            const catalog = await loadCatalog();
+            years = [...new Set(catalog.map(x => x.y).filter(Boolean))].sort((a, b) => b - a);
+          }
+          const yearSelect = document.getElementById('filter-year');
+          if (yearSelect && years.length) {
+            yearSelect.innerHTML = `<option value="">Semua Tahun</option>` +
+              years.slice(0, 35).map(y => `<option value="${y}">${y}</option>`).join('');
+          }
+        } catch {}
       },
 
       async applyCatalogFilter(resetLimit = true) {
