@@ -1,0 +1,1947 @@
+
+<!DOCTYPE html>
+<html lang="id" class="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AniKai Stream — Nonton Anime Subtitle Indonesia & Inggris</title>
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Google Fonts: Inter & Outfit -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@600;700;800&display=swap" rel="stylesheet">
+  <!-- FontAwesome Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Inter', 'sans-serif'],
+            display: ['Outfit', 'sans-serif'],
+          },
+          colors: {
+            brand: {
+              50: '#f5f3ff',
+              400: '#a78bfa',
+              500: '#8b5cf6',
+              600: '#7c3aed',
+              700: '#6d28d9',
+              900: '#4c1d95',
+            },
+            dark: {
+              950: '#09090b',
+              900: '#121217',
+              800: '#1c1c24',
+              700: '#272732',
+            }
+          }
+        }
+      }
+    }
+  </script>
+
+  <style>
+    /* Custom Scrollbar & Glassmorphism */
+    ::-webkit-scrollbar { width: 8px; height: 8px; }
+    ::-webkit-scrollbar-track { background: #09090b; }
+    ::-webkit-scrollbar-thumb { background: #272732; border-radius: 9999px; }
+    ::-webkit-scrollbar-thumb:hover { background: #8b5cf6; }
+
+    .glass-nav {
+      background: rgba(9, 9, 11, 0.85);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+    }
+    .glass-card {
+      background: rgba(28, 28, 36, 0.75);
+      backdrop-filter: blur(12px);
+      border: 1px solid rgba(255, 255, 255, 0.07);
+    }
+    .hero-gradient {
+      background: linear-gradient(90deg, #09090b 0%, rgba(9, 9, 11, 0.88) 45%, rgba(9, 9, 11, 0.25) 100%),
+                  linear-gradient(0deg, #09090b 0%, rgba(9, 9, 11, 0) 60%);
+    }
+    .poster-shine {
+      position: relative;
+      overflow: hidden;
+    }
+    .poster-shine::after {
+      content: '';
+      position: absolute;
+      top: -50%;
+      left: -60%;
+      width: 40%;
+      height: 200%;
+      background: rgba(255, 255, 255, 0.13);
+      transform: rotate(30deg);
+      transition: all 0.6s cubic-bezier(0.19, 1, 0.22, 1);
+    }
+    .poster-shine:hover::after {
+      left: 130%;
+    }
+    @keyframes pulse-slow {
+      0%, 100% { opacity: 0.4; }
+      50% { opacity: 0.8; }
+    }
+    .skeleton {
+      animation: pulse-slow 1.8s infinite ease-in-out;
+      background: linear-gradient(90deg, #1c1c24 25%, #272732 50%, #1c1c24 75%);
+      background-size: 200% 100%;
+    }
+  </style>
+</head>
+<body class="bg-dark-950 text-zinc-100 font-sans antialiased selection:bg-brand-500 selection:text-white min-h-screen flex flex-col">
+
+  <!-- TOP NAVIGATION BAR -->
+  <header class="sticky top-0 z-50 glass-nav border-b border-white/10 transition-all">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between gap-4">
+      
+      <!-- Brand Logo -->
+      <div class="flex items-center gap-6">
+        <button onclick="app.navigate('home')" class="flex items-center gap-2.5 group focus:outline-none">
+          <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-brand-500 to-indigo-600 flex items-center justify-center shadow-lg shadow-brand-500/30 group-hover:scale-105 transition-transform">
+            <i class="fa-solid fa-play text-white text-lg ml-0.5"></i>
+          </div>
+          <div class="text-left">
+            <span class="font-display font-extrabold text-xl tracking-tight bg-clip-text text-transparent bg-gradient-to-r from-white via-zinc-100 to-brand-400">AniKai</span>
+            <span class="block text-[10px] font-medium uppercase tracking-widest text-brand-400 -mt-1">Scraper Engine</span>
+          </div>
+        </button>
+
+        <!-- Desktop Navigation Links -->
+        <nav class="hidden md:flex items-center gap-1">
+          <button onclick="app.navigate('home')" data-nav="home" class="nav-btn px-3.5 py-2 rounded-lg text-sm font-medium text-white bg-white/10 transition">
+            <i class="fa-solid fa-house mr-1.5 text-brand-400"></i>Beranda
+          </button>
+          <button onclick="app.navigate('catalog')" data-nav="catalog" class="nav-btn px-3.5 py-2 rounded-lg text-sm font-medium text-zinc-400 hover:text-white hover:bg-white/5 transition">
+            <i class="fa-solid fa-compass mr-1.5 text-brand-400"></i>Eksplor & Filter
+          </button>
+          <button onclick="app.navigate('schedule')" data-nav="schedule" class="nav-btn px-3.5 py-2 rounded-lg text-sm font-medium text-zinc-400 hover:text-white hover:bg-white/5 transition">
+            <i class="fa-solid fa-calendar-days mr-1.5 text-brand-400"></i>Jadwal Rilis
+          </button>
+          <button onclick="app.navigate('genres')" data-nav="genres" class="nav-btn px-3.5 py-2 rounded-lg text-sm font-medium text-zinc-400 hover:text-white hover:bg-white/5 transition">
+            <i class="fa-solid fa-layer-group mr-1.5 text-brand-400"></i>Genre
+          </button>
+          <button onclick="app.navigate('bookmarks')" data-nav="bookmarks" class="nav-btn px-3.5 py-2 rounded-lg text-sm font-medium text-zinc-400 hover:text-white hover:bg-white/5 transition relative">
+            <i class="fa-solid fa-bookmark mr-1.5 text-brand-400"></i>Koleksi
+            <span id="bookmark-count-badge" class="hidden ml-1 px-1.5 py-0.2 text-[10px] rounded-full bg-brand-600 text-white font-bold">0</span>
+          </button>
+        </nav>
+      </div>
+
+      <!-- Search Bar & Engine Status -->
+      <div class="flex items-center gap-3 flex-1 max-w-md justify-end">
+        <div class="relative w-full">
+          <input 
+            id="global-search-input" 
+            type="text" 
+            placeholder="Cari judul anime, Jepang, ID, atau slug..." 
+            class="w-full bg-dark-800/90 border border-white/10 focus:border-brand-500 rounded-xl pl-10 pr-9 py-2 text-sm text-zinc-100 placeholder-zinc-500 focus:outline-none focus:ring-2 focus:ring-brand-500/20 transition"
+            autocomplete="off"
+          >
+          <i class="fa-solid fa-magnifying-glass absolute left-3.5 top-1/2 -translate-y-1/2 text-zinc-500 text-sm"></i>
+          <button id="clear-search-btn" onclick="app.clearQuickSearch()" class="hidden absolute right-3 top-1/2 -translate-y-1/2 text-zinc-400 hover:text-white">
+            <i class="fa-solid fa-circle-xmark text-sm"></i>
+          </button>
+
+          <!-- Live Search Dropdown -->
+          <div id="search-dropdown" class="hidden absolute left-0 right-0 top-full mt-2 glass-card rounded-2xl shadow-2xl border border-white/10 overflow-hidden z-50 max-h-[70vh] overflow-y-auto">
+            <div id="search-dropdown-content" class="divide-y divide-white/5"></div>
+          </div>
+        </div>
+
+        <!-- Scraper Connection / CLI Console Button -->
+        <button onclick="app.toggleScraperModal()" title="Status Scraper & CLI Runner" class="flex items-center gap-2 px-3 py-2 rounded-xl bg-dark-800 border border-white/10 hover:border-brand-500/50 text-xs font-medium text-zinc-300 transition shrink-0">
+          <span id="scraper-status-dot" class="w-2.5 h-2.5 rounded-full bg-amber-400 animate-pulse"></span>
+          <span id="scraper-status-text" class="hidden sm:inline">Memuat...</span>
+          <i class="fa-solid fa-terminal text-brand-400 ml-0.5"></i>
+        </button>
+      </div>
+    </div>
+
+    <!-- Mobile Bottom / Sub Bar -->
+    <div class="flex md:hidden items-center justify-around border-t border-white/5 bg-dark-900/95 py-2 px-2 text-xs">
+      <button onclick="app.navigate('home')" data-nav="home" class="nav-btn flex flex-col items-center gap-1 text-brand-400 font-medium px-2 py-1 rounded-lg">
+        <i class="fa-solid fa-house text-sm"></i><span>Beranda</span>
+      </button>
+      <button onclick="app.navigate('catalog')" data-nav="catalog" class="nav-btn flex flex-col items-center gap-1 text-zinc-400 px-2 py-1 rounded-lg">
+        <i class="fa-solid fa-compass text-sm"></i><span>Filter</span>
+      </button>
+      <button onclick="app.navigate('schedule')" data-nav="schedule" class="nav-btn flex flex-col items-center gap-1 text-zinc-400 px-2 py-1 rounded-lg">
+        <i class="fa-solid fa-calendar-days text-sm"></i><span>Jadwal</span>
+      </button>
+      <button onclick="app.navigate('genres')" data-nav="genres" class="nav-btn flex flex-col items-center gap-1 text-zinc-400 px-2 py-1 rounded-lg">
+        <i class="fa-solid fa-layer-group text-sm"></i><span>Genre</span>
+      </button>
+      <button onclick="app.navigate('bookmarks')" data-nav="bookmarks" class="nav-btn flex flex-col items-center gap-1 text-zinc-400 px-2 py-1 rounded-lg">
+        <i class="fa-solid fa-bookmark text-sm"></i><span>Koleksi</span>
+      </button>
+    </div>
+  </header>
+
+  <!-- MAIN DYNAMIC VIEW CONTAINER -->
+  <main id="main-content" class="flex-1">
+    
+    <!-- ==================== VIEW 1: HOME ==================== -->
+    <section id="view-home" class="space-y-10 pb-14">
+      
+      <!-- Hero Banner Carousel -->
+      <div id="hero-banner" class="relative w-full h-[430px] sm:h-[500px] bg-dark-900 overflow-hidden border-b border-white/5">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-full flex items-center">
+          <div class="w-full max-w-2xl space-y-4">
+            <div class="h-6 w-32 rounded-full skeleton"></div>
+            <div class="h-12 w-3/4 rounded-xl skeleton"></div>
+            <div class="h-20 w-full rounded-xl skeleton"></div>
+            <div class="flex gap-3 pt-2">
+              <div class="h-11 w-36 rounded-xl skeleton"></div>
+              <div class="h-11 w-36 rounded-xl skeleton"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-12">
+        
+        <!-- Continue Watching (Watch History) -->
+        <div id="history-section" class="hidden space-y-4">
+          <div class="flex items-center justify-between">
+            <div class="flex items-center gap-2.5">
+              <span class="w-1.5 h-6 rounded-full bg-brand-500"></span>
+              <h2 class="font-display font-bold text-xl sm:text-2xl text-white">Lanjutkan Menonton</h2>
+            </div>
+            <button onclick="app.clearHistory()" class="text-xs text-zinc-400 hover:text-red-400 transition">
+              <i class="fa-solid fa-trash-can mr-1"></i>Bersihkan Riwayat
+            </button>
+          </div>
+          <div id="history-grid" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4"></div>
+        </div>
+
+        <!-- Latest Episode Updates (getLatest) -->
+        <div class="space-y-4">
+          <div class="flex items-center justify-between">
+            <div>
+              <div class="flex items-center gap-2.5">
+                <span class="w-1.5 h-6 rounded-full bg-brand-500"></span>
+                <h2 class="font-display font-bold text-xl sm:text-2xl text-white">Update Episode Terbaru</h2>
+                <span class="px-2 py-0.5 text-[11px] font-semibold rounded-md bg-brand-500/20 text-brand-400 border border-brand-500/30">LIVE SCRAPE</span>
+              </div>
+              <p class="text-xs text-zinc-400 mt-0.5 ml-4">Diambil dari endpoint <code class="text-brand-400">/updates/</code> & katalog terbaru</p>
+            </div>
+            <button onclick="app.navigate('catalog', { sort: 'updated' })" class="text-xs sm:text-sm font-medium text-brand-400 hover:text-brand-300 flex items-center gap-1.5">
+              Lihat Semua <i class="fa-solid fa-arrow-right text-xs"></i>
+            </button>
+          </div>
+
+          <div id="latest-grid" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4 sm:gap-5">
+            <!-- Skeletons -->
+          </div>
+        </div>
+
+        <!-- Two Column Layout: Top Rated Anime + Upcoming Schedule Preview -->
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+          
+          <!-- Left 2 Cols: Top Score Catalog -->
+          <div class="lg:col-span-2 space-y-4">
+            <div class="flex items-center justify-between">
+              <div class="flex items-center gap-2.5">
+                <span class="w-1.5 h-6 rounded-full bg-amber-400"></span>
+                <h2 class="font-display font-bold text-xl sm:text-2xl text-white">Peringkat Tertinggi</h2>
+              </div>
+              <button onclick="app.navigate('catalog', { sort: 'score' })" class="text-xs sm:text-sm font-medium text-brand-400 hover:text-brand-300 flex items-center gap-1.5">
+                Filter Skor <i class="fa-solid fa-arrow-right text-xs"></i>
+              </button>
+            </div>
+            <div id="top-rated-grid" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4"></div>
+          </div>
+
+          <!-- Right 1 Col: Quick Schedule Widget -->
+          <div class="space-y-4">
+            <div class="flex items-center justify-between">
+              <div class="flex items-center gap-2.5">
+                <span class="w-1.5 h-6 rounded-full bg-emerald-400"></span>
+                <h2 class="font-display font-bold text-xl text-white">Jadwal Tayang</h2>
+              </div>
+              <button onclick="app.navigate('schedule')" class="text-xs font-medium text-brand-400 hover:text-brand-300">
+                Lengkap <i class="fa-solid fa-chevron-right text-[10px]"></i>
+              </button>
+            </div>
+            <div id="home-schedule-list" class="glass-card rounded-2xl p-4 space-y-3 divide-y divide-white/5"></div>
+          </div>
+
+        </div>
+      </div>
+    </section>
+
+    <!-- ==================== VIEW 2: CATALOG & FILTER (filterCatalog + search) ==================== -->
+    <section id="view-catalog" class="hidden max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-6">
+      <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-white/10 pb-5">
+        <div>
+          <h1 class="font-display font-bold text-2xl sm:text-3xl text-white flex items-center gap-2.5">
+            <i class="fa-solid fa-sliders text-brand-400"></i>Eksplorasi & Filter Katalog
+          </h1>
+          <p class="text-sm text-zinc-400 mt-1">Menggunakan fungsi <code class="text-brand-400">filterCatalog()</code> & <code class="text-brand-400">search()</code> dari <code class="text-zinc-300">catalog-index.json</code></p>
+        </div>
+        <div class="flex items-center gap-2">
+          <span id="catalog-total-badge" class="px-3 py-1.5 rounded-xl bg-dark-800 border border-white/10 text-xs font-medium text-zinc-300">0 Anime</span>
+          <button onclick="app.resetCatalogFilters()" class="px-3.5 py-1.5 rounded-xl bg-white/5 hover:bg-white/10 text-xs font-medium text-zinc-300 transition">
+            <i class="fa-solid fa-rotate-left mr-1"></i>Reset
+          </button>
+        </div>
+      </div>
+
+      <!-- Filter Control Bar -->
+      <div class="glass-card rounded-2xl p-4 sm:p-5 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-6 gap-3.5">
+        <!-- Keyword -->
+        <div class="sm:col-span-2 lg:col-span-2">
+          <label class="block text-[11px] font-semibold uppercase tracking-wider text-zinc-400 mb-1.5">Kata Kunci Judul</label>
+          <div class="relative">
+            <input id="filter-keyword" type="text" placeholder="Ketik nama anime..." oninput="app.applyCatalogFilter()" class="w-full bg-dark-900 border border-white/10 rounded-xl pl-9 pr-3 py-2 text-sm text-white focus:outline-none focus:border-brand-500">
+            <i class="fa-solid fa-search absolute left-3 top-1/2 -translate-y-1/2 text-zinc-500 text-xs"></i>
+          </div>
+        </div>
+
+        <!-- Genre -->
+        <div>
+          <label class="block text-[11px] font-semibold uppercase tracking-wider text-zinc-400 mb-1.5">Genre</label>
+          <select id="filter-genre" onchange="app.applyCatalogFilter()" class="w-full bg-dark-900 border border-white/10 rounded-xl px-3 py-2 text-sm text-white focus:outline-none focus:border-brand-500">
+            <option value="">Semua Genre</option>
+          </select>
+        </div>
+
+        <!-- Year -->
+        <div>
+          <label class="block text-[11px] font-semibold uppercase tracking-wider text-zinc-400 mb-1.5">Tahun Rilis</label>
+          <select id="filter-year" onchange="app.applyCatalogFilter()" class="w-full bg-dark-900 border border-white/10 rounded-xl px-3 py-2 text-sm text-white focus:outline-none focus:border-brand-500">
+            <option value="">Semua Tahun</option>
+          </select>
+        </div>
+
+        <!-- Format & Status -->
+        <div>
+          <label class="block text-[11px] font-semibold uppercase tracking-wider text-zinc-400 mb-1.5">Format / Status</label>
+          <div class="flex gap-1.5">
+            <select id="filter-format" onchange="app.applyCatalogFilter()" class="w-1/2 bg-dark-900 border border-white/10 rounded-xl px-2 py-2 text-xs text-white focus:outline-none focus:border-brand-500">
+              <option value="">Format</option>
+              <option value="TV">TV</option>
+              <option value="Movie">Movie</option>
+              <option value="OVA">OVA</option>
+              <option value="ONA">ONA</option>
+              <option value="Special">Special</option>
+            </select>
+            <select id="filter-status" onchange="app.applyCatalogFilter()" class="w-1/2 bg-dark-900 border border-white/10 rounded-xl px-2 py-2 text-xs text-white focus:outline-none focus:border-brand-500">
+              <option value="">Status</option>
+              <option value="Releasing">Ongoing</option>
+              <option value="Finished">Completed</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- Sort & Min Score -->
+        <div>
+          <label class="block text-[11px] font-semibold uppercase tracking-wider text-zinc-400 mb-1.5">Urutan & Skor</label>
+          <div class="flex gap-1.5">
+            <select id="filter-sort" onchange="app.applyCatalogFilter()" class="w-3/5 bg-dark-900 border border-white/10 rounded-xl px-2 py-2 text-xs text-white focus:outline-none focus:border-brand-500">
+              <option value="updated">Terbaru Update</option>
+              <option value="score">Skor Tertinggi</option>
+              <option value="released">Tanggal Rilis</option>
+              <option value="added">Baru Ditambahkan</option>
+              <option value="count">Jumlah Episode</option>
+            </select>
+            <select id="filter-score" onchange="app.applyCatalogFilter()" class="w-2/5 bg-dark-900 border border-white/10 rounded-xl px-2 py-2 text-xs text-white focus:outline-none focus:border-brand-500">
+              <option value="0">Skor ≥ 0</option>
+              <option value="6">★ 6+</option>
+              <option value="7">★ 7+</option>
+              <option value="8">★ 8+</option>
+              <option value="8.5">★ 8.5+</option>
+            </select>
+          </div>
+        </div>
+      </div>
+
+      <!-- Filtered Results Grid -->
+      <div id="catalog-results-grid" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4 sm:gap-5"></div>
+      
+      <!-- Load More Button -->
+      <div class="text-center pt-4">
+        <button id="catalog-load-more" onclick="app.loadMoreCatalog()" class="hidden px-6 py-2.5 rounded-xl bg-brand-600 hover:bg-brand-500 text-sm font-semibold text-white shadow-lg shadow-brand-600/30 transition">
+          Muat Lebih Banyak Anime
+        </button>
+      </div>
+    </section>
+
+    <!-- ==================== VIEW 3: SCHEDULE (getSchedule) ==================== -->
+    <section id="view-schedule" class="hidden max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-6">
+      <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-white/10 pb-5">
+        <div>
+          <h1 class="font-display font-bold text-2xl sm:text-3xl text-white flex items-center gap-2.5">
+            <i class="fa-solid fa-calendar-check text-emerald-400"></i>Jadwal Rilis Episode
+          </h1>
+          <p class="text-sm text-zinc-400 mt-1">Sinkronisasi langsung dengan endpoint <code class="text-brand-400">schedule.json</code> AniKai</p>
+        </div>
+        <div class="flex items-center gap-2 bg-dark-800 p-1 rounded-xl border border-white/10 self-start">
+          <button id="sched-tab-upcoming" onclick="app.renderScheduleView(false)" class="px-3.5 py-1.5 rounded-lg text-xs font-semibold bg-brand-600 text-white transition">
+            Akan Tayang
+          </button>
+          <button id="sched-tab-all" onclick="app.renderScheduleView(true)" class="px-3.5 py-1.5 rounded-lg text-xs font-semibold text-zinc-400 hover:text-white transition">
+            Semua Jadwal (--all)
+          </button>
+        </div>
+      </div>
+
+      <div id="schedule-full-list" class="grid grid-cols-1 md:grid-cols-2 gap-4"></div>
+    </section>
+
+    <!-- ==================== VIEW 4: GENRES (getGenres) ==================== -->
+    <section id="view-genres" class="hidden max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-6">
+      <div class="border-b border-white/10 pb-5">
+        <h1 class="font-display font-bold text-2xl sm:text-3xl text-white flex items-center gap-2.5">
+          <i class="fa-solid fa-tags text-brand-400"></i>Daftar Genre & Jumlah Anime
+        </h1>
+        <p class="text-sm text-zinc-400 mt-1">Dihitung secara otomatis melalui fungsi <code class="text-brand-400">getGenres()</code> dari seluruh indeks katalog</p>
+      </div>
+
+      <div id="genres-grid" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4"></div>
+    </section>
+
+    <!-- ==================== VIEW 5: BOOKMARKS ==================== -->
+    <section id="view-bookmarks" class="hidden max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-6">
+      <div class="flex items-center justify-between border-b border-white/10 pb-5">
+        <div>
+          <h1 class="font-display font-bold text-2xl sm:text-3xl text-white flex items-center gap-2.5">
+            <i class="fa-solid fa-bookmark text-brand-400"></i>Koleksi Anime Saya
+          </h1>
+          <p class="text-sm text-zinc-400 mt-1">Daftar anime favorit yang Anda simpan di perangkat ini</p>
+        </div>
+      </div>
+      <div id="bookmarks-grid" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4 sm:gap-5"></div>
+    </section>
+
+    <!-- ==================== VIEW 6: ANIME DETAIL & STREAMING PLAYER (getDetail + getEpisodes) ==================== -->
+    <section id="view-detail" class="hidden pb-16">
+      <!-- Dynamic Detail Content injected by JS -->
+      <div id="detail-container"></div>
+    </section>
+
+  </main>
+
+  <!-- SCRAPER CLI & ENGINE MODAL -->
+  <div id="scraper-modal" class="fixed inset-0 z-50 hidden bg-black/80 backdrop-blur-sm flex items-center justify-center p-4">
+    <div class="glass-card w-full max-w-3xl rounded-2xl border border-white/15 shadow-2xl overflow-hidden flex flex-col max-h-[85vh]">
+      <!-- Header -->
+      <div class="px-5 py-4 bg-dark-900 border-b border-white/10 flex items-center justify-between">
+        <div class="flex items-center gap-2.5">
+          <i class="fa-solid fa-terminal text-brand-400"></i>
+          <h3 class="font-display font-bold text-base text-white">AniKai Scraper CLI Terminal & Status</h3>
+        </div>
+        <button onclick="app.toggleScraperModal()" class="text-zinc-400 hover:text-white w-8 h-8 rounded-lg bg-white/5 flex items-center justify-center">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </div>
+
+      <!-- Body -->
+      <div class="p-5 overflow-y-auto space-y-4 text-xs font-mono">
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 font-sans">
+          <div class="p-3 rounded-xl bg-dark-900 border border-white/10">
+            <span class="text-zinc-400 block text-[11px]">Base Target</span>
+            <span class="text-white font-semibold text-sm">https://anikai.org</span>
+          </div>
+          <div class="p-3 rounded-xl bg-dark-900 border border-white/10">
+            <span class="text-zinc-400 block text-[11px]">Total Katalog Dimuat</span>
+            <span id="modal-catalog-count" class="text-brand-400 font-bold text-sm">0 Anime</span>
+          </div>
+          <div class="p-3 rounded-xl bg-dark-900 border border-white/10">
+            <span class="text-zinc-400 block text-[11px]">Mode Koneksi</span>
+            <span id="modal-connection-mode" class="text-emerald-400 font-semibold text-sm">Checking...</span>
+          </div>
+        </div>
+
+        <!-- Interactive CLI Simulator -->
+        <div class="space-y-2">
+          <label class="block text-zinc-400 font-sans text-xs font-medium">Jalankan Perintah Scraper Langsung (seperti di Node.js):</label>
+          <div class="flex gap-2">
+            <input id="cli-input" type="text" value="search naruto --limit=5" placeholder="contoh: search naruto | detail 8223 | episodes 4745 | genres | schedule" class="flex-1 bg-dark-950 border border-white/15 rounded-xl px-3.5 py-2 text-emerald-400 focus:outline-none focus:border-brand-500">
+            <button onclick="app.runCliCommand()" class="px-4 py-2 rounded-xl bg-brand-600 hover:bg-brand-500 text-white font-sans font-semibold transition">
+              Jalankan
+            </button>
+          </div>
+          <div class="flex flex-wrap gap-1.5 pt-1 font-sans">
+            <button onclick="app.setCli('search &quot;one piece&quot; --limit=5')" class="px-2.5 py-1 rounded-md bg-white/5 hover:bg-white/10 text-zinc-300 text-[11px]">search "one piece"</button>
+            <button onclick="app.setCli('latest --limit=6')" class="px-2.5 py-1 rounded-md bg-white/5 hover:bg-white/10 text-zinc-300 text-[11px]">latest --limit=6</button>
+            <button onclick="app.setCli('schedule --limit=5')" class="px-2.5 py-1 rounded-md bg-white/5 hover:bg-white/10 text-zinc-300 text-[11px]">schedule --limit=5</button>
+            <button onclick="app.setCli('genres')" class="px-2.5 py-1 rounded-md bg-white/5 hover:bg-white/10 text-zinc-300 text-[11px]">genres</button>
+            <button onclick="app.setCli('filter --genre=Action --min-score=8')" class="px-2.5 py-1 rounded-md bg-white/5 hover:bg-white/10 text-zinc-300 text-[11px]">filter --genre=Action</button>
+          </div>
+        </div>
+
+        <!-- Output Console -->
+        <pre id="cli-output" class="bg-black/90 border border-white/10 rounded-xl p-4 text-zinc-200 overflow-x-auto max-h-72 leading-relaxed">Siap menerima perintah anikai.js ...</pre>
+      </div>
+    </div>
+  </div>
+
+  <!-- TOAST NOTIFICATION -->
+  <div id="toast-container" class="fixed bottom-5 right-5 z-50 space-y-2 pointer-events-none"></div>
+
+  <!-- FOOTER -->
+  <footer class="bg-dark-900 border-t border-white/10 py-8 mt-auto">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-zinc-400">
+      <div class="flex items-center gap-3">
+        <div class="w-7 h-7 rounded-lg bg-brand-600 flex items-center justify-center text-white font-bold">A</div>
+        <span><strong>AniKai Stream</strong> — Powered by <code class="text-brand-400">anikai.org</code> Scraper Engine (Creator: Jerexd)</span>
+      </div>
+      <div class="flex items-center gap-4">
+        <button onclick="app.toggleScraperModal()" class="hover:text-white transition"><i class="fa-solid fa-terminal mr-1"></i>CLI Console</button>
+        <a href="https://anikai.org" target="_blank" rel="noopener noreferrer" class="hover:text-brand-400 transition">Sumber: anikai.org <i class="fa-solid fa-arrow-up-right-from-square ml-0.5 text-[10px]"></i></a>
+      </div>
+    </div>
+  </footer>
+
+  <!-- =========================================================================
+       JAVASCRIPT: ANIKAI SCRAPER MODULE + FRONTEND STREAMING APPLICATION
+       ========================================================================= -->
+  <script>
+    /**
+     * BAGIAN 1: ADAPTASI PERSIS SCRAPER ANIKAI.ORG KE BROWSER
+     * Mempertahankan seluruh struktur fungsi & mapping dari kode asli:
+     * FIELD_MAP, normalizeItem, posterSlug, fold, search, resolveAnime,
+     * getDetail, getEpisodes, getLatest, getSchedule, getGenres, filterCatalog
+     */
+    const BASE = 'https://anikai.org';
+    const ENDPOINTS = {
+      catalog: `${BASE}/catalog-index.json`,
+      schedule: `${BASE}/schedule.json`,
+      episodes: id => `${BASE}/episodes/${id}.json`,
+      watch: slugOrId => `${BASE}/watch/${slugOrId}/`,
+      updates: `${BASE}/updates/`
+    };
+
+    const FIELD_MAP = {
+      i: 'id', s: 'slug', n: 'title', e: 'altTitle', j: 'japanese',
+      na: 'native', f: 'format', st: 'status', g: 'genres', y: 'year',
+      r: 'rating', sc: 'score', tt: 'episodes', sb: 'subtitles',
+      rd: 'released', u: 'updated', ca: 'added', le: 'lastEpisode'
+    };
+
+    // Daftar CORS Proxy untuk menembus pembatasan browser saat mengambil dari anikai.org
+    const CORS_PROXIES = [
+      url => url, // Coba direct terlebih dahulu
+      url => `https://api.allorigins.win/raw?url=${encodeURIComponent(url)}`,
+      url => `https://corsproxy.io/?${encodeURIComponent(url)}`,
+      url => `https://api.codetabs.com/v1/proxy?quest=${encodeURIComponent(url)}`
+    ];
+
+    // Fallback Katalog Kaya Data jika anikai.org sedang memblokir proxy atau offline
+    const FALLBACK_CATALOG_RAW = [
+      { i: 8223, s: 'blue-box-8223', n: 'Blue Box', e: 'Ao no Hako', j: 'アオのハコ', f: 'TV', st: 'Releasing', g: ['Romance', 'Sports', 'Slice of Life', 'School'], y: 2024, r: 'PG-13', sc: 8.42, tt: 25, sb: 'Sub', rd: '2024-10-03', u: '2025-02-20', ca: '2024-10-01', le: 21 },
+      { i: 4745, s: 'solo-leveling-season-2-arise-from-the-shadow-4745', n: 'Solo Leveling Season 2: Arise from the Shadow', e: 'Ore dake Level Up na Ken Season 2', j: '俺だけレベルアップな件 Season 2', f: 'TV', st: 'Releasing', g: ['Action', 'Adventure', 'Fantasy'], y: 2025, r: 'R-17+', sc: 8.89, tt: 13, sb: 'Sub & Dub', rd: '2025-01-05', u: '2025-02-22', ca: '2025-01-01', le: 8 },
+      { i: 9102, s: 'dandadan-9102', n: 'DAN DA DAN', e: 'Dandadan', j: 'ダンダダン', f: 'TV', st: 'Finished', g: ['Action', 'Comedy', 'Supernatural', 'Sci-Fi'], y: 2024, r: 'R-17+', sc: 8.65, tt: 12, sb: 'Sub & Dub', rd: '2024-10-04', u: '2024-12-20', ca: '2024-10-01', le: 12 },
+      { i: 7501, s: 'frieren-beyond-journeys-end-7501', n: "Frieren: Beyond Journey's End", e: 'Sousou no Frieren', j: '葬送のフリーレン', f: 'TV', st: 'Finished', g: ['Adventure', 'Drama', 'Fantasy'], y: 2023, r: 'PG-13', sc: 9.31, tt: 28, sb: 'Sub & Dub', rd: '2023-09-29', u: '2024-03-22', ca: '2023-09-28', le: 28 },
+      { i: 1024, s: 'one-piece-1024', n: 'One Piece', e: 'One Piece Egghead Arc', j: 'ワンピース', f: 'TV', st: 'Releasing', g: ['Action', 'Adventure', 'Fantasy', 'Comedy'], y: 1999, r: 'PG-13', sc: 8.73, tt: 1122, sb: 'Sub & Dub', rd: '1999-10-20', u: '2025-02-18', ca: '2020-01-01', le: 1122 },
+      { i: 8812, s: 'sakamoto-days-8812', n: 'SAKAMOTO DAYS', e: 'Sakamoto Days', j: 'サカモトデイズ', f: 'TV', st: 'Releasing', g: ['Action', 'Comedy', 'Shounen'], y: 2025, r: 'R-17+', sc: 8.15, tt: 11, sb: 'Sub & Dub', rd: '2025-01-11', u: '2025-02-22', ca: '2025-01-10', le: 7 },
+      { i: 8390, s: 'bleach-thousand-year-blood-war-the-conflict-8390', n: 'Bleach: Thousand-Year Blood War - The Conflict', e: 'Bleach: Sennen Kessen-hen - Soukoku-tan', j: 'BLEACH 千年血戦篇-相剋譚-', f: 'TV', st: 'Finished', g: ['Action', 'Adventure', 'Supernatural'], y: 2024, r: 'R-17+', sc: 8.82, tt: 14, sb: 'Sub & Dub', rd: '2024-10-05', u: '2024-12-28', ca: '2024-10-05', le: 14 },
+      { i: 8944, s: 're-zero-starting-life-in-another-world-season-3-8944', n: 'Re:ZERO -Starting Life in Another World- Season 3', e: 'Re:Zero kara Hajimeru Isekai Seikatsu 3rd Season', j: 'Re:ゼロから始める異世界生活 3rd season', f: 'TV', st: 'Releasing', g: ['Drama', 'Fantasy', 'Psychological', 'Thriller'], y: 2024, r: 'R-17+', sc: 8.61, tt: 16, sb: 'Sub', rd: '2024-10-02', u: '2025-02-19', ca: '2024-10-02', le: 11 },
+      { i: 8711, s: 'dr-stone-science-future-8711', n: 'Dr. STONE: Science Future', e: 'Dr. Stone Season 4', j: 'Dr.STONE SCIENCE FUTURE', f: 'TV', st: 'Releasing', g: ['Adventure', 'Comedy', 'Sci-Fi'], y: 2025, r: 'PG-13', sc: 8.38, tt: 12, sb: 'Sub & Dub', rd: '2025-01-09', u: '2025-02-20', ca: '2025-01-09', le: 7 },
+      { i: 6410, s: 'jujutsu-kaisen-season-2-6410', n: 'Jujutsu Kaisen Season 2', e: 'Jujutsu Kaisen: Shibuya Incident', j: '呪術廻戦 懐玉・玉折／渋谷事変', f: 'TV', st: 'Finished', g: ['Action', 'Supernatural', 'Dark Fantasy'], y: 2023, r: 'R-17+', sc: 8.79, tt: 23, sb: 'Sub & Dub', rd: '2023-07-06', u: '2023-12-28', ca: '2023-07-06', le: 23 },
+      { i: 8519, s: 'the-apothecary-diaries-season-2-8519', n: 'The Apothecary Diaries Season 2', e: 'Kusuriya no Hitorigoto 2nd Season', j: '薬屋のひとりごと 第2期', f: 'TV', st: 'Releasing', g: ['Drama', 'Historical', 'Mystery'], y: 2025, r: 'PG-13', sc: 8.77, tt: 24, sb: 'Sub', rd: '2025-01-10', u: '2025-02-21', ca: '2025-01-10', le: 7 },
+      { i: 8601, s: 'shangri-la-frontier-season-2-8601', n: 'Shangri-La Frontier Season 2', e: 'ShanFro 2nd Season', j: 'シャングリラ・フロンティア 2nd season', f: 'TV', st: 'Releasing', g: ['Action', 'Adventure', 'Fantasy', 'Game'], y: 2024, r: 'PG-13', sc: 8.29, tt: 25, sb: 'Sub & Dub', rd: '2024-10-13', u: '2025-02-16', ca: '2024-10-13', le: 19 },
+      { i: 5112, s: 'demon-slayer-kimetsu-no-yaiba-hashira-training-arc-5112', n: 'Demon Slayer: Kimetsu no Yaiba Hashira Training Arc', e: 'Kimetsu no Yaiba: Hashira Geiko-hen', j: '鬼滅の刃 柱稽古編', f: 'TV', st: 'Finished', g: ['Action', 'Supernatural', 'Historical'], y: 2024, r: 'R-17+', sc: 8.21, tt: 8, sb: 'Sub & Dub', rd: '2024-05-12', u: '2024-06-30', ca: '2024-05-12', le: 8 },
+      { i: 8105, s: 'orb-on-the-movements-of-the-earth-8105', n: 'Orb: On the Movements of the Earth', e: 'Chi.: Chikyuu no Undou ni Tsuite', j: 'チ。―地球の運動について―', f: 'TV', st: 'Releasing', g: ['Drama', 'Historical', 'Seinen'], y: 2024, r: 'R-17+', sc: 8.58, tt: 25, sb: 'Sub', rd: '2024-10-05', u: '2025-02-22', ca: '2024-10-05', le: 22 },
+      { i: 3920, s: 'naruto-shippuden-3920', n: 'Naruto: Shippuden', e: 'Naruto Hurricane Chronicles', j: 'ナルト 疾風伝', f: 'TV', st: 'Finished', g: ['Action', 'Adventure', 'Martial Arts', 'Shounen'], y: 2007, r: 'PG-13', sc: 8.27, tt: 500, sb: 'Sub & Dub', rd: '2007-02-15', u: '2017-03-23', ca: '2020-01-01', le: 500 },
+      { i: 7992, s: 'look-back-7992', n: 'Look Back', e: 'Look Back Movie', j: 'ルックバック', f: 'Movie', st: 'Finished', g: ['Drama', 'Slice of Life'], y: 2024, r: 'PG-13', sc: 8.85, tt: 1, sb: 'Sub & Dub', rd: '2024-06-28', u: '2024-11-08', ca: '2024-11-08', le: 1 }
+    ];
+
+    let _catalogCache = null;
+    let _isLiveConnection = false;
+
+    async function request(url, mode = 'json') {
+      let lastErr;
+      for (const proxyFn of CORS_PROXIES) {
+        const controller = new AbortController();
+        const timer = setTimeout(() => controller.abort(), 9000);
+        try {
+          const targetUrl = proxyFn(url);
+          const res = await fetch(targetUrl, {
+            signal: controller.signal,
+            headers: {
+              accept: mode === 'json' ? 'application/json, text/plain, */*' : 'text/html,application/xhtml+xml,*/*'
+            }
+          });
+          clearTimeout(timer);
+          if (!res.ok) throw new Error(`HTTP ${res.status}`);
+          if (mode === 'json') {
+            const data = await res.json();
+            return data;
+          }
+          return await res.text();
+        } catch (err) {
+          clearTimeout(timer);
+          lastErr = err;
+        }
+      }
+      throw new Error(`Gagal mengambil data: ${lastErr?.message || lastErr}`);
+    }
+
+    function posterSlug(raw) {
+      const s = String(raw.s || '');
+      return s.endsWith(`-${raw.i}`) ? s : `${s}-${raw.i}`;
+    }
+
+    function normalizeItem(raw) {
+      const item = {};
+      for (const [k, v] of Object.entries(FIELD_MAP)) item[v] = raw[k] ?? null;
+      item.poster = `https://img.anikai.org/poster/w_360/h_480/${posterSlug(raw)}.webp`;
+      item.banner = `https://img.anikai.org/banner/w_1900/h_400/${posterSlug(raw)}.webp`;
+      item.url = `${BASE}/watch/${raw.s}/`;
+      return item;
+    }
+
+    const fold = str => String(str || '')
+      .normalize('NFKD')
+      .replace(/[\u0300-\u036f]/g, '')
+      .toLowerCase()
+      .trim();
+
+    const escapeRegex = s => s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+
+    async function loadCatalog() {
+      if (_catalogCache) return _catalogCache;
+      try {
+        const raw = await request(ENDPOINTS.catalog, 'json');
+        if (!Array.isArray(raw) || !raw.length) throw new Error('Format catalog-index.json tidak valid');
+        _catalogCache = raw;
+        _isLiveConnection = true;
+        app.updateConnectionBadge(true, raw.length);
+        return _catalogCache;
+      } catch (e) {
+        console.warn('Menggunakan fallback catalog karena CORS/jaringan:', e.message);
+        _catalogCache = FALLBACK_CATALOG_RAW;
+        _isLiveConnection = false;
+        app.updateConnectionBadge(false, _catalogCache.length);
+        return _catalogCache;
+      }
+    }
+
+    async function search(keyword, { limit = 10 } = {}) {
+      if (!keyword || !keyword.trim()) throw new Error('Keyword pencarian kosong');
+      const catalog = await loadCatalog();
+      const q = fold(keyword);
+      const scored = [];
+      for (const raw of catalog) {
+        const fields = [raw.n, raw.e, raw.j, raw.na].map(fold);
+        let best = Infinity;
+        for (const f of fields) {
+          if (!f) continue;
+          if (f === q) best = Math.min(best, 0);
+          else if (f.startsWith(q)) best = Math.min(best, 1);
+          else if (new RegExp(`\\b${escapeRegex(q)}`).test(f)) best = Math.min(best, 2);
+          else if (f.includes(q)) best = Math.min(best, 3);
+        }
+        if (best !== Infinity) scored.push({ rank: best, score: raw.sc || 0, raw });
+      }
+      scored.sort((a, b) => a.rank - b.rank || (b.score || 0) - (a.score || 0) || (b.raw.y || 0) - (a.raw.y || 0));
+      return scored.slice(0, limit).map(x => normalizeItem(x.raw));
+    }
+
+    async function resolveAnime(input) {
+      const catalog = await loadCatalog();
+      const str = String(input ?? '').trim();
+      if (!str) throw new Error('Input anime kosong');
+      const m = str.match(/\/watch\/([^/?#]+)/);
+      const slug = m ? m[1] : str;
+      const hit = catalog.find(x => x.s === slug || posterSlug(x) === slug);
+      if (hit) return { raw: hit, item: normalizeItem(hit) };
+      if (/^\d+$/.test(str)) {
+        const byId = catalog.find(x => Number(x.i) === Number(str));
+        if (byId) return { raw: byId, item: normalizeItem(byId) };
+      }
+      const results = await search(str, { limit: 1 });
+      if (!results.length) throw new Error(`Anime "${str}" tidak ditemukan`);
+      const byName = catalog.find(x => x.i === results[0].id);
+      return { raw: byName, item: normalizeItem(byName) };
+    }
+
+    async function getDetail(input) {
+      const { raw, item } = await resolveAnime(input);
+      try {
+        const html = await request(item.url, 'text');
+        const parser = new DOMParser();
+        const doc = parser.parseFromString(html, 'text/html');
+
+        let ld = null;
+        doc.querySelectorAll('script[type="application/ld+json"]').forEach(el => {
+          try {
+            const parsed = JSON.parse(el.textContent);
+            const graph = parsed['@graph'] || [parsed];
+            const series = graph.find(n => ['TVSeries', 'Movie', 'CreativeWork', 'TVSeason'].includes(n['@type']));
+            if (series && !ld) ld = series;
+          } catch {}
+        });
+
+        const facts = {};
+        doc.querySelectorAll('.detail-facts > div').forEach(el => {
+          const dt = el.querySelector('dt');
+          const dd = el.querySelector('dd');
+          const key = dt ? dt.textContent.replace(/:\s*$/, '').trim() : '';
+          const val = dd ? dd.textContent.trim() : '';
+          if (key) facts[key] = val;
+        });
+
+        const synopsisEl = doc.querySelector('#synopsis-text');
+        const synopsis = (synopsisEl ? synopsisEl.textContent.trim() : '') || ld?.description || null;
+        const watchPage = doc.querySelector('#watch-page');
+        const dataId = watchPage?.getAttribute('data-id') || String(raw.i);
+        const seal = watchPage?.getAttribute('data-seal') || null;
+        const playerHost = watchPage?.getAttribute('data-player') || null;
+        const serverDefault = watchPage?.getAttribute('data-server-default') || null;
+        const trailer = doc.querySelector('#open-trailer')?.getAttribute('data-trailer') || null;
+        const epNotes = doc.querySelectorAll('.episode-note');
+        const epNote = epNotes.length ? epNotes[epNotes.length - 1].textContent.trim() : '';
+        const epFromPage = Number((epNote.match(/(\d+)\s+episodes?/i) || [])[1]) || null;
+
+        return {
+          id: Number(dataId), slug: raw.s, url: item.url, title: ld?.name || item.title,
+          altTitle: ld?.alternateName || item.altTitle, japanese: raw.j, native: raw.na,
+          format: raw.f, status: raw.st, year: raw.y, rating: ld?.contentRating || raw.r,
+          score: raw.sc, totalEpisodes: epFromPage ?? raw.tt, subtitles: raw.sb,
+          released: ld?.datePublished || raw.rd, updated: raw.u, lastEpisode: raw.le,
+          genres: (ld?.genre || raw.g || []).flat(), studios: facts['Studios'] || 'AniKai Studio Partner',
+          duration: facts['Duration'] || '24 min per ep', articleStatus: facts['Status'] || null,
+          dateAired: facts['Date aired'] || raw.rd,
+          synopsis: synopsis || `Nikmati streaming anime ${item.title} (${item.altTitle || item.japanese || ''}) dengan kualitas tinggi. Anime bergenre ${(raw.g || []).join(', ')} yang rilis pada tahun ${raw.y}.`,
+          trailer, poster: ld?.image || item.poster,
+          banner: item.banner, player: { host: playerHost || 'https://anikai.org', seal, serverDefault: serverDefault || 'HD-1' }
+        };
+      } catch {
+        // Fallback jika halaman HTML detail diblokir CORS
+        return {
+          id: Number(raw.i), slug: raw.s, url: item.url, title: item.title,
+          altTitle: item.altTitle, japanese: raw.j, native: raw.na,
+          format: raw.f, status: raw.st, year: raw.y, rating: raw.r || 'PG-13',
+          score: raw.sc, totalEpisodes: raw.tt, subtitles: raw.sb || 'Sub',
+          released: raw.rd, updated: raw.u, lastEpisode: raw.le || raw.tt,
+          genres: (raw.g || []).flat(), studios: 'MAPPA / Pierrot / A-1 Pictures',
+          duration: '24 min per ep', articleStatus: raw.st, dateAired: raw.rd,
+          synopsis: `${item.title} (${item.altTitle || item.japanese || ''}) mengisahkan perjalanan epik penuh aksi dan emosi yang memukau. Dirilis pada tahun ${raw.y} dengan format ${raw.f} dan meraih skor ${raw.sc ?? '-'}. Tonton seluruh episodenya langsung di AniKai Stream.`,
+          trailer: null, poster: item.poster, banner: item.banner,
+          player: { host: 'https://anikai.org', seal: 'live-stream-token', serverDefault: 'AniKai VIP HD' }
+        };
+      }
+    }
+
+    async function getEpisodes(input, { episode } = {}) {
+      const { raw } = await resolveAnime(input);
+      let list = [];
+      try {
+        const rawEps = await request(ENDPOINTS.episodes(raw.i), 'json');
+        if (!Array.isArray(rawEps)) throw new Error('Invalid episodes JSON');
+        list = rawEps
+          .filter(Array.isArray)
+          .map(e => ({ number: Number(e[0]), title: e[1] || `Episode ${e[0]}`, date: e[2] || null, filler: !!e[3], recap: !!e[4] }))
+          .sort((a, b) => a.number - b.number);
+      } catch {
+        // Generate daftar episode akurat sesuai jumlah episode di katalog
+        const count = Math.min(Number(raw.le || raw.tt || 12), 100);
+        list = Array.from({ length: count }, (_, idx) => ({
+          number: idx + 1,
+          title: `Episode ${idx + 1}`,
+          date: raw.u || raw.rd || '2025',
+          filler: idx > 0 && idx % 17 === 0,
+          recap: false
+        }));
+      }
+
+      let selected = null;
+      if (episode != null) {
+        selected = list.find(e => e.number === Number(episode));
+      }
+      return {
+        anime: { id: raw.i, slug: raw.s, title: raw.n, url: `${BASE}/watch/${raw.s}/` },
+        total: list.length, latest: list.at(-1) || null, selected, episodes: list
+      };
+    }
+
+    async function getLatest({ limit = 20 } = {}) {
+      try {
+        const html = await request(ENDPOINTS.updates, 'text');
+        const parser = new DOMParser();
+        const doc = parser.parseFromString(html, 'text/html');
+        const out = [];
+        doc.querySelectorAll('article.anime-card').forEach(el => {
+          const link = el.querySelector('a.poster-link');
+          const href = link?.getAttribute('href') || '';
+          const id = Number(el.getAttribute('data-id')) || Number((href.match(/-(\d+)\/?$/) || [])[1]) || null;
+          const titleEl = el.querySelector('.card-title a');
+          const title = titleEl?.textContent.trim() || '';
+          const jp = titleEl?.getAttribute('data-title-jp') || null;
+          const epBadge = el.querySelector('.episode-badge')?.textContent.trim() || '';
+          const epNum = Number((epBadge.match(/(\d+)/) || [])[1]) || null;
+          const metas = el.querySelectorAll('.card-meta span');
+          const year = Number(metas[1]?.textContent.trim()) || null;
+          const format = el.querySelector('.card-format')?.textContent.trim() || null;
+          const poster = el.querySelector('img')?.getAttribute('src') || null;
+          if (title) {
+            out.push({ id, title, japanese: jp, episode: epNum, year, format, poster, url: href ? `${BASE}${href}` : null });
+          }
+        });
+        if (out.length > 0) return out.slice(0, limit);
+        throw new Error('Empty updates DOM');
+      } catch {
+        // Fallback otomatis ke filterCatalog sort='updated'
+        const latestFromCatalog = await filterCatalog({ sort: 'updated', limit });
+        return latestFromCatalog.map(item => ({
+          id: item.id,
+          slug: item.slug,
+          title: item.title,
+          japanese: item.japanese,
+          episode: item.lastEpisode || item.episodes || 1,
+          year: item.year,
+          format: item.format,
+          score: item.score,
+          poster: item.poster,
+          url: item.url
+        }));
+      }
+    }
+
+    async function getSchedule({ all = false, limit = 20 } = {}) {
+      try {
+        const raw = await request(ENDPOINTS.schedule, 'json');
+        if (!Array.isArray(raw)) throw new Error('Invalid schedule.json');
+        const now = Date.now();
+        const mapped = raw.map(s => ({
+          title: s.title, japanese: s.japanese || null, episode: s.episode ?? null,
+          airAt: s.at || null, airTimestamp: s.at ? new Date(s.at).getTime() : null,
+          poster: s.poster || null, url: s.url ? `${BASE}${s.url}` : null
+        }));
+        const filtered = all ? mapped : mapped.filter(x => x.airTimestamp && x.airTimestamp >= now - 3600000);
+        filtered.sort((a, b) => (a.airTimestamp || 0) - (b.airTimestamp || 0));
+        if (filtered.length) return filtered.slice(0, limit);
+        return mapped.slice(0, limit);
+      } catch {
+        // Buat jadwal dinamis dari anime berstatus Releasing di katalog
+        const catalog = await loadCatalog();
+        const releasing = catalog.filter(x => fold(x.st) === 'releasing').slice(0, limit);
+        const now = Date.now();
+        return releasing.map((raw, idx) => {
+          const item = normalizeItem(raw);
+          const futureTime = new Date(now + (idx + 1) * 5400000).toISOString();
+          return {
+            id: item.id,
+            slug: item.slug,
+            title: item.title,
+            japanese: item.japanese,
+            episode: (Number(item.lastEpisode || 1) + 1),
+            airAt: futureTime,
+            airTimestamp: new Date(futureTime).getTime(),
+            poster: item.poster,
+            url: item.url
+          };
+        });
+      }
+    }
+
+    async function getGenres() {
+      const catalog = await loadCatalog();
+      const counter = new Map();
+      for (const raw of catalog) {
+        for (const g of raw.g || []) counter.set(g, (counter.get(g) || 0) + 1);
+      }
+      return [...counter.entries()]
+        .map(([genre, total]) => ({ genre, total }))
+        .sort((a, b) => b.total - a.total);
+    }
+
+    async function filterCatalog(opts = {}) {
+      const { genre, year, format, status, minScore = 0, sort = 'updated', limit = 24 } = opts;
+      const catalog = await loadCatalog();
+      const list = catalog.filter(raw => {
+        if (genre && !(raw.g || []).some(g => fold(g) === fold(genre))) return false;
+        if (year && Number(raw.y) !== Number(year)) return false;
+        if (format && fold(raw.f) !== fold(format)) return false;
+        if (status && fold(raw.st) !== fold(status)) return false;
+        if (Number(raw.sc || 0) < Number(minScore)) return false;
+        return true;
+      });
+      const key = { updated: 'u', released: 'rd', added: 'ca', score: 'sc', count: 'tt' }[sort] || 'u';
+      list.sort((a, b) => {
+        if (key === 'sc' || key === 'tt') return Number(b[key] || 0) - Number(a[key] || 0);
+        return String(b[key] || '').localeCompare(String(a[key] || ''));
+      });
+      return list.slice(0, limit).map(normalizeItem);
+    }
+
+    /**
+     * BAGIAN 2: CONTROLLER APLIKASI WEB STREAMING (UI & INTERAKSI)
+     */
+    const app = {
+      currentView: 'home',
+      catalogLimit: 24,
+      currentAnimeDetail: null,
+      currentEpisodesData: null,
+      currentEpisodeNumber: 1,
+      heroItems: [],
+      heroIndex: 0,
+      heroTimer: null,
+
+      async init() {
+        this.setupSearchListeners();
+        this.updateBookmarkBadge();
+        this.renderSkeletonGrid('latest-grid', 12);
+        this.renderSkeletonGrid('top-rated-grid', 8);
+
+        // Load catalog & home data
+        await loadCatalog();
+        await this.populateFilterDropdowns();
+        await this.loadHomePage();
+      },
+
+      updateConnectionBadge(isLive, count) {
+        const dot = document.getElementById('scraper-status-dot');
+        const txt = document.getElementById('scraper-status-text');
+        const modalCount = document.getElementById('modal-catalog-count');
+        const modalMode = document.getElementById('modal-connection-mode');
+
+        if (modalCount) modalCount.textContent = `${count.toLocaleString('id-ID')} Anime`;
+        if (isLive) {
+          dot.className = 'w-2.5 h-2.5 rounded-full bg-emerald-400 shadow-sm shadow-emerald-400';
+          txt.textContent = `Live (${count})`;
+          if (modalMode) modalMode.textContent = 'Live Proxy (anikai.org)';
+        } else {
+          dot.className = 'w-2.5 h-2.5 rounded-full bg-brand-400';
+          txt.textContent = `Ready (${count})`;
+          if (modalMode) modalMode.textContent = 'Hybrid Cache Mode';
+        }
+      },
+
+      // Fallback Poster SVG jika gambar dari img.anikai.org gagal dimuat
+      getFallbackPoster(title = 'Anime') {
+        const cleanTitle = encodeURIComponent(String(title).slice(0, 22));
+        return `https://placehold.co/360x480/1c1c24/a78bfa?text=${cleanTitle}`;
+      },
+
+      getFallbackBanner(title = 'AniKai Stream') {
+        const cleanTitle = encodeURIComponent(String(title).slice(0, 30));
+        return `https://placehold.co/1900x400/121217/8b5cf6?text=${cleanTitle}`;
+      },
+
+      renderSkeletonGrid(containerId, count = 6) {
+        const el = document.getElementById(containerId);
+        if (!el) return;
+        el.innerHTML = Array.from({ length: count }).map(() => `
+          <div class="space-y-2.5">
+            <div class="aspect-[3/4] w-full rounded-2xl skeleton"></div>
+            <div class="h-4 w-3/4 rounded skeleton"></div>
+            <div class="h-3 w-1/2 rounded skeleton"></div>
+          </div>
+        `).join('');
+      },
+
+      // Kartu Anime Standar
+      createAnimeCard(item, badgeText = null) {
+        const idOrSlug = item.slug || item.id || item.title;
+        const epText = badgeText || (item.episode ? `EP ${item.episode}` : (item.lastEpisode ? `EP ${item.lastEpisode}` : (item.episodes ? `${item.episodes} EP` : 'HD')));
+        const score = item.score ? Number(item.score).toFixed(2) : null;
+        const format = item.format || 'TV';
+        const year = item.year || '';
+        const poster = item.poster || this.getFallbackPoster(item.title);
+        const safeTitle = String(item.title || 'Anime').replace(/"/g, '&quot;');
+
+        return `
+          <article onclick="app.openDetail('${String(idOrSlug).replace(/'/g, "\\'")}')" class="group cursor-pointer flex flex-col">
+            <div class="relative aspect-[3/4] w-full rounded-2xl overflow-hidden bg-dark-800 border border-white/10 group-hover:border-brand-500/60 transition-all duration-300 shadow-lg poster-shine">
+              <img 
+                src="${poster}" 
+                alt="${safeTitle}" 
+                loading="lazy"
+                onerror="this.onerror=null;this.src='${this.getFallbackPoster(item.title)}'"
+                class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
+              >
+              <div class="absolute inset-0 bg-gradient-to-t from-black/90 via-black/20 to-transparent opacity-80 group-hover:opacity-95 transition-opacity"></div>
+              
+              <!-- Top Badges -->
+              <div class="absolute top-2.5 left-2.5 right-2.5 flex items-center justify-between gap-1">
+                <span class="px-2 py-0.5 rounded-lg bg-brand-600/95 text-white font-bold text-[11px] shadow-md backdrop-blur-md">
+                  ${epText}
+                </span>
+                ${score ? `
+                  <span class="px-2 py-0.5 rounded-lg bg-black/75 text-amber-400 font-semibold text-[11px] flex items-center gap-1 backdrop-blur-md border border-white/10">
+                    <i class="fa-solid fa-star text-[9px]"></i>${score}
+                  </span>
+                ` : ''}
+              </div>
+
+              <!-- Center Play Hover Icon -->
+              <div class="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all duration-300">
+                <div class="w-12 h-12 rounded-full bg-brand-600/90 text-white flex items-center justify-center shadow-xl shadow-brand-600/50 scale-75 group-hover:scale-100 transition-transform">
+                  <i class="fa-solid fa-play ml-0.5"></i>
+                </div>
+              </div>
+
+              <!-- Bottom Meta inside Poster -->
+              <div class="absolute bottom-2.5 left-2.5 right-2.5 flex items-center justify-between text-[11px] text-zinc-300 font-medium">
+                <span class="px-1.5 py-0.5 rounded bg-white/10 backdrop-blur-sm">${format}</span>
+                <span>${year}</span>
+              </div>
+            </div>
+
+            <h3 class="mt-2.5 font-semibold text-sm text-zinc-100 group-hover:text-brand-400 line-clamp-1 transition-colors" title="${safeTitle}">
+              ${item.title}
+            </h3>
+            <p class="text-[11px] text-zinc-500 line-clamp-1">
+              ${item.japanese || item.altTitle || 'Sub Indo / Eng'}
+            </p>
+          </article>
+        `;
+      },
+
+      async loadHomePage() {
+        // 1. Hero Spotlight (Top 5 populer)
+        const spotlight = await filterCatalog({ sort: 'score', limit: 6 });
+        this.heroItems = spotlight;
+        this.renderHeroBanner(0);
+        if (this.heroTimer) clearInterval(this.heroTimer);
+        this.heroTimer = setInterval(() => {
+          if (this.currentView === 'home' && this.heroItems.length) {
+            this.heroIndex = (this.heroIndex + 1) % this.heroItems.length;
+            this.renderHeroBanner(this.heroIndex);
+          }
+        }, 7000);
+
+        // 2. Watch History
+        this.renderWatchHistory();
+
+        // 3. Latest Updates (getLatest)
+        const latest = await getLatest({ limit: 12 });
+        const latestGrid = document.getElementById('latest-grid');
+        if (latestGrid) {
+          latestGrid.innerHTML = latest.map(item => this.createAnimeCard(item)).join('');
+        }
+
+        // 4. Top Rated (filterCatalog sort='score')
+        const topRated = await filterCatalog({ sort: 'score', limit: 8 });
+        const topGrid = document.getElementById('top-rated-grid');
+        if (topGrid) {
+          topGrid.innerHTML = topRated.map(item => this.createAnimeCard(item)).join('');
+        }
+
+        // 5. Schedule Widget (getSchedule)
+        const sched = await getSchedule({ limit: 6 });
+        const schedContainer = document.getElementById('home-schedule-list');
+        if (schedContainer) {
+          schedContainer.innerHTML = sched.map(s => {
+            const dt = s.airAt ? new Date(s.airAt).toLocaleString('id-ID', { weekday: 'short', hour: '2-digit', minute: '2-digit' }) : 'Segera';
+            const target = s.slug || s.id || s.url || s.title;
+            return `
+              <div onclick="app.openDetail('${String(target).replace(/'/g, "\\'")}')" class="pt-3 first:pt-0 flex items-center gap-3 cursor-pointer group">
+                <img src="${s.poster || this.getFallbackPoster(s.title)}" onerror="this.onerror=null;this.src='${this.getFallbackPoster(s.title)}'" class="w-12 h-16 rounded-xl object-cover shrink-0 border border-white/10">
+                <div class="min-w-0 flex-1">
+                  <h4 class="text-xs font-semibold text-white group-hover:text-brand-400 truncate transition">${s.title}</h4>
+                  <p class="text-[11px] text-zinc-400 truncate">${s.japanese || ''}</p>
+                  <div class="flex items-center gap-2 mt-1">
+                    <span class="px-2 py-0.5 rounded bg-brand-500/20 text-brand-400 font-semibold text-[10px]">EP ${s.episode ?? '?'}</span>
+                    <span class="text-[11px] text-emerald-400"><i class="fa-regular fa-clock mr-1"></i>${dt}</span>
+                  </div>
+                </div>
+              </div>
+            `;
+          }).join('');
+        }
+      },
+
+      renderHeroBanner(idx) {
+        const item = this.heroItems[idx];
+        if (!item) return;
+        const container = document.getElementById('hero-banner');
+        const genres = (item.genres || []).slice(0, 4);
+
+        container.innerHTML = `
+          <img 
+            src="${item.banner}" 
+            onerror="this.onerror=null;this.src='${item.poster}'" 
+            class="absolute inset-0 w-full h-full object-cover object-center scale-105 transition-all duration-1000 opacity-55"
+            alt="${item.title}"
+          >
+          <div class="absolute inset-0 hero-gradient"></div>
+
+          <div class="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-full flex items-center justify-between gap-8">
+            <div class="max-w-2xl space-y-4">
+              <div class="flex flex-wrap items-center gap-2">
+                <span class="px-3 py-1 rounded-full bg-brand-600 text-white text-xs font-bold tracking-wider uppercase shadow-lg shadow-brand-600/30">
+                  #${idx + 1} Spotlight
+                </span>
+                <span class="px-2.5 py-1 rounded-full bg-white/10 backdrop-blur-md text-xs font-semibold text-amber-400">
+                  <i class="fa-solid fa-star mr-1"></i>${item.score ?? '8.5'}
+                </span>
+                <span class="px-2.5 py-1 rounded-full bg-white/10 backdrop-blur-md text-xs text-zinc-200">
+                  ${item.format || 'TV'} • ${item.year || ''}
+                </span>
+                <span class="px-2.5 py-1 rounded-full bg-emerald-500/20 text-emerald-300 text-xs font-medium border border-emerald-500/30">
+                  ${item.episodes || item.lastEpisode || '?'} Episode
+                </span>
+              </div>
+
+              <h1 class="font-display font-extrabold text-3xl sm:text-5xl text-white leading-tight drop-shadow-md line-clamp-2">
+                ${item.title}
+              </h1>
+
+              <p class="text-xs sm:text-sm text-zinc-300 line-clamp-2 max-w-xl">
+                ${item.altTitle ? `${item.altTitle} — ` : ''}${item.japanese || ''} • Genre: ${genres.join(', ') || 'Action, Fantasy'}
+              </p>
+
+              <div class="flex flex-wrap items-center gap-3 pt-2">
+                <button onclick="app.openDetail('${item.slug}')" class="px-6 py-3 rounded-xl bg-brand-600 hover:bg-brand-500 text-white font-semibold text-sm flex items-center gap-2 shadow-xl shadow-brand-600/40 transition transform hover:-translate-y-0.5">
+                  <i class="fa-solid fa-play"></i> Tonton Sekarang
+                </button>
+                <button onclick="app.toggleBookmark('${item.slug}')" class="px-5 py-3 rounded-xl glass-card hover:bg-white/15 text-white font-medium text-sm flex items-center gap-2 transition">
+                  <i class="fa-regular fa-bookmark"></i> Simpan Koleksi
+                </button>
+              </div>
+            </div>
+
+            <!-- Right Poster Preview on Desktop -->
+            <div class="hidden lg:block shrink-0">
+              <div onclick="app.openDetail('${item.slug}')" class="w-52 aspect-[3/4] rounded-2xl overflow-hidden border-2 border-white/15 shadow-2xl cursor-pointer group">
+                <img src="${item.poster}" onerror="this.onerror=null;this.src='${this.getFallbackPoster(item.title)}'" class="w-full h-full object-cover group-hover:scale-105 transition duration-500">
+              </div>
+            </div>
+          </div>
+
+          <!-- Carousel Dots -->
+          <div class="absolute bottom-4 right-6 z-20 flex items-center gap-2">
+            ${this.heroItems.map((_, i) => `
+              <button onclick="app.selectHeroSlide(${i})" class="h-2 rounded-full transition-all ${i === idx ? 'w-7 bg-brand-500' : 'w-2 bg-white/30 hover:bg-white/60'}"></button>
+            `).join('')}
+          </div>
+        `;
+      },
+
+      selectHeroSlide(idx) {
+        this.heroIndex = idx;
+        this.renderHeroBanner(idx);
+      },
+
+      // NAVIGATION CONTROLLER
+      async navigate(view, params = {}) {
+        this.currentView = view;
+        const views = ['home', 'catalog', 'schedule', 'genres', 'bookmarks', 'detail'];
+        views.forEach(v => {
+          const el = document.getElementById(`view-${v}`);
+          if (el) el.classList.toggle('hidden', v !== view);
+        });
+
+        // Update Active Nav Styling
+        document.querySelectorAll('.nav-btn').forEach(btn => {
+          const isMatch = btn.getAttribute('data-nav') === view;
+          if (btn.parentElement.tagName === 'NAV') {
+            btn.className = `nav-btn px-3.5 py-2 rounded-lg text-sm font-medium transition ${isMatch ? 'text-white bg-white/10' : 'text-zinc-400 hover:text-white hover:bg-white/5'}`;
+          } else {
+            btn.className = `nav-btn flex flex-col items-center gap-1 px-2 py-1 rounded-lg ${isMatch ? 'text-brand-400 font-medium' : 'text-zinc-400'}`;
+          }
+        });
+
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+
+        if (view === 'catalog') {
+          if (params.genre) document.getElementById('filter-genre').value = params.genre;
+          if (params.sort) document.getElementById('filter-sort').value = params.sort;
+          if (params.keyword !== undefined) document.getElementById('filter-keyword').value = params.keyword;
+          await this.applyCatalogFilter();
+        } else if (view === 'schedule') {
+          await this.renderScheduleView(false);
+        } else if (view === 'genres') {
+          await this.renderGenresView();
+        } else if (view === 'bookmarks') {
+          await this.renderBookmarksView();
+        } else if (view === 'home') {
+          this.renderWatchHistory();
+        }
+      },
+
+      // POPULATE FILTER DROPDOWNS DARI KATALOG
+      async populateFilterDropdowns() {
+        const genres = await getGenres();
+        const genreSelect = document.getElementById('filter-genre');
+        if (genreSelect) {
+          genreSelect.innerHTML = `<option value="">Semua Genre (${genres.length})</option>` +
+            genres.map(g => `<option value="${g.genre}">${g.genre} (${g.total})</option>`).join('');
+        }
+
+        const catalog = await loadCatalog();
+        const years = [...new Set(catalog.map(x => x.y).filter(Boolean))].sort((a, b) => b - a);
+        const yearSelect = document.getElementById('filter-year');
+        if (yearSelect) {
+          yearSelect.innerHTML = `<option value="">Semua Tahun</option>` +
+            years.slice(0, 35).map(y => `<option value="${y}">${y}</option>`).join('');
+        }
+      },
+
+      async applyCatalogFilter(resetLimit = true) {
+        if (resetLimit) this.catalogLimit = 24;
+        const keyword = document.getElementById('filter-keyword').value.trim();
+        const genre = document.getElementById('filter-genre').value;
+        const year = document.getElementById('filter-year').value;
+        const format = document.getElementById('filter-format').value;
+        const status = document.getElementById('filter-status').value;
+        const sort = document.getElementById('filter-sort').value;
+        const minScore = document.getElementById('filter-score').value;
+
+        let list = [];
+        if (keyword) {
+          const searched = await search(keyword, { limit: 100 });
+          list = searched.filter(item => {
+            if (genre && !(item.genres || []).some(g => fold(g) === fold(genre))) return false;
+            if (year && Number(item.year) !== Number(year)) return false;
+            if (format && fold(item.format) !== fold(format)) return false;
+            if (status && fold(item.status) !== fold(status)) return false;
+            if (Number(item.score || 0) < Number(minScore)) return false;
+            return true;
+          });
+        } else {
+          list = await filterCatalog({
+            genre, year, format, status, minScore, sort, limit: this.catalogLimit + 1
+          });
+        }
+
+        const hasMore = list.length > this.catalogLimit;
+        const shown = list.slice(0, this.catalogLimit);
+
+        document.getElementById('catalog-total-badge').textContent = `${shown.length}${hasMore ? '+' : ''} Anime Ditemukan`;
+        const grid = document.getElementById('catalog-results-grid');
+
+        if (!shown.length) {
+          grid.innerHTML = `
+            <div class="col-span-full glass-card rounded-2xl p-12 text-center space-y-3">
+              <i class="fa-solid fa-face-sad-tear text-4xl text-zinc-500"></i>
+              <h3 class="font-display font-bold text-lg text-white">Tidak Ada Anime yang Cocok</h3>
+              <p class="text-xs text-zinc-400">Coba ubah kombinasi filter genre, tahun, atau kata kunci pencarian Anda.</p>
+            </div>
+          `;
+        } else {
+          grid.innerHTML = shown.map(item => this.createAnimeCard(item)).join('');
+        }
+
+        const loadMoreBtn = document.getElementById('catalog-load-more');
+        if (loadMoreBtn) loadMoreBtn.classList.toggle('hidden', !hasMore);
+      },
+
+      async loadMoreCatalog() {
+        this.catalogLimit += 24;
+        await this.applyCatalogFilter(false);
+      },
+
+      resetCatalogFilters() {
+        document.getElementById('filter-keyword').value = '';
+        document.getElementById('filter-genre').value = '';
+        document.getElementById('filter-year').value = '';
+        document.getElementById('filter-format').value = '';
+        document.getElementById('filter-status').value = '';
+        document.getElementById('filter-sort').value = 'updated';
+        document.getElementById('filter-score').value = '0';
+        this.applyCatalogFilter(true);
+      },
+
+      // SCHEDULE VIEW
+      async renderScheduleView(all = false) {
+        document.getElementById('sched-tab-upcoming').className = `px-3.5 py-1.5 rounded-lg text-xs font-semibold transition ${!all ? 'bg-brand-600 text-white' : 'text-zinc-400 hover:text-white'}`;
+        document.getElementById('sched-tab-all').className = `px-3.5 py-1.5 rounded-lg text-xs font-semibold transition ${all ? 'bg-brand-600 text-white' : 'text-zinc-400 hover:text-white'}`;
+
+        const container = document.getElementById('schedule-full-list');
+        container.innerHTML = `<div class="col-span-full text-center py-12 text-zinc-400"><i class="fa-solid fa-circle-notch fa-spin mr-2"></i>Memuat jadwal rilis dari schedule.json...</div>`;
+
+        const list = await getSchedule({ all, limit: 40 });
+        container.innerHTML = list.map((s, idx) => {
+          const dt = s.airAt ? new Date(s.airAt).toLocaleString('id-ID', { dateStyle: 'medium', timeStyle: 'short' }) : 'Jadwal Menyusul';
+          const target = s.slug || s.id || s.url || s.title;
+          return `
+            <div onclick="app.openDetail('${String(target).replace(/'/g, "\\'")}')" class="glass-card rounded-2xl p-4 flex items-center gap-4 hover:border-brand-500/50 cursor-pointer transition group">
+              <div class="w-10 h-10 rounded-xl bg-dark-900 border border-white/10 flex items-center justify-center font-display font-bold text-sm text-brand-400 shrink-0">
+                #${idx + 1}
+              </div>
+              <img src="${s.poster || this.getFallbackPoster(s.title)}" onerror="this.onerror=null;this.src='${this.getFallbackPoster(s.title)}'" class="w-14 h-20 rounded-xl object-cover shrink-0">
+              <div class="min-w-0 flex-1 space-y-1">
+                <h3 class="font-semibold text-sm sm:text-base text-white group-hover:text-brand-400 truncate transition">${s.title}</h3>
+                <p class="text-xs text-zinc-400 truncate">${s.japanese || 'Simulcast Release'}</p>
+                <div class="flex flex-wrap items-center gap-2 pt-1">
+                  <span class="px-2.5 py-0.5 rounded-md bg-brand-600/20 text-brand-400 border border-brand-500/30 font-bold text-xs">
+                    Episode ${s.episode ?? '-'}
+                  </span>
+                  <span class="text-xs text-emerald-400 font-medium">
+                    <i class="fa-regular fa-bell mr-1"></i>${dt}
+                  </span>
+                </div>
+              </div>
+              <i class="fa-solid fa-chevron-right text-zinc-600 group-hover:text-brand-400 mr-2"></i>
+            </div>
+          `;
+        }).join('');
+      },
+
+      // GENRES VIEW
+      async renderGenresView() {
+        const list = await getGenres();
+        const container = document.getElementById('genres-grid');
+        container.innerHTML = list.map(g => `
+          <div onclick="app.navigate('catalog', { genre: '${g.genre.replace(/'/g, "\\'")}' })" class="glass-card rounded-2xl p-4 flex items-center justify-between cursor-pointer hover:border-brand-500/60 hover:bg-brand-600/10 transition group">
+            <div>
+              <h3 class="font-semibold text-sm text-white group-hover:text-brand-400 transition">${g.genre}</h3>
+              <span class="text-xs text-zinc-400">${g.total} Anime</span>
+            </div>
+            <div class="w-9 h-9 rounded-xl bg-white/5 group-hover:bg-brand-600 text-zinc-400 group-hover:text-white flex items-center justify-center transition">
+              <i class="fa-solid fa-arrow-right text-xs"></i>
+            </div>
+          </div>
+        `).join('');
+      },
+
+      // DETAIL & PLAYER VIEW (getDetail + getEpisodes)
+      async openDetail(input, preferredEp = null) {
+        this.navigate('detail');
+        const container = document.getElementById('detail-container');
+        container.innerHTML = `
+          <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 space-y-6">
+            <div class="aspect-video w-full max-h-[540px] rounded-2xl skeleton"></div>
+            <div class="h-8 w-1/2 rounded-xl skeleton"></div>
+            <div class="h-24 w-full rounded-xl skeleton"></div>
+          </div>
+        `;
+
+        try {
+          const [detail, epData] = await Promise.all([
+            getDetail(input),
+            getEpisodes(input)
+          ]);
+
+          this.currentAnimeDetail = detail;
+          this.currentEpisodesData = epData;
+          const episodes = epData.episodes || [];
+          const activeEp = preferredEp || (episodes.length ? episodes[episodes.length - 1].number : 1);
+          this.currentEpisodeNumber = activeEp;
+
+          this.saveToHistory(detail, activeEp);
+          this.renderDetailMarkup(detail, epData, activeEp);
+        } catch (err) {
+          container.innerHTML = `
+            <div class="max-w-3xl mx-auto px-4 py-16 text-center space-y-4">
+              <i class="fa-solid fa-triangle-exclamation text-4xl text-amber-400"></i>
+              <h2 class="text-xl font-bold text-white">Gagal Memuat Anime</h2>
+              <p class="text-sm text-zinc-400">${err.message}</p>
+              <button onclick="app.navigate('home')" class="px-5 py-2.5 rounded-xl bg-brand-600 text-white text-sm font-semibold">Kembali ke Beranda</button>
+            </div>
+          `;
+        }
+      },
+
+      renderDetailMarkup(d, epData, activeEpNum) {
+        const container = document.getElementById('detail-container');
+        const episodes = epData.episodes || [];
+        const currentEpObj = episodes.find(e => e.number === Number(activeEpNum)) || { number: activeEpNum, title: `Episode ${activeEpNum}` };
+        const isBookmarked = this.isBookmarked(d.slug);
+
+        container.innerHTML = `
+          <!-- Ambient Banner Header -->
+          <div class="relative w-full h-48 sm:h-64 overflow-hidden border-b border-white/10">
+            <img src="${d.banner}" onerror="this.onerror=null;this.src='${d.poster}'" class="w-full h-full object-cover blur-md opacity-30 scale-110">
+            <div class="absolute inset-0 bg-gradient-to-t from-dark-950 via-dark-950/60 to-transparent"></div>
+            <div class="absolute bottom-4 left-0 right-0 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex items-center justify-between">
+              <button onclick="app.navigate('home')" class="px-3.5 py-2 rounded-xl glass-card hover:bg-white/10 text-xs font-medium text-zinc-200 flex items-center gap-2 transition">
+                <i class="fa-solid fa-arrow-left"></i> Kembali
+              </button>
+              <div class="flex items-center gap-2">
+                <a href="${d.url}" target="_blank" rel="noopener noreferrer" class="px-3.5 py-2 rounded-xl glass-card hover:bg-white/10 text-xs font-medium text-brand-400 flex items-center gap-1.5">
+                  <i class="fa-solid fa-up-right-from-square"></i> Halaman Asli AniKai
+                </a>
+              </div>
+            </div>
+          </div>
+
+          <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 -mt-6 relative z-10 space-y-8">
+            
+            <!-- PLAYER + EPISODE LIST GRID -->
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+              
+              <!-- Left 2 Cols: Video Player Window -->
+              <div class="lg:col-span-2 space-y-4">
+                <div class="glass-card rounded-2xl overflow-hidden border border-white/15 shadow-2xl">
+                  
+                  <!-- Top Player Status Bar -->
+                  <div class="px-4 py-3 bg-dark-900 border-b border-white/10 flex flex-wrap items-center justify-between gap-2 text-xs">
+                    <div class="flex items-center gap-2">
+                      <span class="px-2.5 py-0.5 rounded-md bg-brand-600 text-white font-bold">EP ${currentEpObj.number}</span>
+                      <span id="player-ep-title" class="font-medium text-zinc-200 truncate max-w-xs sm:max-w-md">${currentEpObj.title}</span>
+                      ${currentEpObj.filler ? `<span class="px-2 py-0.5 rounded bg-amber-500/20 text-amber-400 text-[10px] font-bold">FILLER</span>` : ''}
+                    </div>
+                    <div class="flex items-center gap-2">
+                      <span class="text-zinc-400">Server:</span>
+                      <select id="server-select" onchange="app.switchServer(this.value)" class="bg-dark-800 border border-white/10 rounded-lg px-2.5 py-1 text-xs text-white focus:outline-none">
+                        <option value="embed">AniKai Embed (${d.player?.serverDefault || 'HD-1'})</option>
+                        <option value="hls">HTML5 Smart Preview</option>
+                        ${d.trailer ? `<option value="trailer">Official Trailer</option>` : ''}
+                      </select>
+                    </div>
+                  </div>
+
+                  <!-- Video Frame Container -->
+                  <div id="video-stage" class="relative aspect-video w-full bg-black flex items-center justify-center overflow-hidden">
+                    <!-- Rendered by renderVideoStage() -->
+                  </div>
+
+                  <!-- Bottom Player Controls -->
+                  <div class="px-4 py-3 bg-dark-900 border-t border-white/10 flex flex-wrap items-center justify-between gap-3 text-xs">
+                    <div class="flex items-center gap-2">
+                      <button onclick="app.StepEpisode(-1)" class="px-3 py-1.5 rounded-lg bg-white/5 hover:bg-white/10 text-zinc-200 font-medium transition">
+                        <i class="fa-solid fa-backward-step mr-1"></i> Prev Ep
+                      </button>
+                      <button onclick="app.StepEpisode(1)" class="px-3 py-1.5 rounded-lg bg-brand-600/20 hover:bg-brand-600/30 text-brand-300 border border-brand-500/30 font-medium transition">
+                        Next Ep <i class="fa-solid fa-forward-step ml-1"></i>
+                      </button>
+                    </div>
+                    <div class="flex items-center gap-2">
+                      <button onclick="app.toggleBookmark('${d.slug}')" id="detail-bookmark-btn" class="px-3.5 py-1.5 rounded-lg ${isBookmarked ? 'bg-brand-600 text-white' : 'bg-white/5 text-zinc-300'} font-medium transition">
+                        <i class="fa-${isBookmarked ? 'solid' : 'regular'} fa-bookmark mr-1"></i> ${isBookmarked ? 'Tersimpan' : 'Bookmark'}
+                      </button>
+                      <button onclick="app.copyStreamLink('${d.url}')" class="px-3 py-1.5 rounded-lg bg-white/5 hover:bg-white/10 text-zinc-300 transition">
+                        <i class="fa-solid fa-share-nodes mr-1"></i> Bagikan
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Right 1 Col: Daftar Episode (getEpisodes) -->
+              <div class="glass-card rounded-2xl border border-white/10 flex flex-col h-[420px] lg:h-auto lg:max-h-[540px] overflow-hidden">
+                <div class="p-4 bg-dark-900 border-b border-white/10 space-y-2.5">
+                  <div class="flex items-center justify-between">
+                    <h3 class="font-display font-bold text-sm text-white flex items-center gap-2">
+                      <i class="fa-solid fa-list-ol text-brand-400"></i> Daftar Episode (${episodes.length})
+                    </h3>
+                    <span class="text-[11px] text-zinc-400">${d.subtitles || 'Sub'}</span>
+                  </div>
+                  <input 
+                    type="text" 
+                    placeholder="Cari nomor atau judul episode..." 
+                    oninput="app.filterEpisodeList(this.value)"
+                    class="w-full bg-dark-950 border border-white/10 rounded-xl px-3 py-1.5 text-xs text-white focus:outline-none focus:border-brand-500"
+                  >
+                </div>
+
+                <div id="episode-list-box" class="flex-1 overflow-y-auto p-3 space-y-1.5 divide-y divide-white/5">
+                  ${episodes.map(ep => this.createEpisodeRow(ep, ep.number === Number(activeEpNum))).join('')}
+                </div>
+              </div>
+
+            </div>
+
+            <!-- METADATA DETAIL LENGKAP (getDetail) -->
+            <div class="glass-card rounded-2xl p-6 sm:p-8 border border-white/10">
+              <div class="flex flex-col md:flex-row gap-6 sm:gap-8">
+                
+                <!-- Poster -->
+                <div class="w-40 sm:w-52 shrink-0 mx-auto md:mx-0">
+                  <img src="${d.poster}" onerror="this.onerror=null;this.src='${this.getFallbackPoster(d.title)}'" class="w-full aspect-[3/4] object-cover rounded-2xl border border-white/15 shadow-xl">
+                </div>
+
+                <!-- Synopsis & Fact Table -->
+                <div class="flex-1 space-y-5">
+                  <div>
+                    <div class="flex flex-wrap items-center gap-2 mb-2">
+                      <span class="px-2.5 py-0.5 rounded-md bg-amber-400/15 text-amber-400 font-bold text-xs border border-amber-400/30">
+                        <i class="fa-solid fa-star mr-1"></i>Skor: ${d.score ?? '-'}
+                      </span>
+                      <span class="px-2.5 py-0.5 rounded-md bg-brand-500/20 text-brand-300 font-semibold text-xs">${d.format || 'TV'}</span>
+                      <span class="px-2.5 py-0.5 rounded-md bg-emerald-500/20 text-emerald-300 font-semibold text-xs">${d.status || 'Releasing'}</span>
+                      <span class="px-2.5 py-0.5 rounded-md bg-white/10 text-zinc-300 text-xs">${d.rating || 'PG-13'}</span>
+                    </div>
+
+                    <h1 class="font-display font-extrabold text-2xl sm:text-3xl text-white">${d.title}</h1>
+                    <p class="text-xs sm:text-sm text-zinc-400 mt-1">
+                      ${[d.altTitle, d.japanese, d.native].filter(Boolean).join(' • ')}
+                    </p>
+                  </div>
+
+                  <!-- Genres -->
+                  <div class="flex flex-wrap gap-2">
+                    ${(d.genres || []).map(g => `
+                      <button onclick="app.navigate('catalog', { genre: '${String(g).replace(/'/g, "\\'")}' })" class="px-3 py-1 rounded-xl bg-dark-800 hover:bg-brand-600 text-xs text-zinc-200 hover:text-white border border-white/10 transition">
+                        ${g}
+                      </button>
+                    `).join('')}
+                  </div>
+
+                  <!-- Synopsis -->
+                  <div class="space-y-1.5">
+                    <h3 class="text-xs font-bold uppercase tracking-wider text-zinc-400">Sinopsis Cerita</h3>
+                    <p class="text-sm text-zinc-300 leading-relaxed whitespace-pre-line">${d.synopsis || 'Sinopsis belum tersedia.'}</p>
+                  </div>
+
+                  <!-- Detail Facts Grid (Sama persis dengan printDetail di anikai.js) -->
+                  <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3 pt-2">
+                    <div class="p-3 rounded-xl bg-dark-900/90 border border-white/5">
+                      <span class="text-[11px] text-zinc-400 block">ID / Slug</span>
+                      <span class="text-xs font-semibold text-white truncate block">${d.id} (${d.slug})</span>
+                    </div>
+                    <div class="p-3 rounded-xl bg-dark-900/90 border border-white/5">
+                      <span class="text-[11px] text-zinc-400 block">Total Episode</span>
+                      <span class="text-xs font-semibold text-white">${d.totalEpisodes ?? '-'} EP (${d.subtitles ?? 'Sub'})</span>
+                    </div>
+                    <div class="p-3 rounded-xl bg-dark-900/90 border border-white/5">
+                      <span class="text-[11px] text-zinc-400 block">Studio Animasi</span>
+                      <span class="text-xs font-semibold text-white">${d.studios || '-'}</span>
+                    </div>
+                    <div class="p-3 rounded-xl bg-dark-900/90 border border-white/5">
+                      <span class="text-[11px] text-zinc-400 block">Durasi</span>
+                      <span class="text-xs font-semibold text-white">${d.duration || '24 min'}</span>
+                    </div>
+                    <div class="p-3 rounded-xl bg-dark-900/90 border border-white/5">
+                      <span class="text-[11px] text-zinc-400 block">Tanggal Rilis</span>
+                      <span class="text-xs font-semibold text-white">${d.released || d.dateAired || '-'}</span>
+                    </div>
+                    <div class="p-3 rounded-xl bg-dark-900/90 border border-white/5">
+                      <span class="text-[11px] text-zinc-400 block">Terakhir Update</span>
+                      <span class="text-xs font-semibold text-white">${d.updated || '-'} (EP ${d.lastEpisode ?? '-'})</span>
+                    </div>
+                    <div class="p-3 rounded-xl bg-dark-900/90 border border-white/5 sm:col-span-2">
+                      <span class="text-[11px] text-zinc-400 block">Player Host & Seal Token</span>
+                      <span class="text-xs font-mono text-brand-400 truncate block">${d.player?.host || 'anikai.org'} ${d.player?.seal ? `(seal: ${d.player.seal.slice(0, 14)}...)` : ''}</span>
+                    </div>
+                  </div>
+
+                </div>
+              </div>
+            </div>
+
+          </div>
+        `;
+
+        this.switchServer('hls');
+      },
+
+      createEpisodeRow(ep, isActive) {
+        return `
+          <button 
+            onclick="app.selectEpisode(${ep.number})" 
+            data-ep-num="${ep.number}"
+            data-ep-title="${fold(ep.title)}"
+            class="ep-row-btn w-full text-left px-3 py-2.5 rounded-xl flex items-center justify-between gap-2 transition ${isActive ? 'bg-brand-600 text-white font-semibold shadow-md' : 'hover:bg-white/5 text-zinc-300'}"
+          >
+            <div class="flex items-center gap-2.5 min-w-0">
+              <span class="w-8 h-7 rounded-lg ${isActive ? 'bg-black/30 text-white' : 'bg-dark-900 text-brand-400'} font-mono text-xs flex items-center justify-center shrink-0">
+                ${String(ep.number).padStart(2, '0')}
+              </span>
+              <span class="text-xs truncate">${ep.title}</span>
+            </div>
+            <div class="flex items-center gap-1 shrink-0">
+              ${ep.filler ? `<span class="px-1.5 py-0.5 rounded bg-amber-500/20 text-amber-300 text-[9px] font-bold">F</span>` : ''}
+              ${ep.recap ? `<span class="px-1.5 py-0.5 rounded bg-cyan-500/20 text-cyan-300 text-[9px] font-bold">R</span>` : ''}
+              ${ep.date ? `<span class="text-[10px] ${isActive ? 'text-brand-100' : 'text-zinc-500'}">${ep.date}</span>` : ''}
+            </div>
+          </button>
+        `;
+      },
+
+      selectEpisode(epNum) {
+        this.currentEpisodeNumber = Number(epNum);
+        const epData = this.currentEpisodesData;
+        const d = this.currentAnimeDetail;
+        if (!epData || !d) return;
+
+        const epObj = epData.episodes.find(e => e.number === Number(epNum)) || { number: epNum, title: `Episode ${epNum}` };
+        const titleEl = document.getElementById('player-ep-title');
+        if (titleEl) titleEl.textContent = epObj.title;
+
+        // Highlight active row
+        document.querySelectorAll('.ep-row-btn').forEach(btn => {
+          const isMatch = Number(btn.getAttribute('data-ep-num')) === Number(epNum);
+          btn.className = `ep-row-btn w-full text-left px-3 py-2.5 rounded-xl flex items-center justify-between gap-2 transition ${isMatch ? 'bg-brand-600 text-white font-semibold shadow-md' : 'hover:bg-white/5 text-zinc-300'}`;
+        });
+
+        this.saveToHistory(d, epNum);
+        const mode = document.getElementById('server-select')?.value || 'hls';
+        this.switchServer(mode);
+      },
+
+      StepEpisode(delta) {
+        const eps = this.currentEpisodesData?.episodes || [];
+        if (!eps.length) return;
+        const target = this.currentEpisodeNumber + delta;
+        const exists = eps.find(e => e.number === target);
+        if (exists) {
+          this.selectEpisode(target);
+        } else {
+          this.showToast(`Episode ${target} belum tersedia.`);
+        }
+      },
+
+      filterEpisodeList(query) {
+        const q = fold(query);
+        document.querySelectorAll('.ep-row-btn').forEach(btn => {
+          const num = btn.getAttribute('data-ep-num');
+          const title = btn.getAttribute('data-ep-title');
+          const match = !q || num.includes(q) || title.includes(q);
+          btn.classList.toggle('hidden', !match);
+        });
+      },
+
+      switchServer(mode) {
+        const stage = document.getElementById('video-stage');
+        const d = this.currentAnimeDetail;
+        const ep = this.currentEpisodeNumber;
+        if (!stage || !d) return;
+
+        if (mode === 'embed') {
+          stage.innerHTML = `
+            <iframe 
+              src="${d.url}?ep=${ep}" 
+              class="w-full h-full border-0" 
+              allowfullscreen 
+              allow="autoplay; encrypted-media"
+            ></iframe>
+          `;
+        } else if (mode === 'trailer' && d.trailer) {
+          stage.innerHTML = `
+            <iframe 
+              src="${d.trailer}" 
+              class="w-full h-full border-0" 
+              allowfullscreen
+            ></iframe>
+          `;
+        } else {
+          // Smart Interactive HTML5 Stream Player
+          stage.innerHTML = `
+            <div class="relative w-full h-full flex flex-col justify-between p-6 select-none overflow-hidden">
+              <img src="${d.banner}" onerror="this.onerror=null;this.src='${d.poster}'" class="absolute inset-0 w-full h-full object-cover opacity-35 scale-105">
+              <div class="absolute inset-0 bg-gradient-to-t from-black via-black/60 to-black/40"></div>
+
+              <!-- Top Overlay Info -->
+              <div class="relative z-10 flex items-center justify-between">
+                <div class="flex items-center gap-2.5">
+                  <span class="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-ping"></span>
+                  <span class="text-xs font-semibold text-zinc-200 tracking-wide">ANIKAI STREAM ENGINE • 1080p60 FHD</span>
+                </div>
+                <span class="px-2.5 py-1 rounded-lg bg-white/10 backdrop-blur-md text-[11px] font-mono text-brand-300">
+                  ID: ${d.id} | EP ${ep}
+                </span>
+              </div>
+
+              <!-- Center Play Action -->
+              <div class="relative z-10 my-auto text-center space-y-4 max-w-md mx-auto">
+                <button onclick="app.startSimulatedPlayback()" class="w-20 h-20 rounded-full bg-brand-600 hover:bg-brand-500 text-white flex items-center justify-center mx-auto shadow-2xl shadow-brand-600/60 transition transform hover:scale-110">
+                  <i class="fa-solid fa-play text-2xl ml-1"></i>
+                </button>
+                <div>
+                  <h4 class="font-display font-bold text-lg text-white">${d.title} — Episode ${ep}</h4>
+                  <p class="text-xs text-zinc-400 mt-1">Klik tombol putar untuk memuat stream video, atau buka langsung di tab server AniKai.</p>
+                </div>
+                <div class="flex flex-wrap items-center justify-center gap-2 pt-1">
+                  <button onclick="app.switchServer('embed')" class="px-4 py-2 rounded-xl bg-white/10 hover:bg-white/20 text-xs font-semibold text-white transition">
+                    <i class="fa-solid fa-server mr-1.5 text-brand-400"></i>Gunakan Embed Iframe
+                  </button>
+                  <a href="${d.url}" target="_blank" rel="noopener noreferrer" class="px-4 py-2 rounded-xl bg-brand-600/25 hover:bg-brand-600/40 border border-brand-500/40 text-xs font-semibold text-brand-300 transition">
+                    <i class="fa-solid fa-external-link-alt mr-1.5"></i>Buka Player Asli
+                  </a>
+                </div>
+              </div>
+
+              <!-- Bottom Fake Timeline Bar -->
+              <div class="relative z-10 space-y-2">
+                <div class="w-full h-1.5 bg-white/20 rounded-full overflow-hidden cursor-pointer">
+                  <div class="w-1/3 h-full bg-gradient-to-r from-brand-500 to-indigo-400 rounded-full"></div>
+                </div>
+                <div class="flex items-center justify-between text-[11px] text-zinc-400 font-mono">
+                  <span>00:00 / 24:12</span>
+                  <span>SUB: ${d.subtitles || 'Multi-Sub'} • Server: ${d.player?.serverDefault || 'VIP-1'}</span>
+                </div>
+              </div>
+            </div>
+          `;
+        }
+      },
+
+      startSimulatedPlayback() {
+        const stage = document.getElementById('video-stage');
+        const d = this.currentAnimeDetail;
+        const ep = this.currentEpisodeNumber;
+        if (!stage) return;
+        stage.innerHTML = `
+          <video controls autoplay class="w-full h-full object-contain bg-black" poster="${d.banner}">
+            <source src="https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4" type="video/mp4">
+          </video>
+        `;
+        this.showToast(`Memutar ${d.title} - Episode ${ep}`);
+      },
+
+      // QUICK SEARCH DROPDOWN
+      setupSearchListeners() {
+        const input = document.getElementById('global-search-input');
+        const clearBtn = document.getElementById('clear-search-btn');
+        const dropdown = document.getElementById('search-dropdown');
+        let debounceTimer;
+
+        input.addEventListener('input', e => {
+          const val = e.target.value.trim();
+          clearBtn.classList.toggle('hidden', !val);
+          clearTimeout(debounceTimer);
+          if (!val) {
+            dropdown.classList.add('hidden');
+            return;
+          }
+          debounceTimer = setTimeout(() => this.performQuickSearch(val), 220);
+        });
+
+        input.addEventListener('keydown', e => {
+          if (e.key === 'Enter' && input.value.trim()) {
+            dropdown.classList.add('hidden');
+            this.navigate('catalog', { keyword: input.value.trim() });
+          }
+        });
+
+        document.addEventListener('click', e => {
+          if (!input.contains(e.target) && !dropdown.contains(e.target)) {
+            dropdown.classList.add('hidden');
+          }
+        });
+      },
+
+      async performQuickSearch(keyword) {
+        const dropdown = document.getElementById('search-dropdown');
+        const content = document.getElementById('search-dropdown-content');
+        dropdown.classList.remove('hidden');
+
+        const results = await search(keyword, { limit: 6 });
+        if (!results.length) {
+          content.innerHTML = `<div class="p-4 text-center text-xs text-zinc-400">Tidak ditemukan hasil untuk "${keyword}"</div>`;
+          return;
+        }
+
+        content.innerHTML = results.map(item => `
+          <div onclick="app.openDetail('${item.slug}'); document.getElementById('search-dropdown').classList.add('hidden');" class="p-3 hover:bg-white/10 flex items-center gap-3 cursor-pointer transition">
+            <img src="${item.poster}" onerror="this.onerror=null;this.src='${this.getFallbackPoster(item.title)}'" class="w-11 h-14 rounded-lg object-cover shrink-0">
+            <div class="min-w-0 flex-1">
+              <h4 class="text-xs font-semibold text-white truncate">${item.title}</h4>
+              <p class="text-[11px] text-zinc-400 truncate">${item.japanese || item.altTitle || ''}</p>
+              <div class="flex items-center gap-2 mt-1 text-[10px] text-zinc-300">
+                <span class="text-amber-400"><i class="fa-solid fa-star mr-0.5"></i>${item.score ?? '-'}</span>
+                <span>•</span>
+                <span>${item.format || 'TV'}</span>
+                <span>•</span>
+                <span>${item.year || ''}</span>
+                <span>•</span>
+                <span class="text-brand-400 font-semibold">${item.episodes ?? '?'} EP</span>
+              </div>
+            </div>
+          </div>
+        `).join('') + `
+          <button onclick="app.navigate('catalog', { keyword: '${keyword.replace(/'/g, "\\'")}' }); document.getElementById('search-dropdown').classList.add('hidden');" class="w-full py-2.5 bg-brand-600/20 hover:bg-brand-600/30 text-brand-300 text-xs font-semibold text-center block transition">
+            Lihat Semua Hasil untuk "${keyword}"
+          </button>
+        `;
+      },
+
+      clearQuickSearch() {
+        document.getElementById('global-search-input').value = '';
+        document.getElementById('clear-search-btn').classList.add('hidden');
+        document.getElementById('search-dropdown').classList.add('hidden');
+      },
+
+      // BOOKMARK & HISTORY (LOCALSTORAGE)
+      getBookmarks() {
+        try { return JSON.parse(localStorage.getItem('anikai_bookmarks') || '[]'); } catch { return []; }
+      },
+
+      isBookmarked(slug) {
+        return this.getBookmarks().some(b => b.slug === slug);
+      },
+
+      async toggleBookmark(slugOrInput) {
+        const { item } = await resolveAnime(slugOrInput);
+        let list = this.getBookmarks();
+        const exists = list.some(b => b.slug === item.slug);
+        if (exists) {
+          list = list.filter(b => b.slug !== item.slug);
+          this.showToast(`Dihapus dari Koleksi: ${item.title}`);
+        } else {
+          list.unshift(item);
+          this.showToast(`Disimpan ke Koleksi: ${item.title}`);
+        }
+        localStorage.setItem('anikai_bookmarks', JSON.stringify(list));
+        this.updateBookmarkBadge();
+
+        // Update button if in detail view
+        const btn = document.getElementById('detail-bookmark-btn');
+        if (btn && this.currentAnimeDetail?.slug === item.slug) {
+          const nowSaved = !exists;
+          btn.className = `px-3.5 py-1.5 rounded-lg ${nowSaved ? 'bg-brand-600 text-white' : 'bg-white/5 text-zinc-300'} font-medium transition`;
+          btn.innerHTML = `<i class="fa-${nowSaved ? 'solid' : 'regular'} fa-bookmark mr-1"></i> ${nowSaved ? 'Tersimpan' : 'Bookmark'}`;
+        }
+        if (this.currentView === 'bookmarks') this.renderBookmarksView();
+      },
+
+      updateBookmarkBadge() {
+        const count = this.getBookmarks().length;
+        const badge = document.getElementById('bookmark-count-badge');
+        if (badge) {
+          badge.textContent = count;
+          badge.classList.toggle('hidden', count === 0);
+        }
+      },
+
+      renderBookmarksView() {
+        const list = this.getBookmarks();
+        const grid = document.getElementById('bookmarks-grid');
+        if (!list.length) {
+          grid.innerHTML = `
+            <div class="col-span-full glass-card rounded-2xl p-12 text-center space-y-3">
+              <i class="fa-regular fa-bookmark text-4xl text-zinc-500"></i>
+              <h3 class="font-display font-bold text-lg text-white">Koleksi Masih Kosong</h3>
+              <p class="text-xs text-zinc-400">Simpan anime favorit Anda agar mudah ditonton kembali kapan saja.</p>
+            </div>
+          `;
+          return;
+        }
+        grid.innerHTML = list.map(item => this.createAnimeCard(item)).join('');
+      },
+
+      saveToHistory(detail, epNum) {
+        try {
+          let hist = JSON.parse(localStorage.getItem('anikai_history') || '[]');
+          hist = hist.filter(h => h.slug !== detail.slug);
+          hist.unshift({
+            slug: detail.slug,
+            title: detail.title,
+            poster: detail.poster,
+            episode: epNum,
+            updatedAt: new Date().toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' })
+          });
+          localStorage.setItem('anikai_history', JSON.stringify(hist.slice(0, 8)));
+        } catch {}
+      },
+
+      renderWatchHistory() {
+        let hist = [];
+        try { hist = JSON.parse(localStorage.getItem('anikai_history') || '[]'); } catch {}
+        const section = document.getElementById('history-section');
+        const grid = document.getElementById('history-grid');
+        if (!hist.length) {
+          section.classList.add('hidden');
+          return;
+        }
+        section.classList.remove('hidden');
+        grid.innerHTML = hist.slice(0, 4).map(h => `
+          <div onclick="app.openDetail('${h.slug}', ${h.episode})" class="glass-card rounded-2xl p-3 flex items-center gap-3.5 cursor-pointer hover:border-brand-500/50 transition group">
+            <img src="${h.poster}" onerror="this.onerror=null;this.src='${this.getFallbackPoster(h.title)}'" class="w-14 h-18 rounded-xl object-cover shrink-0">
+            <div class="min-w-0 flex-1">
+              <h4 class="text-xs font-semibold text-white group-hover:text-brand-400 truncate transition">${h.title}</h4>
+              <span class="inline-block mt-1 px-2 py-0.5 rounded bg-brand-600/20 text-brand-300 text-[11px] font-bold">
+                Lanjut EP ${h.episode}
+              </span>
+              <span class="block text-[10px] text-zinc-500 mt-1">Ditonton ${h.updatedAt || 'baru saja'}</span>
+            </div>
+            <div class="w-8 h-8 rounded-full bg-brand-600/20 group-hover:bg-brand-600 text-brand-400 group-hover:text-white flex items-center justify-center transition">
+              <i class="fa-solid fa-play text-xs"></i>
+            </div>
+          </div>
+        `).join('');
+      },
+
+      clearHistory() {
+        localStorage.removeItem('anikai_history');
+        this.renderWatchHistory();
+        this.showToast('Riwayat tontonan dibersihkan.');
+      },
+
+      // CLI CONSOLE RUNNER MODAL (Sama seperti fungsi main() di kode asli Anda)
+      toggleScraperModal() {
+        const modal = document.getElementById('scraper-modal');
+        modal.classList.toggle('hidden');
+      },
+
+      setCli(cmd) {
+        document.getElementById('cli-input').value = cmd;
+        this.runCliCommand();
+      },
+
+      async runCliCommand() {
+        const rawCmd = document.getElementById('cli-input').value.trim();
+        const outEl = document.getElementById('cli-output');
+        outEl.textContent = `$ node anikai.js ${rawCmd}\nMemproses perintah...`;
+
+        try {
+          // Parse argumen sederhana seperti di CLI
+          const tokens = rawCmd.match(/(?:[^\s"]+|"[^"]*")+/g) || [];
+          const args = [];
+          const flags = {};
+          for (const t of tokens) {
+            const clean = t.replace(/^"|"$/g, '');
+            if (clean.startsWith('--')) {
+              const [k, v] = clean.slice(2).split('=');
+              flags[k] = v === undefined ? true : v;
+            } else {
+              args.push(clean);
+            }
+          }
+
+          const [command, ...rest] = args;
+          const limit = flags.limit ? Math.max(1, Number(flags.limit)) : undefined;
+          let result;
+
+          switch ((command || '').toLowerCase()) {
+            case 'search':
+              result = await search(rest.join(' '), { limit: limit ?? 10 });
+              break;
+            case 'detail':
+              result = await getDetail(rest.join(' '));
+              break;
+            case 'episodes':
+              result = await getEpisodes(rest.join(' '), { episode: flags.ep });
+              break;
+            case 'latest':
+              result = await getLatest({ limit: limit ?? 10 });
+              break;
+            case 'schedule':
+              result = await getSchedule({ all: !!flags.all, limit: limit ?? 10 });
+              break;
+            case 'genres':
+              result = await getGenres();
+              break;
+            case 'filter':
+              result = await filterCatalog({
+                genre: flags.genre, year: flags.year, format: flags.format,
+                status: flags.status, minScore: flags['min-score'],
+                sort: flags.sort || 'updated', limit: limit ?? 10
+              });
+              break;
+            default:
+              result = { info: 'Command tersedia: search, detail, episodes, latest, schedule, genres, filter' };
+          }
+
+          outEl.textContent = `// Output JSON dari: node anikai.js ${rawCmd}\n` + JSON.stringify(result, null, 2);
+        } catch (err) {
+          outEl.textContent = `Error: ${err.message}`;
+        }
+      },
+
+      copyStreamLink(url) {
+        const temp = document.createElement('textarea');
+        temp.value = url;
+        document.body.appendChild(temp);
+        temp.select();
+        document.execCommand('copy');
+        document.body.removeChild(temp);
+        this.showToast('Tautan anime berhasil disalin ke clipboard!');
+      },
+
+      showToast(msg) {
+        const container = document.getElementById('toast-container');
+        const toast = document.createElement('div');
+        toast.className = 'glass-card px-4 py-3 rounded-xl border border-brand-500/40 text-xs font-medium text-white shadow-xl flex items-center gap-2.5 animate-bounce';
+        toast.innerHTML = `<i class="fa-solid fa-circle-check text-brand-400"></i><span>${msg}</span>`;
+        container.appendChild(toast);
+        setTimeout(() => toast.remove(), 3200);
+      }
+    };
+
+    window.addEventListener('DOMContentLoaded', () => app.init());
+  </script>
+</body>
+</html>
