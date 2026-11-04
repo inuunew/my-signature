@@ -1,0 +1,397 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>CFOP Lab – Belajar Rubik 3x3</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@500;700;800&family=IBM+Plex+Mono:wght@500&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#f3f6fd;--ink:#15203b;--mute:#66728d;--line:#e2e8f5;--acc:#4560ff;--acc2:#e9edff;--ok:#0f9d6a;--no:#e5484d;--card:#fff;color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px)}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+*,*::before,*::after{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.5 "Bricolage Grotesque",system-ui,sans-serif;-webkit-tap-highlight-color:transparent}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);background:var(--bg);z-index:30}
+button{font:inherit;color:inherit;cursor:pointer}
+button:focus-visible{outline:3px solid var(--acc);outline-offset:2px}
+.top{max-width:1080px;margin:0 auto;padding:14px 16px 8px;display:flex;align-items:center;justify-content:space-between}
+.brand{display:flex;align-items:center;gap:10px;font-weight:800;font-size:20px;letter-spacing:-.01em}
+.logo{width:28px;height:28px;border-radius:8px;background:conic-gradient(from 45deg,#ffd500,#ff7a00,#d62a2a,#1c5cff,#00a650,#ffd500)}
+.stat{font-size:13px;font-weight:700;color:var(--acc);background:var(--acc2);border-radius:99px;padding:6px 12px}
+.app{max-width:1080px;margin:0 auto;padding:6px 16px 110px;display:grid;gap:16px;grid-template-columns:minmax(0,1fr)}
+.stage{position:sticky;top:calc(env(safe-area-inset-top,0px) + 6px);z-index:5;background:linear-gradient(165deg,#e8eeff,#fff 75%);border:1px solid var(--line);border-radius:22px;box-shadow:0 10px 30px rgba(52,78,180,.14);overflow:hidden}
+#cv{display:block;width:100%;height:26vh;min-height:160px;touch-action:none;cursor:grab}
+.ctl{display:flex;gap:4px;align-items:center;padding:6px 8px;flex-wrap:nowrap}
+.ctl button{font-weight:700;font-size:13px;background:var(--acc2);color:var(--acc);border:0;border-radius:10px;padding:6px 9px;min-height:38px;white-space:nowrap}
+.ctl button.go{background:var(--acc);color:#fff;min-width:60px}
+.ctl label{flex:1;min-width:0;display:flex;align-items:center}
+.ctl input{width:100%;min-width:40px;accent-color:var(--acc)}
+#cap{padding:0 14px 2px;font-size:13px;color:var(--mute);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+#not{padding:2px 12px 10px;font:500 14px "IBM Plex Mono",ui-monospace,monospace;white-space:nowrap;overflow-x:auto}
+#not span{display:inline-block;padding:2px 6px;border-radius:6px;color:#a2abc2}
+#not span.done{color:var(--ink)}
+#not span.cur{background:var(--acc);color:#fff}
+body[data-page=puzzle] .ctl,body[data-page=puzzle] #not{display:none}
+body[data-page=puzzle] #cap{padding-bottom:10px}
+body[data-page=riwayat] .stage{display:none}
+.chips{display:flex;gap:8px;overflow-x:auto;padding:2px 2px 12px}
+.chip{flex:none;border:1px solid var(--line);background:var(--card);border-radius:99px;padding:8px 16px;min-height:40px;font-weight:700;box-shadow:0 2px 6px rgba(52,78,180,.07)}
+.chip.on{background:var(--acc);border-color:var(--acc);color:#fff}
+.card{background:var(--card);border:1px solid var(--line);border-radius:20px;padding:16px;margin-bottom:12px;box-shadow:0 4px 16px rgba(52,78,180,.07)}
+h2{margin:0 0 4px;font-size:22px;letter-spacing:-.01em}
+h3{margin:18px 0 8px;font-size:17px}
+.card p{margin:0 0 8px;color:var(--mute);max-width:60ch}
+.card ol{margin:0;padding-left:20px;max-width:60ch}
+.list{display:grid;gap:10px}
+.row{display:flex;gap:12px;align-items:center;width:100%;text-align:left;background:var(--card);border:1px solid var(--line);border-radius:18px;padding:10px}
+.row[aria-pressed="true"]{border-color:var(--acc);background:var(--acc2)}
+.th{width:76px;height:76px;flex:none;border-radius:12px;background:#eef2ff}
+.tx{min-width:0;flex:1}
+.row b{display:flex;gap:8px;align-items:center;font-size:17px}
+.row code,.hrow code,.res code{display:block;margin:2px 0;font:500 14px "IBM Plex Mono",ui-monospace,monospace;color:var(--acc);overflow-wrap:anywhere}
+.row small,.hrow small{color:var(--mute);font-size:14px}
+em{font-style:normal;font-size:12px;font-weight:700;border-radius:99px;padding:1px 8px}
+em.ok{background:#e1f7ee;color:var(--ok)}
+em.no{background:#ffe9ea;color:var(--no)}
+.btn{border:0;border-radius:14px;background:var(--acc);color:#fff;font-weight:700;padding:10px 18px;min-height:46px}
+.btn.ghost{background:var(--acc2);color:var(--acc)}
+.btn.sm{min-height:38px;padding:6px 14px;flex:none}
+.meter{height:8px;border-radius:99px;background:var(--acc2);overflow:hidden;margin-top:6px}
+.meter i{display:block;height:100%;width:0;background:var(--acc);border-radius:inherit;transition:width .2s}
+.mrow{font-size:14px;color:var(--mute);margin-top:10px}
+.pad{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin:12px 0}
+.pad button{font:600 17px "IBM Plex Mono",ui-monospace,monospace;min-height:48px;border-radius:14px;border:1px solid var(--line);background:var(--card);box-shadow:0 2px 6px rgba(52,78,180,.08)}
+.pad button:active{background:var(--acc2);transform:scale(.97)}
+details{margin:6px 0}
+summary{cursor:pointer;font-weight:700;color:var(--acc);padding:6px 0}
+.acts{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
+.res{border-radius:20px;padding:16px;margin-bottom:12px}
+.res.win{background:#e6f8ef;border:1px solid #b5ebd2}
+.res.lose{background:#fff0f0;border:1px solid #ffd0d3}
+.res b{font-size:20px;display:block;margin-bottom:4px}
+.res p{margin:0 0 8px}
+.sum{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:10px}
+.sum div{background:var(--acc2);border-radius:14px;padding:10px;text-align:center}
+.sum b{display:block;font-size:24px;color:var(--acc)}
+.sum span{font-size:13px;color:var(--mute)}
+.hrow{display:flex;gap:10px;align-items:center;justify-content:space-between;background:var(--card);border:1px solid var(--line);border-radius:16px;padding:12px;margin-bottom:8px}
+.hrow>div{min-width:0}
+.empty{color:var(--mute);margin:0 0 8px}
+.bnav{position:fixed;left:0;right:0;bottom:0;z-index:20;display:grid;grid-template-columns:repeat(3,1fr);gap:10px;max-width:520px;margin:0 auto;padding:0 12px calc(10px + env(safe-area-inset-bottom,0px));pointer-events:none}
+.bnav button{pointer-events:auto;display:flex;flex-direction:column;align-items:center;gap:2px;border:1px solid var(--line);background:var(--card);border-radius:18px;padding:8px 4px;min-height:58px;font-size:12px;font-weight:700;color:var(--mute);box-shadow:0 6px 18px rgba(52,78,180,.16)}
+.bnav button[aria-current="page"]{background:var(--acc);border-color:var(--acc);color:#fff}
+.bnav svg{width:22px;height:22px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+@media (min-width:860px){.app{grid-template-columns:420px minmax(0,1fr);align-items:start}.stage{top:16px}#cv{height:360px}body[data-page=riwayat] .app{grid-template-columns:minmax(0,720px);justify-content:center}}
+</style>
+</head>
+<body data-page="belajar">
+<header class="top"><div class="brand"><span class="logo"></span>CFOP Lab</div><span class="stat" id="stat"></span></header>
+<main class="app">
+<section class="stage" id="stage" aria-label="Kubus 3D">
+<canvas id="cv" aria-label="Kubus Rubik 3D. Geser untuk memutar sudut pandang."></canvas>
+<div class="ctl">
+<button id="bReset">Ulang</button>
+<button id="bBack">Mundur</button>
+<button id="bPlay" class="go">Putar</button>
+<button id="bNext">Maju</button>
+<button id="bView">Atas</button>
+<label><input id="sp" type="range" min="0.5" max="3" step="0.25" value="1" aria-label="Kecepatan animasi"></label>
+</div>
+<div id="cap"></div>
+<div id="not"></div>
+</section>
+<section id="pg"></section>
+</main>
+<nav class="bnav" id="nav" aria-label="Halaman">
+<button data-p="belajar" aria-current="page"><svg viewBox="0 0 24 24"><path d="M4 5.5A2.5 2.5 0 0 1 6.5 3H20v16H6.5A2.5 2.5 0 0 0 4 21.5zM4 5.5v16"/></svg>Belajar</button>
+<button data-p="puzzle" aria-current="false"><svg viewBox="0 0 24 24"><path d="M12 3l8 4.5v9L12 21l-8-4.5v-9zM12 12l8-4.5M12 12v9M12 12L4 7.5"/></svg>Teka-teki</button>
+<button data-p="riwayat" aria-current="false"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>Riwayat</button>
+</nav>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script>
+const TABS=[
+{t:"Dasar",h:"Membaca notasi",p:"Setiap huruf adalah sisi yang diputar 90° searah jarum jam saat menghadap sisi itu. Tanda ' berarti berlawanan arah, angka 2 berarti putar 180°. Ketuk gerakan untuk melihatnya.",s:0,i:[
+["R","R","Sisi kanan (Right)"],["R'","R'","Sisi kanan, berlawanan arah"],["U","U","Sisi atas (Up)"],["F","F","Sisi depan (Front)"],["L","L","Sisi kiri (Left)"],["D","D","Sisi bawah (Down)"],["B","B","Sisi belakang (Back)"],["R2","R2","Putar kanan 180°"],["M","M","Lapisan tengah, searah L"],["x","x","Putar seluruh kubus searah R"]]},
+{t:"Cross",h:"1. Cross",p:"Bentuk tanda plus di satu sisi (biasanya putih) dengan warna samping yang cocok dengan titik tengahnya. Targetnya selesai dalam 8 gerakan atau kurang, tanpa rumus hafalan.",s:0,o:["Pilih sisi putih sebagai sisi bawah.","Cari empat sisi putih, bawa ke lapisan atas membentuk bunga (daisy).","Putar lapisan atas sampai warna samping cocok dengan titik tengah.","Putar 180° sisi itu (F2, R2, B2, L2) agar sisi putih turun ke bawah."],i:[
+["Turunkan satu sisi","F2","Setelah warnanya cocok, putar 180° untuk memasukkan sisi putih."],["Turunkan keempat sisi","F2 R2 B2 L2","Dari daisy yang sudah cocok, selesaikan Cross."]]},
+{t:"F2L",h:"2. F2L (First Two Layers)",p:"Pasangkan sudut dan sisi lapisan tengah, lalu sisipkan bersamaan ke slot. Ada 41 kasus; mulai dari beberapa kasus dasar ini. Kubus diacak dengan kebalikan rumus, jadi tekan Putar untuk memecahkannya.",s:1,i:[
+["Sisip kanan","R U R'","Kasus paling dasar untuk slot kanan-depan."],["Sisip kiri","F' U' F","Cermin dari kasus kanan, untuk slot kiri-depan."],["Pasangan terpisah (kanan)","U R U' R'","Sudut dan sisi terpisah di lapisan atas; satukan lalu sisipkan."],["Pasangan terpisah (kiri)","U' F' U F","Cermin dari kasus sebelumnya."],["Sudut menghadap atas","R U2 R' U' R U R'","Kasus umum saat stiker sudut menghadap ke atas."],["Sexy move","R U R' U'","Dipakai berulang di banyak kasus F2L dan OLL."],["Sledgehammer","R' F R F'","Mengeluarkan pasangan yang terjebak di slot."]]},
+{t:"OLL",h:"3. OLL (Orient Last Layer)",p:"Buat seluruh lapisan atas berwarna sama (kuning). Metode 2-look: pertama sisi (garis, L, atau titik), lalu sudut. Total 57 kasus penuh, tapi 2-look hanya perlu 10 rumus.",s:1,i:[
+["Sisi: Garis","F R U R' U' F'","Dua sisi kuning membentuk garis."],["Sisi: Huruf L","F U R U' R' F'","Dua sisi kuning membentuk L."],["Sisi: Titik","F R U R' U' F' f R U R' U' f'","Tidak ada sisi kuning; gabungan Garis dan L."],["Sudut: Sune","R U R' U R U2 R'","Satu sudut kuning menghadap atas."],["Sudut: Anti-Sune","R U2 R' U' R U' R'","Cermin dari Sune."],["Sudut: H","F R U R' U' R U R' U' R U R' U' F'","Dua sudut menghadap samping di sisi berseberangan."],["Sudut: Pi","R U2 R2 U' R2 U' R2 U2 R","Pola seperti huruf π."],["Sudut: U","R2 D R' U2 R D' R' U2 R'","Dua sudut menghadap atas bersebelahan."],["Sudut: T","R U R' U' R' F R F'","Pola seperti huruf T."],["Sudut: L","F R' F' R U R U' R'","Pola seperti huruf L pada sudut."]]},
+{t:"PLL",h:"4. PLL (Permute Last Layer)",p:"Susun posisi akhir potongan lapisan atas hingga kubus selesai. Total 21 kasus; mulai dari yang paling sering muncul.",s:1,i:[
+["Ua","R U' R U R U R U' R' U' R2","Menukar tiga sisi, satu arah."],["Ub","R2 U R U R' U' R' U' R' U R'","Menukar tiga sisi, arah sebaliknya."],["H","M2 U M2 U2 M2 U M2","Menukar dua pasang sisi berseberangan."],["Z","M' U M2 U M2 U M' U2 M2","Menukar dua pasang sisi bersebelahan."],["Aa","x R' U R' D2 R U' R' D2 R2 x'","Menukar tiga sudut."],["Ab","x R2 D2 R U R' D2 R U' R x'","Menukar tiga sudut, arah sebaliknya."],["T","R U R' U' R' F R2 U' R' U' R U R' F'","Menukar dua sudut dan dua sisi."],["Y","F R U' R' U' R U R' F' R U R' U' R' F R F'","Menukar dua sudut diagonal dan dua sisi."],["Jb","R U R' F' R U R' U' R' F R2 U' R'","Menukar dua sudut dan dua sisi bersebelahan."],["Ra","R U' R' U' R U R D R' U' R D' R' U2 R'","Menukar dua sudut dan dua sisi."]]}
+];
+
+/* ---------- tabel lengkap dari panduan GAN ---------- */
+const mk=(p,a,n)=>a.split("|").map((s,i)=>[p+String(i+1).padStart(2,"0"),s.trim(),n]);
+TABS[2].p="41 kasus F2L dari tabel panduan. Pasangkan sudut dan sisi lalu sisipkan ke slot. Kubus diacak dengan kebalikan rumus, tekan Putar untuk memecahkannya.";
+TABS[2].i=mk("F2L ","R U' R' U y' R' U2 R U2 R' U R|U R U' R' U' y' R' U R|R' F' R U R U' R' F|R U R' U' R U2 R' U' R U R'|R F U R U' R' F' U' R'|y' R' U' R U R' U' R|R U' R' U R U' R'|R U' R' U R U2 R' U R U' R'|R U F R U R' U' F' R'|y' R' U R U' R' U R|R U R' U' R U R'|R U R' U' R U R' U' R U R'|R U' R' U y' R' U R|y' R' U2 R U R' U' R|y' U' R' U2 R U' R' U R|y' R' U R U2 R' U' R|F U R U' R' F' R U' R'|U R U' R' U' R U' R' U R U' R'|R U' R' U2 R U R'|U R U2 R' U R U' R'|R U2 R' U' R U R'|U' R U' R' U2 R U' R'|U' R U R' y' U R' U' R|y' U R' U R U' R' U' R|y' R' U' R|y' U R' U' R U R' U' R|y' R U2 R2 U' R2 U' R'|l U r U' r' U' l'|U' R U2 R' U2 R U' R'|U' R U R' U' R U' R'|U R U' R'|U' R U2 R' U R U R'|y' U R' U' R d' R U R'|y' U' R' U R|y' U R' U' R U2 R' U R|y' U R' U2 R U2 R' U R|R U' R' U2 y' R' U' R|R U' R' U R U' R' U2 R U' R'|U' R U R' U R U2 R'|R U R'|U' R U' R' U R U R'","Kasus dari tabel F2L.");
+TABS[3].p="57 kasus OLL dari tabel panduan: buat seluruh lapisan atas berwarna sama. Kubus diacak dengan kebalikan rumus, tekan Putar untuk memecahkannya.";
+TABS[3].i=mk("OLL ","R U2 R2 F R F' U2 R' F R F'|F R U R' U' F' f R U R' U' f'|f R U R' U' f' U' F R U R' U' F'|f R U R' U' f' U F R U R' U' F'|r' U2 R U R' U r|r U2 R' U' R U' r'|r U R' U R U2 r'|r' U' R U' R' U2 r|R U R' U' R' F R2 U R' U' F'|R U R' U R' F R F' R U2 R'|r' R2 U R' U R U2 R' U M'|M' R' U' R U' R' U2 R U' M|f R U R2 U' R' U R U' f'|R' F R U R' F' R F U' F'|r' U' r R' U' R U r' U r|r U r' R U R' U' r U' r'|R U R' U R' F R F' U2 R' F R F'|r U R' U R U2 r2 U' R U' R' U2 r|r' R U R U R' U' M' R' F R F'|r U R' U' M2 U R U' R' U' M'|R U2 R' U' R U R' U' R U' R'|R U2 R2 U' R2 U' R2 U2 R|R2 D' R U2 R' D R U2 R|r U R' U' r' F R F'|F' r U R' U' r' F R|R U2 R' U' R U' R'|R U R' U R U2 R'|r U R' U' r' R U R U' R'|R U R' U' R U' R' F' U' F R U R'|f R U R2 U' R' U R2 U' R' f'|R' F R U R' U' F2 U F R|R U B' U' R' U R B R'|R U R' U' R' F R F'|R U R2 U' R' F R U R U' F'|R U2 R2 F R F' R U2 R'|R' U' R U' R' U R U l U' R' U|F R U' R' U' R U R' F'|R U R' U R U' R' U' R' F R F'|R U R' F' U' F U R U2 R'|R' F R U R' U' F' U R|R U R' U R U2 R' F R U R' U' F'|R' U' R U' R' U2 R F R U R' U' F'|f' L' U' L U f|f R U R' U' f'|F R U R' U' F'|R' U' R' F R F' U R|F' L' U' L U L' U' L U F|F R U R' U' R U R' U' F'|R B' R2 F R2 B R2 F' R|r' U r2 U' r2 U' r2 U r'|f R U R' U' R U R' U' f'|R' F' U' F U' R U R' U R|r' U2 R U R' U' R U R' U r|r U2 R' U' R U R' U' R U' r'|r U2 R' U' r' R2 U R' U' r U' r'|r U r' U R U' R' U R U' R' r U' r'|R U R' U' M' U R U' r'","Kasus dari tabel OLL.");
+TABS[4].p="21 kasus PLL dari tabel panduan: susun posisi akhir potongan lapisan atas hingga kubus selesai.";
+{const n="Ua|Ub|H|Z|Aa|Ab|E|T|F|V|Y|Ja|Jb|Rb|Ra|Gc|Gd|Ga|Gb|Nb|Na".split("|");
+const a="M2 U M U2 M' U M2|M2 U' M U2 M' U' M2|M2 U M2 U2 M2 U M2|M' U M2 U M2 U M' U2 M2 U'|x' R2 D2 R' U' R D2 R' U R'|x' R U' R D2 R' U R D2 R2|x' R U' R' D R U R' D' R U R' D R U' R' D'|R U R' U' R' F R2 U' R' U' R U R' F'|R' U' F' R U R' U' R' F R2 U' R' U' R U R' U R|R' U R U' R' f' U' R U2 R' U' R U' R' f R|F R U' R' U' R U R' F' R U R' U' R' F R F'|z U' R D' R2 U R' U' R2 U D R'|R U R' F' R U R' U' R' F R2 U' R' U'|R' U2 R U2 R' F R U R' U' R' F' R2 U'|R U' R' U' R U R D R' U' R D' R' U2 R' U'|R2 u' R U' R U R' u R2 f R' f'|R U R' y' R2 u' R U' R' U R' u R2|R2 U R' U R' U' R U' R2 U' D R' U R D' U|R' d' F R2 u R' U R U' R u' R2|R' U R U' R' F' U' F R U R' F R' F' R U' R|R U R' U R U R' F' R U R' U' R' F R2 U' R' U2 R U' R'".split("|");
+TABS[4].i=n.map((x,i)=>[x,a[i],"PLL "+String(i+1).padStart(2,"0")+" dari tabel panduan."]);}
+
+/* ---------- 3D ---------- */
+const cv=document.getElementById("cv");
+let renderer,scene,camera,cube,cubies=[];
+const COL={U:0xffd500,D:0xffffff,F:0x00a650,B:0x1c5cff,R:0xff7a00,L:0xd62a2a};
+try{
+renderer=new THREE.WebGLRenderer({canvas:cv,antialias:true,alpha:true});
+renderer.setPixelRatio(Math.min(devicePixelRatio||1,2));
+scene=new THREE.Scene();
+camera=new THREE.PerspectiveCamera(38,1,.1,100);camera.position.set(0,0,10.5);
+scene.add(new THREE.AmbientLight(0xffffff,.8));
+const dl=new THREE.DirectionalLight(0xffffff,.5);dl.position.set(3,5,6);scene.add(dl);
+cube=new THREE.Group();scene.add(cube);
+cube.rotation.set(.85,-.6,0);
+const body=new THREE.MeshLambertMaterial({color:0x0b0d12}),bg=new THREE.BoxGeometry(.96,.96,.96),sg=new THREE.PlaneGeometry(.8,.8);
+const mats={};for(const k in COL)mats[k]=new THREE.MeshLambertMaterial({color:COL[k]});
+const P=Math.PI/2;
+const FACES=[["R",[1,0,0],[0,P,0]],["L",[-1,0,0],[0,-P,0]],["U",[0,1,0],[-P,0,0]],["D",[0,-1,0],[P,0,0]],["F",[0,0,1],[0,0,0]],["B",[0,0,-1],[0,Math.PI,0]]];
+for(let x=-1;x<=1;x++)for(let y=-1;y<=1;y++)for(let z=-1;z<=1;z++){
+const g=new THREE.Group();g.add(new THREE.Mesh(bg,body));
+const c=[x,y,z];
+FACES.forEach(([n,d,r])=>{if(d[0]*x+d[1]*y+d[2]*z===1){const s=new THREE.Mesh(sg,mats[n]);s.userData={f:n,d:d};s.position.set(d[0]*.485,d[1]*.485,d[2]*.485);s.rotation.set(r[0],r[1],r[2]);g.add(s);}});
+g.position.set(x,y,z);g.userData.home=c;cube.add(g);cubies.push(g);}
+window.__tc=cube.clone(true);
+}catch(e){document.querySelector(".stage").insertAdjacentHTML("afterbegin",'<p class="warn">Browser tidak mendukung WebGL, jadi animasi 3D tidak dapat ditampilkan.</p>');}
+
+function fit(){if(!renderer)return;const w=cv.clientWidth,h=cv.clientHeight;if(!w||!h)return;renderer.setSize(w,h,false);camera.aspect=w/h;camera.updateProjectionMatrix();}
+new ResizeObserver(fit).observe(cv);fit();
+(function loop(){if(renderer)renderer.render(scene,camera);requestAnimationFrame(loop);})();
+
+/* drag untuk memutar sudut pandang */
+let drag=null,hold=null;
+cv.addEventListener("pointerdown",e=>{drag=[e.clientX,e.clientY];cv.setPointerCapture(e.pointerId);cv.style.cursor="grabbing";});
+cv.addEventListener("pointermove",e=>{if(!drag||!cube||hold)return;const dx=e.clientX-drag[0],dy=e.clientY-drag[1];drag=[e.clientX,e.clientY];
+const q=new THREE.Quaternion().setFromEuler(new THREE.Euler(dy*.01,dx*.01,0));cube.quaternion.premultiply(q);});
+cv.addEventListener("pointerup",()=>{drag=null;hold=null;cv.style.cursor="grab";});
+/* geser langsung di kubus untuk memutar satu lapisan */
+const ray=new THREE.Raycaster(),mouse=new THREE.Vector2();
+cv.addEventListener("pointerdown",e=>{
+if(!cube)return;const r=cv.getBoundingClientRect();
+mouse.set((e.clientX-r.left)/r.width*2-1,-((e.clientY-r.top)/r.height)*2+1);ray.setFromCamera(mouse,camera);
+const hit=ray.intersectObjects(cubies,true)[0];if(!hit)return;
+const ln=hit.face.normal.clone().transformDirection(hit.object.matrixWorld).applyQuaternion(cube.quaternion.clone().invert());
+ln.set(Math.round(ln.x),Math.round(ln.y),Math.round(ln.z));
+hold={c:hit.object.parent,n:ln,pt:hit.point.clone(),x:e.clientX,y:e.clientY,done:false};});
+cv.addEventListener("pointermove",e=>{
+if(!hold||hold.done)return;const dx=e.clientX-hold.x,dy=e.clientY-hold.y;
+if(Math.hypot(dx,dy)<14)return;hold.done=true;layerMove(hold,dx,dy);});
+function layerMove(h,dx,dy){
+const r=cv.getBoundingClientRect(),p=h.c.position;
+const scr=v=>{const q=v.clone().project(camera);return [(q.x+1)/2*r.width,(1-q.y)/2*r.height];};
+let best=null;
+[[1,0,0],[0,1,0],[0,0,1]].forEach((a,ai)=>{
+const av=new THREE.Vector3(a[0],a[1],a[2]);if(Math.abs(av.dot(h.n))>.5)return;
+const t=new THREE.Vector3().crossVectors(av,h.n).applyQuaternion(cube.quaternion).multiplyScalar(.6);
+const s0=scr(h.pt),s1=scr(h.pt.clone().add(t)),vx=s1[0]-s0[0],vy=s1[1]-s0[1];
+const dot=(vx*dx+vy*dy)/(Math.hypot(vx,vy)||1);
+if(!best||Math.abs(dot)>Math.abs(best.dot))best={ai,dot};});
+if(!best)return;
+const ai=best.ai,sign=best.dot>0?1:-1,layer=Math.round([p.x,p.y,p.z][ai]);
+const L=[["R","L","M"],["U","D","E"],["F","B","S"]][ai];
+const f=layer==1?L[0]:layer==-1?L[1]:L[2];
+manual(f+(sign*SPEC[f][2]<0?"'":""));}
+function manual(t){
+if(document.body.dataset.page=="puzzle")pzMove(t);
+else if(!busy&&!playing){busy=true;turn(parse(t)[0],220).then(()=>{busy=false;});}}
+
+/* ---------- gerakan ---------- */
+const SPEC={R:["x",v=>v==1,-1],L:["x",v=>v==-1,1],U:["y",v=>v==1,-1],D:["y",v=>v==-1,1],F:["z",v=>v==1,-1],B:["z",v=>v==-1,1],
+r:["x",v=>v>=0,-1],l:["x",v=>v<=0,1],u:["y",v=>v>=0,-1],d:["y",v=>v<=0,1],f:["z",v=>v>=0,-1],b:["z",v=>v<=0,1],
+M:["x",v=>v==0,1],E:["y",v=>v==0,1],S:["z",v=>v==0,-1],x:["x",()=>true,-1],y:["y",()=>true,-1],z:["z",()=>true,-1]};
+const parse=s=>s.trim().split(/\s+/).map(t=>({n:t,f:t[0],k:t.includes("2")?2:t.endsWith("'")?-1:1}));
+const inv=m=>({n:m.k==2?m.n:m.n.endsWith("'")?m.f:m.f+"'",f:m.f,k:-m.k});
+
+const _mc=()=>cube,_ms=()=>cubies;
+function turn(m,dur,G,C){return new Promise(res=>{
+const cube=G||_mc(),cubies=C||_ms();
+if(!cube){res();return;}
+const [ax,pred,dir]=SPEC[m.f];
+const layer=cubies.filter(c=>pred(Math.round(c.position[ax])));
+const piv=new THREE.Group();cube.add(piv);layer.forEach(c=>piv.attach(c));
+const tot=dir*m.k*Math.PI/2;
+const fin=()=>{piv.rotation[ax]=tot;piv.updateMatrixWorld(true);
+layer.forEach(c=>{cube.attach(c);c.position.round();
+const mm=new THREE.Matrix4().makeRotationFromQuaternion(c.quaternion);
+mm.elements=mm.elements.map(Math.round);c.quaternion.setFromRotationMatrix(mm);});
+cube.remove(piv);res();};
+if(!dur){fin();return;}
+const t0=performance.now();
+(function step(){const p=Math.min(1,(performance.now()-t0)/dur);
+piv.rotation[ax]=tot*(p*p*(3-2*p));
+if(p<1)requestAnimationFrame(step);else fin();})();
+});}
+
+/* ---------- pemutar ---------- */
+const $=id=>document.getElementById(id);
+let alg=[],idx=0,playing=false,busy=false,token=0,cur=null,speed=1;
+const sleep=ms=>new Promise(r=>setTimeout(r,ms));
+
+function resetCube(){cubies.forEach(c=>{c.position.set(...c.userData.home);c.quaternion.identity();});}
+async function load(it,setup){
+token++;playing=false;busy=false;
+resetCube();alg=parse(it[1]);idx=0;cur={it,setup};
+$("cap").textContent=it[0]+" — "+it[2]+" Tekan Putar untuk menjalankan.";
+if(setup)for(const m of alg.slice().reverse())turn(inv(m),0);
+draw();
+}
+function draw(){
+$("not").innerHTML=alg.map((m,i)=>'<span class="'+(i==idx-1?"cur":i<idx?"done":"")+'">'+m.n+"</span>").join(" ");
+const cs=$("not").querySelector(".cur");if(cs)cs.scrollIntoView({block:"nearest",inline:"center"});
+$("bPlay").textContent=playing?"Jeda":"Putar";
+}
+async function step(d){
+if(busy)return;busy=true;const my=token;
+if(d>0&&idx<alg.length){await turn(alg[idx],(alg[idx].k==2?680:460)/speed);if(my==token)idx++;}
+else if(d<0&&idx>0){idx--;await turn(inv(alg[idx]),(alg[idx].k==2?680:460)/speed);}
+busy=false;draw();
+}
+async function play(){
+if(!cur)return;
+if(playing){playing=false;draw();return;}
+if(idx>=alg.length)await load(cur.it,cur.setup);
+playing=true;draw();const my=token;
+while(playing&&my==token&&idx<alg.length){await step(1);await sleep(20/speed);}
+if(my==token){playing=false;draw();}
+}
+const VQ=cube?[new THREE.Quaternion().setFromEuler(new THREE.Euler(.85,-.6,0)),new THREE.Quaternion().setFromEuler(new THREE.Euler(1.3,0,0))]:[];
+let vi=0;
+function setView(i){if(!cube)return;vi=i;const from=cube.quaternion.clone(),t0=performance.now();
+(function s(){const p=Math.min(1,(performance.now()-t0)/600),e=p*p*(3-2*p);cube.quaternion.copy(from).slerp(VQ[i],e);if(p<1)requestAnimationFrame(s);})();
+$("bView").textContent=i?"Miring":"Atas";}
+$("bView").onclick=()=>setView(vi?0:1);
+$("bPlay").onclick=play;
+$("bReset").onclick=()=>cur&&load(cur.it,cur.setup);
+$("bNext").onclick=()=>{playing=false;step(1);};
+$("bBack").onclick=()=>{playing=false;step(-1);};
+$("sp").oninput=e=>{speed=+e.target.value;};
+
+let TR,TS,TCAM;
+function thumb(alg,setup){
+const tc=window.__tc;if(!tc||!TR)return "";
+const cs=tc.children.filter(o=>o.userData.home);
+cs.forEach(c=>{c.position.set(...c.userData.home);c.quaternion.identity();});
+if(setup)for(const m of parse(alg).reverse())turn(inv(m),0,tc,cs);
+TR.render(TS,TCAM);return TR.domElement.toDataURL();}
+function fillThumbs(n){
+const tc=window.__tc,T=TABS[n],imgs=$("pane").querySelectorAll(".th");
+if(!tc)return;
+if(!T.s){imgs.forEach(i=>i.style.display="none");return;}
+if(!TR){TR=new THREE.WebGLRenderer({antialias:true,alpha:true,preserveDrawingBuffer:true});TR.setPixelRatio(1);TR.setSize(176,176);
+TS=new THREE.Scene();TS.add(new THREE.AmbientLight(0xffffff,.8));const l=new THREE.DirectionalLight(0xffffff,.5);l.position.set(3,5,6);TS.add(l);
+TCAM=new THREE.PerspectiveCamera(38,1,.1,100);TCAM.position.set(0,0,9.8);TS.add(tc);}
+let k=0;
+(function nx(){if(k>=imgs.length||tabIdx!=n)return;
+tc.rotation.set(...(n==3?[1.1,-.4,0]:[.85,-.6,0]));
+imgs[k].src=thumb(T.i[k][1],T.s);k++;setTimeout(nx,0);})();}
+/* ---------- riwayat tersimpan ---------- */
+let H={solved:{},failed:{}};
+try{const r=JSON.parse(localStorage.getItem("cfop-h")||"{}");H.solved=r.solved||{};H.failed=r.failed||{};}catch(e){}
+const save=()=>{try{localStorage.setItem("cfop-h",JSON.stringify(H));}catch(e){}};
+const TOTAL=TABS.slice(2,5).reduce((a,t)=>a+t.i.length,0);
+const key=(t,i)=>t+":"+i;
+const nameOf=k=>{const [t,i]=k.split(":");return TABS[+t].i[+i];};
+const stat=()=>{$("stat").textContent=Object.keys(H.solved).length+" dari "+TOTAL+" selesai";};
+const ago=ts=>new Date(ts).toLocaleDateString("id-ID",{day:"numeric",month:"short"});
+const KIND=["","","F2L","OLL","PLL"];
+
+/* ---------- navigasi ---------- */
+let tabIdx=0,pz=null,pq=Promise.resolve(),lastKey="";
+function go(p,skip){
+document.body.dataset.page=p;token++;playing=false;
+document.querySelectorAll("#nav button").forEach(b=>b.setAttribute("aria-current",b.dataset.p==p?"page":"false"));
+if(p=="belajar"){if(cur&&!skip)load(cur.it,cur.setup);showTab(tabIdx);}
+else if(p=="puzzle")pzPage();else histPage();
+window.scrollTo(0,0);}
+
+/* ---------- halaman belajar ---------- */
+function showTab(n){
+tabIdx=n;const T=TABS[n];
+$("pg").innerHTML='<div class="chips">'+TABS.map((t,i)=>'<button class="chip'+(i==n?" on":"")+'" data-tab="'+i+'">'+t.t+"</button>").join("")+'</div><div class="card"><h2>'+T.h+"</h2><p>"+T.p+"</p>"+(T.o?"<ol>"+T.o.map(s=>"<li>"+s+"</li>").join("")+"</ol>":"")+'</div><div class="list" id="pane">'+
+T.i.map((r,i)=>{const k=key(n,i);return '<button class="row" data-row="'+i+'" aria-pressed="'+(cur&&cur.it===r)+'"><img class="th" alt="" width="76" height="76"><span class="tx"><b>'+r[0]+(H.solved[k]?'<em class="ok">Selesai</em>':H.failed[k]?'<em class="no">Belum bisa</em>':"")+"</b><code>"+r[1]+"</code><small>"+r[2]+"</small></span></button>";}).join("")+"</div>";
+fillThumbs(n);}
+async function rowClick(b){
+const T=TABS[tabIdx];
+$("pane").querySelectorAll(".row").forEach(x=>x.setAttribute("aria-pressed","false"));
+b.setAttribute("aria-pressed","true");
+await load(T.i[+b.dataset.row],T.s);setView(tabIdx==3?1:0);}
+function openCase(t,i){
+tabIdx=t;go("belajar",1);
+const b=$("pane").children[i];if(b){rowClick(b);b.scrollIntoView({block:"center"});}}
+
+/* ---------- halaman teka-teki ---------- */
+function isSolved(){
+const m={};
+for(const c of cubies)for(const s of c.children){const d=s.userData.d;if(!d)continue;
+const v=new THREE.Vector3(d[0],d[1],d[2]).applyQuaternion(c.quaternion);
+const k=Math.round(v.x)+","+Math.round(v.y)+","+Math.round(v.z);(m[k]=m[k]||new Set()).add(s.userData.f);}
+return Object.values(m).every(s=>s.size==1);}
+function pzNew(){
+const pool=[];for(let t=2;t<=4;t++)TABS[t].i.forEach((_,i)=>pool.push([t,i]));
+let c;do{c=pool[Math.random()*pool.length|0];}while(key(c[0],c[1])==lastKey);
+lastKey=key(c[0],c[1]);
+pz={t:c[0],i:c[1],k:lastKey,it:TABS[c[0]].i[c[1]],hist:[],n:0,ap:0,done:0};
+pz.limit=Math.max(12,parse(pz.it[1]).length*2);
+pzShow();}
+function pzShow(){
+const P=pz;token++;playing=false;pq=Promise.resolve();
+resetCube();parse(P.it[1]).reverse().forEach(m=>turn(inv(m),0));
+P.hist.forEach(m=>turn(m,0));P.n=P.ap=P.hist.length;
+setView(P.t==3?1:0);pzRender();pzCount();}
+function pzPage(){pz?pzShow():pzNew();}
+const BASIC="U U' R R' F F' L L' D D' B B'".split(" "),MORE="r r' l l' u u' d d' f f' b b' M M' E E' S S' x x' y y' z z'".split(" ");
+const padH=a=>'<div class="pad">'+a.map(m=>'<button data-m="'+m+'">'+m+"</button>").join("")+"</div>";
+function pzRender(){
+const P=pz;let h='<div class="card"><h2>Teka-teki acak</h2><p>Kubus di atas adalah satu kasus <b>'+KIND[P.t]+"</b>. Selesaikan dengan rumus yang tepat sebelum jatah gerakan habis. Geser langsung di kubus untuk memutar satu lapisan, atau pakai tombol di bawah.</p>"+
+'<div class="mrow" id="pzc"></div><div class="meter"><i id="pzb"></i></div></div>';
+if(P.done==1)h+='<div class="res win"><b>Berhasil!</b><p>Kamu menyelesaikan '+P.it[0]+" dengan "+P.n+" gerakan. Rumus aslinya:</p><code>"+P.it[1]+'</code><div class="acts"><button class="btn" data-a="next">Teka-teki berikutnya</button></div></div>';
+else if(P.done==-1)h+='<div class="res lose"><b>Belum bisa? Belajar dulu</b><p>Kasus ini adalah '+P.it[0]+". Pelajari rumusnya, lalu coba teka-teki lain.</p>"+'<div class="acts"><button class="btn" data-a="learn">Belajar rumus ini</button><button class="btn ghost" data-a="next">Teka-teki lain</button></div></div>';
+else h+=padH(BASIC)+"<details><summary>Gerakan lanjutan</summary>"+padH(MORE)+'</details><div class="acts"><button class="btn ghost" data-a="undo">Urungkan</button><button class="btn ghost" data-a="giveup">Menyerah</button></div>';
+$("pg").innerHTML=h;}
+function pzCount(){
+const P=pz;if(!P)return;
+$("cap").textContent="Teka-teki "+KIND[P.t]+": gerakan "+P.n+" dari "+P.limit;
+const c=$("pzc");if(c){c.textContent="Gerakan "+P.n+" dari "+P.limit;$("pzb").style.width=(100*P.n/P.limit)+"%";}}
+function pzMove(t){
+const P=pz;if(!P||P.done||P.n>=P.limit)return;
+const mv=parse(t)[0];P.hist.push(mv);P.n++;pzCount();
+pq=pq.then(()=>pz===P?turn(mv,220):0).then(()=>{if(pz!==P||P.done)return;P.ap++;if(isSolved())pzWin();else if(P.ap>=P.limit)pzFail();});}
+function pzUndo(){
+const P=pz;if(!P||P.done||!P.hist.length)return;
+const mv=P.hist.pop();P.n--;pzCount();
+pq=pq.then(()=>pz===P?turn(inv(mv),220):0).then(()=>{if(pz===P)P.ap--;});}
+function pzWin(){const P=pz;P.done=1;H.solved[P.k]=Date.now();delete H.failed[P.k];save();stat();pzRender();pzCount();}
+function pzFail(){const P=pz;if(P.done)return;P.done=-1;
+if(!H.solved[P.k])H.failed[P.k]={ts:Date.now(),n:((H.failed[P.k]||{}).n||0)+1};
+save();stat();pzRender();pzCount();}
+
+/* ---------- halaman riwayat ---------- */
+function histPage(){
+const f=Object.entries(H.failed).sort((a,b)=>b[1].ts-a[1].ts),s=Object.entries(H.solved).sort((a,b)=>b[1]-a[1]);
+const row=(k,sub,btn)=>{const it=nameOf(k);return '<div class="hrow"><div><b>'+it[0]+"</b><code>"+it[1]+"</code><small>"+sub+'</small></div><button class="btn sm" data-a="open:'+k+'">'+btn+"</button></div>";};
+$("pg").innerHTML='<div class="card"><h2>Riwayat</h2><div class="sum"><div><b>'+s.length+"</b><span>selesai</span></div><div><b>"+f.length+"</b><span>belum selesai</span></div><div><b>"+(TOTAL-s.length)+"</b><span>tersisa</span></div></div></div>"+
+"<h3>Belum terselesaikan</h3>"+(f.length?f.map(([k,v])=>row(k,"Gagal "+v.n+"x, terakhir "+ago(v.ts),"Belajar")).join(""):'<p class="empty">Belum ada. Coba teka-teki dulu.</p>')+
+"<h3>Rumus yang sudah diselesaikan</h3>"+(s.length?s.map(([k,v])=>row(k,"Selesai "+ago(v),"Lihat")).join(""):'<p class="empty">Belum ada yang diselesaikan.</p>')+
+(f.length||s.length?'<div class="acts"><button class="btn ghost" data-a="clearh">Hapus riwayat</button></div>':"");}
+
+/* ---------- event ---------- */
+$("nav").onclick=e=>{const b=e.target.closest("button");if(b)go(b.dataset.p);};
+$("pg").addEventListener("click",e=>{
+const b=e.target.closest("button");if(!b)return;const d=b.dataset;
+if(d.m)pzMove(d.m);
+else if(d.tab!=null)showTab(+d.tab);
+else if(d.row!=null)rowClick(b);
+else if(d.a){const a=d.a;
+if(a=="next")pzNew();else if(a=="giveup")pzFail();else if(a=="undo")pzUndo();
+else if(a=="learn")openCase(pz.t,pz.i);
+else if(a=="clearh"){H={solved:{},failed:{}};save();stat();histPage();}
+else if(a.startsWith("open:")){const [t,i]=a.slice(5).split(":");openCase(+t,+i);}}});
+stat();go("belajar",1);
+load(TABS[0].i[0],0).then(play);
+</script>
+</body>
+</html>
