@@ -31,9 +31,11 @@ button:focus-visible{outline:3px solid var(--acc);outline-offset:2px}
 #not span{display:inline-block;padding:2px 6px;border-radius:6px;color:#a2abc2}
 #not span.done{color:var(--ink)}
 #not span.cur{background:var(--acc);color:#fff}
-body[data-page=puzzle] .ctl,body[data-page=puzzle] #not{display:none}
-body[data-page=puzzle] #cap{padding-bottom:10px}
-body[data-page=riwayat] .stage{display:none}
+body[data-page=puzzle] .ctl,body[data-page=puzzle] #not,body[data-page=solve] .ctl,body[data-page=solve] #not{display:none}
+body[data-page=puzzle] #cap,body[data-page=solve] #cap{padding-bottom:10px}
+#vt{display:none;font-weight:800;font-size:30px;font-variant-numeric:tabular-nums;color:var(--acc)}
+body[data-page=solve] .stage.big #vt{display:block}
+body[data-page=riwayat] .stage,body[data-page=timer] .stage{display:none}
 .chips{display:flex;gap:8px;overflow-x:auto;padding:2px 2px 12px}
 .chip{flex:none;border:1px solid var(--line);background:var(--card);border-radius:99px;padding:8px 16px;min-height:40px;font-weight:700;box-shadow:0 2px 6px rgba(52,78,180,.07)}
 .chip.on{background:var(--acc);border-color:var(--acc);color:#fff}
@@ -76,19 +78,45 @@ summary{cursor:pointer;font-weight:700;color:var(--acc);padding:6px 0}
 .sum span{font-size:13px;color:var(--mute)}
 .hrow{display:flex;gap:10px;align-items:center;justify-content:space-between;background:var(--card);border:1px solid var(--line);border-radius:16px;padding:12px;margin-bottom:8px}
 .hrow>div{min-width:0}
+.hb{display:grid;gap:6px;flex:none}
 .empty{color:var(--mute);margin:0 0 8px}
-.bnav{position:fixed;left:0;right:0;bottom:0;z-index:20;display:grid;grid-template-columns:repeat(3,1fr);gap:10px;max-width:520px;margin:0 auto;padding:0 12px calc(10px + env(safe-area-inset-bottom,0px));pointer-events:none}
-.bnav button{pointer-events:auto;display:flex;flex-direction:column;align-items:center;gap:2px;border:1px solid var(--line);background:var(--card);border-radius:18px;padding:8px 4px;min-height:58px;font-size:12px;font-weight:700;color:var(--mute);box-shadow:0 6px 18px rgba(52,78,180,.16)}
+.bnav{position:fixed;left:0;right:0;bottom:0;z-index:20;display:grid;grid-template-columns:repeat(5,1fr);gap:6px;max-width:600px;margin:0 auto;padding:0 12px calc(10px + env(safe-area-inset-bottom,0px));pointer-events:none}
+.bnav button{pointer-events:auto;display:flex;flex-direction:column;align-items:center;gap:2px;border:1px solid var(--line);background:var(--card);border-radius:18px;padding:8px 1px;min-height:58px;font-size:11px;font-weight:700;color:var(--mute);box-shadow:0 6px 18px rgba(52,78,180,.16)}
 .bnav button[aria-current="page"]{background:var(--acc);border-color:var(--acc);color:#fff}
 .bnav svg{width:22px;height:22px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
-@media (min-width:860px){.app{grid-template-columns:420px minmax(0,1fr);align-items:start}.stage{top:16px}#cv{height:360px}body[data-page=riwayat] .app{grid-template-columns:minmax(0,720px);justify-content:center}}
+@media (min-width:860px){.app{grid-template-columns:420px minmax(0,1fr);align-items:start}.stage{top:16px}#cv{height:360px}body[data-page=riwayat] .app,body[data-page=timer] .app{grid-template-columns:minmax(0,720px);justify-content:center}}
+.bigbtn{position:absolute;top:8px;right:8px;z-index:2;width:40px;height:40px;border:1px solid var(--line);border-radius:12px;background:rgba(255,255,255,.92);display:grid;place-items:center;color:var(--acc)}
+.bigbtn svg{width:20px;height:20px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.modebtn{position:absolute;top:8px;left:8px;z-index:2;height:40px;padding:0 12px;border:1px solid var(--line);border-radius:12px;background:rgba(255,255,255,.92);font-weight:700;font-size:13px;color:var(--acc)}
+.bigbar{display:none;justify-content:space-between;align-items:center;padding:10px 12px}
+.stage.big{position:fixed;inset:0;top:0;z-index:50;border-radius:0;border:0;display:flex;flex-direction:column;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);background:linear-gradient(165deg,#e8eeff,#fff 75%)}
+.stage.big .bigbar{display:flex;order:-1}
+.stage.big #cv{flex:1;height:auto;min-height:0}
+.stage.big .ctl,.stage.big #not,.stage.big .bigbtn{display:none}
+.stage.big #cap{padding:8px 14px 14px;text-align:center;font-size:14px}
+.tpad{user-select:none;-webkit-user-select:none;touch-action:none;background:var(--card);border:2px solid var(--line);border-radius:24px;min-height:32vh;display:grid;place-content:center;text-align:center;gap:8px;margin-bottom:12px;box-shadow:0 4px 16px rgba(52,78,180,.07)}
+#ttime{font-weight:800;font-size:clamp(52px,17vw,88px);line-height:1;font-variant-numeric:tabular-nums;letter-spacing:-.02em}
+.tpad small{color:var(--mute);font-size:14px}
+.tpad[data-s=hold]{background:#fff0f0;border-color:#ffb4b8}
+.tpad[data-s=ready]{background:#e6f8ef;border-color:#7fdcb2}
+.tpad[data-s=run]{background:var(--acc2);border-color:var(--acc)}
+.tpad[data-s=insp]{background:#fff8e6;border-color:#ffd77a}
+.sum.four{grid-template-columns:repeat(4,1fr);margin-bottom:6px}
+.sum.four b{font-size:17px}
+.scr small{color:var(--mute);font-size:13px}
+.scr code{display:block;font:500 15px "IBM Plex Mono",ui-monospace,monospace;overflow-wrap:anywhere;margin:2px 0 10px}
+body.bigon{overflow:hidden}
+body:not([data-page=puzzle]) #bUndo{visibility:hidden}
 </style>
 </head>
 <body data-page="belajar">
 <header class="top"><div class="brand"><span class="logo"></span>CFOP Lab</div><span class="stat" id="stat"></span></header>
 <main class="app">
 <section class="stage" id="stage" aria-label="Kubus 3D">
-<canvas id="cv" aria-label="Kubus Rubik 3D. Geser untuk memutar sudut pandang."></canvas>
+<canvas id="cv" aria-label="Kubus Rubik 3D. Geser stiker untuk memutar lapisan, geser area kosong untuk memutar sudut pandang."></canvas>
+<button class="modebtn" id="bMode">Geser: Tampilan</button>
+<button class="bigbtn" id="bBig" aria-label="Perbesar layar"><svg viewBox="0 0 24 24"><path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5"/></svg></button>
+<div class="bigbar"><button class="btn sm" id="bClose">Tutup</button><span id="vt"></span><button class="btn sm ghost" id="bUndo">Urungkan</button></div>
 <div class="ctl">
 <button id="bReset">Ulang</button>
 <button id="bBack">Mundur</button>
@@ -105,6 +133,8 @@ summary{cursor:pointer;font-weight:700;color:var(--acc);padding:6px 0}
 <nav class="bnav" id="nav" aria-label="Halaman">
 <button data-p="belajar" aria-current="page"><svg viewBox="0 0 24 24"><path d="M4 5.5A2.5 2.5 0 0 1 6.5 3H20v16H6.5A2.5 2.5 0 0 0 4 21.5zM4 5.5v16"/></svg>Belajar</button>
 <button data-p="puzzle" aria-current="false"><svg viewBox="0 0 24 24"><path d="M12 3l8 4.5v9L12 21l-8-4.5v-9zM12 12l8-4.5M12 12v9M12 12L4 7.5"/></svg>Teka-teki</button>
+<button data-p="solve" aria-current="false"><svg viewBox="0 0 24 24"><path d="M16 3h5v5M4 20L21 3M21 16v5h-5M15 15l6 6M4 4l5 5"/></svg>Acak</button>
+<button data-p="timer" aria-current="false"><svg viewBox="0 0 24 24"><circle cx="12" cy="13" r="8"/><path d="M12 9v4l2 2M9 3h6"/></svg>Stopwatch</button>
 <button data-p="riwayat" aria-current="false"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>Riwayat</button>
 </nav>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
@@ -135,69 +165,121 @@ TABS[4].i=n.map((x,i)=>[x,a[i],"PLL "+String(i+1).padStart(2,"0")+" dari tabel p
 
 /* ---------- 3D ---------- */
 const cv=document.getElementById("cv");
-let renderer,scene,camera,cube,cubies=[];
-const COL={U:0xffd500,D:0xffffff,F:0x00a650,B:0x1c5cff,R:0xff7a00,L:0xd62a2a};
+let renderer,scene,camera,cube,cubies=[],moving=0,flipping=false;
+const COL={U:0xffef48,D:0xfff7ff,F:0x82ca38,B:0x41aac8,R:0xff8c0a,L:0xef3923};
+const POL=Math.acos(1/Math.sqrt(3)),cam={p:POL,t:POL};
+function placeCam(){const s=Math.sin(cam.p),r=10.5;camera.position.set(r*s*.7071,r*Math.cos(cam.p),r*s*.7071);camera.lookAt(0,0,0);}
 try{
 renderer=new THREE.WebGLRenderer({canvas:cv,antialias:true,alpha:true});
 renderer.setPixelRatio(Math.min(devicePixelRatio||1,2));
 scene=new THREE.Scene();
-camera=new THREE.PerspectiveCamera(38,1,.1,100);camera.position.set(0,0,10.5);
-scene.add(new THREE.AmbientLight(0xffffff,.8));
-const dl=new THREE.DirectionalLight(0xffffff,.5);dl.position.set(3,5,6);scene.add(dl);
+camera=new THREE.PerspectiveCamera(38,1,.1,100);placeCam();
+scene.add(new THREE.AmbientLight(0xffffff,.69));
+const l1=new THREE.DirectionalLight(0xffffff,.36);l1.position.set(1.5,5,3);scene.add(l1);
+const l2=new THREE.DirectionalLight(0xffffff,.19);l2.position.set(-1.5,-5,-3);scene.add(l2);
 cube=new THREE.Group();scene.add(cube);
-cube.rotation.set(.85,-.6,0);
-const body=new THREE.MeshLambertMaterial({color:0x0b0d12}),bg=new THREE.BoxGeometry(.96,.96,.96),sg=new THREE.PlaneGeometry(.8,.8);
+const rr=(w,r)=>{const h=w/2,s=new THREE.Shape();s.moveTo(-h,-h+r);s.lineTo(-h,h-r);s.quadraticCurveTo(-h,h,-h+r,h);s.lineTo(h-r,h);s.quadraticCurveTo(h,h,h,h-r);s.lineTo(h,-h+r);s.quadraticCurveTo(h,-h,h-r,-h);s.lineTo(-h+r,-h);s.quadraticCurveTo(-h,-h,-h,-h+r);return s;};
+const bg=new THREE.ExtrudeBufferGeometry(rr(.8,.16),{depth:.8,bevelEnabled:true,bevelThickness:.08,bevelSize:.08,bevelSegments:2,curveSegments:4});bg.center();
+const sg=new THREE.ExtrudeBufferGeometry(rr(.82,.14),{depth:.012,bevelEnabled:false,curveSegments:3});
+const body=new THREE.MeshLambertMaterial({color:0x08101a});
 const mats={};for(const k in COL)mats[k]=new THREE.MeshLambertMaterial({color:COL[k]});
 const P=Math.PI/2;
 const FACES=[["R",[1,0,0],[0,P,0]],["L",[-1,0,0],[0,-P,0]],["U",[0,1,0],[-P,0,0]],["D",[0,-1,0],[P,0,0]],["F",[0,0,1],[0,0,0]],["B",[0,0,-1],[0,Math.PI,0]]];
 for(let x=-1;x<=1;x++)for(let y=-1;y<=1;y++)for(let z=-1;z<=1;z++){
 const g=new THREE.Group();g.add(new THREE.Mesh(bg,body));
-const c=[x,y,z];
-FACES.forEach(([n,d,r])=>{if(d[0]*x+d[1]*y+d[2]*z===1){const s=new THREE.Mesh(sg,mats[n]);s.userData={f:n,d:d};s.position.set(d[0]*.485,d[1]*.485,d[2]*.485);s.rotation.set(r[0],r[1],r[2]);g.add(s);}});
-g.position.set(x,y,z);g.userData.home=c;cube.add(g);cubies.push(g);}
+FACES.forEach(([n,d,r])=>{if(d[0]*x+d[1]*y+d[2]*z===1){const s=new THREE.Mesh(sg,mats[n]);s.userData={f:n,d:d};s.position.set(d[0]*.48,d[1]*.48,d[2]*.48);s.rotation.set(r[0],r[1],r[2]);g.add(s);}});
+g.position.set(x,y,z);g.userData.home=[x,y,z];cube.add(g);cubies.push(g);}
 window.__tc=cube.clone(true);
 }catch(e){document.querySelector(".stage").insertAdjacentHTML("afterbegin",'<p class="warn">Browser tidak mendukung WebGL, jadi animasi 3D tidak dapat ditampilkan.</p>');}
 
 function fit(){if(!renderer)return;const w=cv.clientWidth,h=cv.clientHeight;if(!w||!h)return;renderer.setSize(w,h,false);camera.aspect=w/h;camera.updateProjectionMatrix();}
 new ResizeObserver(fit).observe(cv);fit();
-(function loop(){if(renderer)renderer.render(scene,camera);requestAnimationFrame(loop);})();
+(function loop(){
+if(renderer){if(Math.abs(cam.t-cam.p)>.001){cam.p+=(cam.t-cam.p)*.12;placeCam();}renderer.render(scene,camera);}
+requestAnimationFrame(loop);})();
 
-/* drag untuk memutar sudut pandang */
-let drag=null,hold=null;
-cv.addEventListener("pointerdown",e=>{drag=[e.clientX,e.clientY];cv.setPointerCapture(e.pointerId);cv.style.cursor="grabbing";});
-cv.addEventListener("pointermove",e=>{if(!drag||!cube||hold)return;const dx=e.clientX-drag[0],dy=e.clientY-drag[1];drag=[e.clientX,e.clientY];
-const q=new THREE.Quaternion().setFromEuler(new THREE.Euler(dy*.01,dx*.01,0));cube.quaternion.premultiply(q);});
-cv.addEventListener("pointerup",()=>{drag=null;hold=null;cv.style.cursor="grab";});
-/* geser langsung di kubus untuk memutar satu lapisan */
-const ray=new THREE.Raycaster(),mouse=new THREE.Vector2();
+/* ---------- geser: putar kubus 90 derajat atau putar satu lapisan ---------- */
+let mode="view",st=null;
+const ray=new THREE.Raycaster(),mouse=new THREE.Vector2(),AX=["x","y","z"];
+function canMove(){
+const pg=document.body.dataset.page;
+if(pg=="puzzle")return !!pz&&!pz.done&&pz.n<pz.limit;
+if(pg=="solve")return !!vs&&(vs.state=="armed"||vs.state=="run")&&$("stage").classList.contains("big");
+return !playing&&!busy;}
 cv.addEventListener("pointerdown",e=>{
-if(!cube)return;const r=cv.getBoundingClientRect();
+if(!cube||moving||flipping||st)return;
+cv.setPointerCapture(e.pointerId);
+const r=cv.getBoundingClientRect();let hit=null;
+if(mode=="layer"&&canMove()){
 mouse.set((e.clientX-r.left)/r.width*2-1,-((e.clientY-r.top)/r.height)*2+1);ray.setFromCamera(mouse,camera);
-const hit=ray.intersectObjects(cubies,true)[0];if(!hit)return;
-const ln=hit.face.normal.clone().transformDirection(hit.object.matrixWorld).applyQuaternion(cube.quaternion.clone().invert());
-ln.set(Math.round(ln.x),Math.round(ln.y),Math.round(ln.z));
-hold={c:hit.object.parent,n:ln,pt:hit.point.clone(),x:e.clientX,y:e.clientY,done:false};});
+hit=ray.intersectObjects(cubies,true)[0]||null;}
+st={x:e.clientX,y:e.clientY,hit:hit,m:"pend",left:e.clientX-r.left<r.width/2,hist:[]};});
 cv.addEventListener("pointermove",e=>{
-if(!hold||hold.done)return;const dx=e.clientX-hold.x,dy=e.clientY-hold.y;
-if(Math.hypot(dx,dy)<14)return;hold.done=true;layerMove(hold,dx,dy);});
-function layerMove(h,dx,dy){
-const r=cv.getBoundingClientRect(),p=h.c.position;
+if(!st)return;
+const dx=e.clientX-st.x,dy=e.clientY-st.y;
+if(st.m=="pend"){if(Math.hypot(dx,dy)<10)return;if(st.hit)layerStart(dx,dy);else flipStart(dx,dy);}
+if(st.m=="layer"){
+const proj=dx*st.tv[0]+dy*st.tv[1],n=performance.now();
+st.th=proj/st.ppu*.5;st.piv.rotation[AX[st.ai]]=st.th;
+st.hist.push([n,proj]);while(st.hist.length>1&&n-st.hist[0][0]>140)st.hist.shift();}});
+function endDrag(){const S=st;st=null;if(S&&S.m=="layer")layerEnd(S);}
+cv.addEventListener("pointerup",endDrag);cv.addEventListener("pointercancel",endDrag);
+
+function flipStart(dx,dy){
+st.m="done";let ax,sg;
+if(Math.abs(dx)>=Math.abs(dy)){ax=1;sg=dx>0?1:-1;}
+else if(st.left){ax=0;sg=dy>0?1:-1;}
+else{ax=2;sg=dy>0?-1:1;}
+flipCube(ax,sg);}
+function flipCube(ax,sg){
+flipping=true;
+const q0=cube.quaternion.clone(),v=new THREE.Vector3();v.setComponent(ax,1);
+const q1=new THREE.Quaternion().setFromAxisAngle(v,sg*Math.PI/2).multiply(q0),t0=performance.now();
+(function s(){const p=Math.min(1,(performance.now()-t0)/260),e=1-Math.pow(1-p,3);
+cube.quaternion.copy(q0).slerp(q1,e);
+if(p<1){requestAnimationFrame(s);return;}
+const m=new THREE.Matrix4().makeRotationFromQuaternion(q1);m.elements=m.elements.map(Math.round);
+cube.quaternion.setFromRotationMatrix(m);flipping=false;})();}
+
+function layerStart(dx,dy){
+const h=st.hit,c=h.object.parent,r=cv.getBoundingClientRect();
+const rel=cube.worldToLocal(h.point.clone()).sub(c.position);
+const ax=Math.abs(rel.x),ay=Math.abs(rel.y),az=Math.abs(rel.z);
+const na=ax>=ay&&ax>=az?0:ay>=az?1:2;
+const n=new THREE.Vector3();n.setComponent(na,rel.getComponent(na)>=0?1:-1);
 const scr=v=>{const q=v.clone().project(camera);return [(q.x+1)/2*r.width,(1-q.y)/2*r.height];};
-let best=null;
-[[1,0,0],[0,1,0],[0,0,1]].forEach((a,ai)=>{
-const av=new THREE.Vector3(a[0],a[1],a[2]);if(Math.abs(av.dot(h.n))>.5)return;
-const t=new THREE.Vector3().crossVectors(av,h.n).applyQuaternion(cube.quaternion).multiplyScalar(.6);
-const s0=scr(h.pt),s1=scr(h.pt.clone().add(t)),vx=s1[0]-s0[0],vy=s1[1]-s0[1];
-const dot=(vx*dx+vy*dy)/(Math.hypot(vx,vy)||1);
-if(!best||Math.abs(dot)>Math.abs(best.dot))best={ai,dot};});
-if(!best)return;
-const ai=best.ai,sign=best.dot>0?1:-1,layer=Math.round([p.x,p.y,p.z][ai]);
-const L=[["R","L","M"],["U","D","E"],["F","B","S"]][ai];
-const f=layer==1?L[0]:layer==-1?L[1]:L[2];
-manual(f+(sign*SPEC[f][2]<0?"'":""));}
-function manual(t){
-if(document.body.dataset.page=="puzzle")pzMove(t);
-else if(!busy&&!playing){busy=true;turn(parse(t)[0],220).then(()=>{busy=false;});}}
+const s0=scr(h.point);let best=null;
+for(let ai=0;ai<3;ai++){if(ai==na)continue;
+const a=new THREE.Vector3();a.setComponent(ai,1);
+const t=new THREE.Vector3().crossVectors(a,n).applyQuaternion(cube.quaternion).multiplyScalar(.6);
+const s1=scr(h.point.clone().add(t)),vx=s1[0]-s0[0],vy=s1[1]-s0[1],len=Math.hypot(vx,vy)||1;
+const dot=(vx*dx+vy*dy)/len;
+if(!best||Math.abs(dot)>Math.abs(best.dot))best={ai:ai,dot:dot,tv:[vx/len,vy/len],ppu:len/.6};}
+const layer=Math.round(c.position.getComponent(best.ai));
+const cs=cubies.filter(q=>Math.round(q.position.getComponent(best.ai))==layer);
+const piv=new THREE.Group();cube.add(piv);cs.forEach(q=>piv.attach(q));
+Object.assign(st,{m:"layer",ai:best.ai,tv:best.tv,ppu:best.ppu,layer:layer,cs:cs,piv:piv,th:0});
+moving++;}
+function layerEnd(S){
+const now=performance.now(),hh=S.hist.filter(p=>now-p[0]<160),Q=Math.PI/2;
+const v=hh.length>1?(hh[hh.length-1][1]-hh[0][1])/Math.max(1,hh[hh.length-1][0]-hh[0][0]):0;
+let q=Math.round(S.th/Q);
+if(Math.abs(v)>.3){const d=v>0?1:-1;if(q*d<1)q=d;}
+q=Math.max(-2,Math.min(2,q));
+const from=S.th,to=q*Q,t0=performance.now(),dur=140+Math.abs(to-from)/Q*60;
+(function s(){const p=Math.min(1,(performance.now()-t0)/dur),e=1-Math.pow(1-p,3);
+S.piv.rotation[AX[S.ai]]=from+(to-from)*e;
+if(p<1){requestAnimationFrame(s);return;}
+S.piv.updateMatrixWorld(true);
+S.cs.forEach(c=>{cube.attach(c);c.position.round();const m=new THREE.Matrix4().makeRotationFromQuaternion(c.quaternion);m.elements=m.elements.map(Math.round);c.quaternion.setFromRotationMatrix(m);});
+cube.remove(S.piv);moving--;
+if(q)moveDone(S,q);})();}
+function moveDone(S,q){
+const L=[["R","L","M"],["U","D","E"],["F","B","S"]][S.ai],f=S.layer==1?L[0]:S.layer==-1?L[1]:L[2];
+const t=Math.abs(q)==2?f+"2":f+(q*SPEC[f][2]<0?"'":"");
+const pg=document.body.dataset.page;
+if(pg=="solve"){if($("stage").classList.contains("big"))vsMove(t,true);}
+else if(pg=="puzzle")pzMove(t,true);}
 
 /* ---------- gerakan ---------- */
 const SPEC={R:["x",v=>v==1,-1],L:["x",v=>v==-1,1],U:["y",v=>v==1,-1],D:["y",v=>v==-1,1],F:["z",v=>v==1,-1],B:["z",v=>v==-1,1],
@@ -208,8 +290,9 @@ const inv=m=>({n:m.k==2?m.n:m.n.endsWith("'")?m.f:m.f+"'",f:m.f,k:-m.k});
 
 const _mc=()=>cube,_ms=()=>cubies;
 function turn(m,dur,G,C){return new Promise(res=>{
-const cube=G||_mc(),cubies=C||_ms();
+const cube=G||_mc(),cubies=C||_ms(),cnt=!G;
 if(!cube){res();return;}
+if(cnt)moving++;
 const [ax,pred,dir]=SPEC[m.f];
 const layer=cubies.filter(c=>pred(Math.round(c.position[ax])));
 const piv=new THREE.Group();cube.add(piv);layer.forEach(c=>piv.attach(c));
@@ -218,7 +301,7 @@ const fin=()=>{piv.rotation[ax]=tot;piv.updateMatrixWorld(true);
 layer.forEach(c=>{cube.attach(c);c.position.round();
 const mm=new THREE.Matrix4().makeRotationFromQuaternion(c.quaternion);
 mm.elements=mm.elements.map(Math.round);c.quaternion.setFromRotationMatrix(mm);});
-cube.remove(piv);res();};
+cube.remove(piv);if(cnt)moving--;res();};
 if(!dur){fin();return;}
 const t0=performance.now();
 (function step(){const p=Math.min(1,(performance.now()-t0)/dur);
@@ -231,7 +314,7 @@ const $=id=>document.getElementById(id);
 let alg=[],idx=0,playing=false,busy=false,token=0,cur=null,speed=1;
 const sleep=ms=>new Promise(r=>setTimeout(r,ms));
 
-function resetCube(){cubies.forEach(c=>{c.position.set(...c.userData.home);c.quaternion.identity();});}
+function resetCube(){if(cube)cube.quaternion.identity();cubies.forEach(c=>{c.position.set(...c.userData.home);c.quaternion.identity();});}
 async function load(it,setup){
 token++;playing=false;busy=false;
 resetCube();alg=parse(it[1]);idx=0;cur={it,setup};
@@ -258,11 +341,8 @@ playing=true;draw();const my=token;
 while(playing&&my==token&&idx<alg.length){await step(1);await sleep(20/speed);}
 if(my==token){playing=false;draw();}
 }
-const VQ=cube?[new THREE.Quaternion().setFromEuler(new THREE.Euler(.85,-.6,0)),new THREE.Quaternion().setFromEuler(new THREE.Euler(1.3,0,0))]:[];
 let vi=0;
-function setView(i){if(!cube)return;vi=i;const from=cube.quaternion.clone(),t0=performance.now();
-(function s(){const p=Math.min(1,(performance.now()-t0)/600),e=p*p*(3-2*p);cube.quaternion.copy(from).slerp(VQ[i],e);if(p<1)requestAnimationFrame(s);})();
-$("bView").textContent=i?"Miring":"Atas";}
+function setView(i){if(!cube)return;vi=i;cam.t=i?.14:POL;$("bView").textContent=i?"Miring":"Atas";}
 $("bView").onclick=()=>setView(vi?0:1);
 $("bPlay").onclick=play;
 $("bReset").onclick=()=>cur&&load(cur.it,cur.setup);
@@ -302,10 +382,10 @@ const KIND=["","","F2L","OLL","PLL"];
 /* ---------- navigasi ---------- */
 let tabIdx=0,pz=null,pq=Promise.resolve(),lastKey="";
 function go(p,skip){
-document.body.dataset.page=p;token++;playing=false;
+bigOff();tmReset();document.body.dataset.page=p;setMode(p=="puzzle"?"layer":"view");token++;playing=false;
 document.querySelectorAll("#nav button").forEach(b=>b.setAttribute("aria-current",b.dataset.p==p?"page":"false"));
 if(p=="belajar"){if(cur&&!skip)load(cur.it,cur.setup);showTab(tabIdx);}
-else if(p=="puzzle")pzPage();else histPage();
+else if(p=="puzzle")pzPage();else if(p=="timer")timerPage();else if(p=="solve")vsPage();else histPage();
 window.scrollTo(0,0);}
 
 /* ---------- halaman belajar ---------- */
@@ -346,37 +426,130 @@ function pzPage(){pz?pzShow():pzNew();}
 const BASIC="U U' R R' F F' L L' D D' B B'".split(" "),MORE="r r' l l' u u' d d' f f' b b' M M' E E' S S' x x' y y' z z'".split(" ");
 const padH=a=>'<div class="pad">'+a.map(m=>'<button data-m="'+m+'">'+m+"</button>").join("")+"</div>";
 function pzRender(){
-const P=pz;let h='<div class="card"><h2>Teka-teki acak</h2><p>Kubus di atas adalah satu kasus <b>'+KIND[P.t]+"</b>. Selesaikan dengan rumus yang tepat sebelum jatah gerakan habis. Geser langsung di kubus untuk memutar satu lapisan, atau pakai tombol di bawah.</p>"+
+const P=pz;let h='<div class="card"><h2>Teka-teki acak</h2><p>Kubus di atas adalah satu kasus <b>'+KIND[P.t]+"</b>. Selesaikan dengan rumus yang tepat sebelum jatah gerakan habis. Tombol Geser di pojok kubus mengganti mode: Lapisan untuk memutar satu lapisan, Tampilan untuk melihat dari sisi lain. Gerakan juga bisa lewat tombol di bawah.</p>"+
 '<div class="mrow" id="pzc"></div><div class="meter"><i id="pzb"></i></div></div>';
 if(P.done==1)h+='<div class="res win"><b>Berhasil!</b><p>Kamu menyelesaikan '+P.it[0]+" dengan "+P.n+" gerakan. Rumus aslinya:</p><code>"+P.it[1]+'</code><div class="acts"><button class="btn" data-a="next">Teka-teki berikutnya</button></div></div>';
-else if(P.done==-1)h+='<div class="res lose"><b>Belum bisa? Belajar dulu</b><p>Kasus ini adalah '+P.it[0]+". Pelajari rumusnya, lalu coba teka-teki lain.</p>"+'<div class="acts"><button class="btn" data-a="learn">Belajar rumus ini</button><button class="btn ghost" data-a="next">Teka-teki lain</button></div></div>';
+else if(P.done==-1)h+='<div class="res lose"><b>Belum bisa? Belajar dulu</b><p>Kasus ini adalah '+P.it[0]+". Pelajari rumusnya, lalu coba lagi kasus yang sama atau ganti teka-teki.</p>"+'<div class="acts"><button class="btn" data-a="retry">Coba lagi</button><button class="btn" data-a="learn">Belajar rumus ini</button><button class="btn ghost" data-a="next">Teka-teki lain</button></div></div>';
 else h+=padH(BASIC)+"<details><summary>Gerakan lanjutan</summary>"+padH(MORE)+'</details><div class="acts"><button class="btn ghost" data-a="undo">Urungkan</button><button class="btn ghost" data-a="giveup">Menyerah</button></div>';
 $("pg").innerHTML=h;}
 function pzCount(){
 const P=pz;if(!P)return;
 $("cap").textContent="Teka-teki "+KIND[P.t]+": gerakan "+P.n+" dari "+P.limit;
 const c=$("pzc");if(c){c.textContent="Gerakan "+P.n+" dari "+P.limit;$("pzb").style.width=(100*P.n/P.limit)+"%";}}
-function pzMove(t){
+function pzMove(t,done){
 const P=pz;if(!P||P.done||P.n>=P.limit)return;
 const mv=parse(t)[0];P.hist.push(mv);P.n++;pzCount();
-pq=pq.then(()=>pz===P?turn(mv,220):0).then(()=>{if(pz!==P||P.done)return;P.ap++;if(isSolved())pzWin();else if(P.ap>=P.limit)pzFail();});}
+const chk=()=>{if(pz!==P||P.done)return;P.ap++;if(isSolved())pzWin();else if(P.ap>=P.limit)pzFail();};
+if(done)chk();else pq=pq.then(()=>pz===P?turn(mv,220):0).then(chk);}
 function pzUndo(){
 const P=pz;if(!P||P.done||!P.hist.length)return;
 const mv=P.hist.pop();P.n--;pzCount();
 pq=pq.then(()=>pz===P?turn(inv(mv),220):0).then(()=>{if(pz===P)P.ap--;});}
-function pzWin(){const P=pz;P.done=1;H.solved[P.k]=Date.now();delete H.failed[P.k];save();stat();pzRender();pzCount();}
-function pzFail(){const P=pz;if(P.done)return;P.done=-1;
+function pzWin(){const P=pz;bigOff();P.done=1;H.solved[P.k]=Date.now();delete H.failed[P.k];save();stat();pzRender();pzCount();}
+function pzCase(t,i){lastKey=key(t,i);const it=TABS[t].i[i];
+pz={t:t,i:i,k:lastKey,it:it,hist:[],n:0,ap:0,done:0,limit:Math.max(12,parse(it[1]).length*2)};go("puzzle");}
+function pzRetry(){const P=pz;if(!P)return;P.hist=[];P.n=P.ap=0;P.done=0;pzShow();}
+function pzFail(){const P=pz;if(P.done)return;bigOff();P.done=-1;
 if(!H.solved[P.k])H.failed[P.k]={ts:Date.now(),n:((H.failed[P.k]||{}).n||0)+1};
 save();stat();pzRender();pzCount();}
 
 /* ---------- halaman riwayat ---------- */
 function histPage(){
 const f=Object.entries(H.failed).sort((a,b)=>b[1].ts-a[1].ts),s=Object.entries(H.solved).sort((a,b)=>b[1]-a[1]);
-const row=(k,sub,btn)=>{const it=nameOf(k);return '<div class="hrow"><div><b>'+it[0]+"</b><code>"+it[1]+"</code><small>"+sub+'</small></div><button class="btn sm" data-a="open:'+k+'">'+btn+"</button></div>";};
+const row=(k,sub,btn)=>{const it=nameOf(k);return '<div class="hrow"><div><b>'+it[0]+"</b><code>"+it[1]+"</code><small>"+sub+'</small></div><div class="hb"><button class="btn sm" data-a="try:'+k+'">Coba lagi</button><button class="btn sm ghost" data-a="open:'+k+'">'+btn+"</button></div></div>";};
 $("pg").innerHTML='<div class="card"><h2>Riwayat</h2><div class="sum"><div><b>'+s.length+"</b><span>selesai</span></div><div><b>"+f.length+"</b><span>belum selesai</span></div><div><b>"+(TOTAL-s.length)+"</b><span>tersisa</span></div></div></div>"+
 "<h3>Belum terselesaikan</h3>"+(f.length?f.map(([k,v])=>row(k,"Gagal "+v.n+"x, terakhir "+ago(v.ts),"Belajar")).join(""):'<p class="empty">Belum ada. Coba teka-teki dulu.</p>')+
 "<h3>Rumus yang sudah diselesaikan</h3>"+(s.length?s.map(([k,v])=>row(k,"Selesai "+ago(v),"Lihat")).join(""):'<p class="empty">Belum ada yang diselesaikan.</p>')+
 (f.length||s.length?'<div class="acts"><button class="btn ghost" data-a="clearh">Hapus riwayat</button></div>':"");}
+
+/* ---------- stopwatch ---------- */
+let TM=[],tmScr="",tmInsp=false,tmSt="idle",tmT0=0,tmRaf=0,tmHold=0,tmReady=false,tmBlock=0,tmPrev="idle",tmInspEnd=0;
+try{TM=JSON.parse(localStorage.getItem("cfop-t")||"[]");}catch(e){}
+const tsave=()=>{try{localStorage.setItem("cfop-t",JSON.stringify(TM));}catch(e){}};
+function scramble(){
+const F=["U","D","R","L","F","B"],ax=m=>"UD".includes(m)?0:"RL".includes(m)?1:2,S=["","'","2"];
+const o=[];let last=-1;
+while(o.length<20){const m=F[Math.random()*6|0];if(ax(m)==last)continue;last=ax(m);o.push(m+S[Math.random()*3|0]);}
+return o.join(" ");}
+const fmt=ms=>{const c=Math.floor(ms/10),s=Math.floor(c/100),m=Math.floor(s/60);return (m?m+":"+String(s%60).padStart(2,"0"):s)+"."+String(c%100).padStart(2,"0");};
+function avg(n){if(TM.length<n)return null;const a=TM.slice(0,n).map(x=>x.t).sort((p,q)=>p-q).slice(1,-1);return a.reduce((s,x)=>s+x,0)/a.length;}
+function setPad(s){
+const p=$("tpad");if(!p)return;p.dataset.s=s;
+$("thint").textContent={idle:tmInsp?"Ketuk untuk mulai inspeksi":"Tahan untuk bersiap",hold:"Tahan...",ready:"Lepas untuk mulai",run:"Ketuk untuk berhenti",insp:"Tahan lalu lepas untuk mulai",done:"Tahan untuk solve baru"}[s];}
+function timerPage(){
+if(!tmScr)tmScr=scramble();
+const best=TM.length?Math.min(...TM.map(x=>x.t)):null,f=x=>x==null?"-":fmt(x);
+const rows=TM.slice(0,30).map((x,i)=>'<div class="hrow"><div><b>'+fmt(x.t)+"</b><small>"+ago(x.d)+", "+new Date(x.d).toLocaleTimeString("id-ID",{hour:"2-digit",minute:"2-digit"})+'</small></div><button class="btn sm ghost" data-a="tdel:'+i+'">Hapus</button></div>').join("");
+$("pg").innerHTML='<div class="card"><h2>Stopwatch</h2><p>Uji kecepatanmu di kubus asli. Tahan area waktu sampai hijau, lepas untuk mulai, ketuk lagi untuk berhenti.</p><div class="scr"><small>Acakan</small><code id="tscr">'+tmScr+'</code></div><div class="acts"><button class="btn sm ghost" data-a="tscr">Acakan baru</button><button class="btn sm ghost" data-a="tinsp">Inspeksi 15 detik: '+(tmInsp?"nyala":"mati")+"</button></div></div>"+
+'<div class="tpad" id="tpad" data-s="idle"><div id="ttime">0.00</div><small id="thint"></small></div>'+
+'<div class="sum four"><div><b>'+f(best)+"</b><span>terbaik</span></div><div><b>"+f(avg(5))+"</b><span>rata-rata 5</span></div><div><b>"+f(avg(12))+"</b><span>rata-rata 12</span></div><div><b>"+TM.length+"</b><span>solve</span></div></div>"+
+"<h3>Solve terbaru</h3>"+(rows||'<p class="empty">Belum ada waktu. Mulai solve pertamamu.</p>')+(TM.length?'<div class="acts"><button class="btn ghost" data-a="tclear">Hapus semua</button></div>':"");
+const p=$("tpad");p.addEventListener("pointerdown",tmDown);p.addEventListener("pointerup",tmUp);p.addEventListener("pointercancel",()=>{clearTimeout(tmHold);tmReady=false;setPad(tmSt=="run"?"run":tmPrev);});p.oncontextmenu=e=>e.preventDefault();
+setPad(tmSt=="done"?"done":"idle");}
+function tmDown(e){
+e.preventDefault();
+if(tmSt=="run"){tmFinish();tmBlock=1;return;}
+if(tmSt=="done")tmSt="idle";
+tmPrev=tmSt;tmReady=false;tmBlock=0;
+if(tmSt=="idle")$("ttime").textContent="0.00";
+setPad("hold");
+if(!(tmSt=="idle"&&tmInsp))tmHold=setTimeout(()=>{tmReady=true;setPad("ready");},300);}
+function tmUp(){
+clearTimeout(tmHold);
+if(tmBlock){tmBlock=0;return;}
+if(tmReady){tmReady=false;tmStart();return;}
+if(tmPrev=="idle"&&tmInsp){tmInspect();return;}
+setPad(tmPrev);}
+function tmStart(){
+cancelAnimationFrame(tmRaf);tmSt="run";tmT0=performance.now();setPad("run");
+(function tick(){const el=$("ttime");if(tmSt=="run"&&el){el.textContent=fmt(performance.now()-tmT0);tmRaf=requestAnimationFrame(tick);}})();}
+function tmInspect(){
+tmSt="insp";tmInspEnd=performance.now()+15000;setPad("insp");
+(function tick(){const el=$("ttime");if(tmSt!="insp"||!el)return;const r=Math.ceil((tmInspEnd-performance.now())/1000);el.textContent=r>0?r:"Waktu habis";tmRaf=requestAnimationFrame(tick);})();}
+function tmFinish(){
+const t=Math.round(performance.now()-tmT0);cancelAnimationFrame(tmRaf);tmSt="done";
+TM.unshift({t:t,s:tmScr,d:Date.now()});tsave();tmScr=scramble();
+timerPage();$("ttime").textContent=fmt(t);setPad("done");}
+function tmReset(){clearTimeout(tmHold);cancelAnimationFrame(tmRaf);tmSt="idle";tmReady=false;tmBlock=0;}
+
+/* ---------- rubik teracak + timer layar penuh ---------- */
+let vs=null,vq=Promise.resolve(),VS=[];
+try{VS=JSON.parse(localStorage.getItem("cfop-v")||"[]");}catch(e){}
+const vsave=()=>{try{localStorage.setItem("cfop-v",JSON.stringify(VS));}catch(e){}};
+function avgV(n){if(VS.length<n)return null;const a=VS.slice(0,n).map(x=>x.t).sort((p,q)=>p-q).slice(1,-1);return a.reduce((s,x)=>s+x,0)/a.length;}
+function vsPage(){if(!vs||vs.state=="done")vsNew();else vsShow();}
+function vsNew(){vs={scr:scramble(),state:"ready",moves:0,t0:0,raf:0,res:null};vsShow();}
+function vsShow(){
+const V=vs;token++;playing=false;vq=Promise.resolve();cancelAnimationFrame(V.raf);V.state="ready";V.moves=0;
+resetCube();parse(V.scr).forEach(m=>turn(m,0));
+setView(0);$("vt").textContent="0.00";
+$("cap").textContent="Rubik sudah diacak. Lihat dulu, lalu tekan Mulai.";
+vsRender();}
+function vsRender(){
+const V=vs,best=VS.length?Math.min(...VS.map(x=>x.t)):null,f=x=>x==null?"-":fmt(x);
+const rows=VS.slice(0,30).map((x,i)=>'<div class="hrow"><div><b>'+fmt(x.t)+"</b><small>"+x.m+" gerakan, "+ago(x.d)+'</small></div><button class="btn sm ghost" data-a="vdel:'+i+'">Hapus</button></div>').join("");
+$("pg").innerHTML=(V.state=="done"?'<div class="res win"><b>Selesai: '+fmt(V.res.t)+"</b><p>"+V.res.m+' gerakan. Waktu tersimpan di riwayat.</p><div class="acts"><button class="btn" data-a="vnew">Acak baru</button></div></div>':
+'<div class="card"><h2>Rubik teracak</h2><p>Kubus di atas sudah diacak. Lihat dulu sesuka hati. Saat kamu tekan Mulai, layar membesar dan waktu berjalan begitu lapisan pertama diputar. Waktu berhenti otomatis saat kubus selesai.</p><div class="scr"><small>Acakan (bisa ditiru di kubus asli)</small><code>'+V.scr+'</code></div><div class="acts"><button class="btn" data-a="vstart">Mulai</button><button class="btn ghost" data-a="vnew">Acak ulang</button></div></div>')+
+'<div class="sum four"><div><b>'+f(best)+"</b><span>terbaik</span></div><div><b>"+f(avgV(5))+"</b><span>rata-rata 5</span></div><div><b>"+f(avgV(12))+"</b><span>rata-rata 12</span></div><div><b>"+VS.length+"</b><span>solve</span></div></div>"+
+"<h3>Riwayat waktu</h3>"+(rows||'<p class="empty">Belum ada waktu. Tekan Mulai untuk solve pertamamu.</p>')+(VS.length?'<div class="acts"><button class="btn ghost" data-a="vclear">Hapus semua</button></div>':"");}
+function vsStart(){
+const V=vs;if(!V||V.state!="ready")return;
+V.state="armed";V.moves=0;setMode("layer");bigOn();
+$("vt").textContent="0.00";$("cap").textContent="Putar lapisan pertama untuk memulai waktu.";}
+function vsMove(t,done){
+const V=vs;if(!V||(V.state!="armed"&&V.state!="run"))return;
+const mv=parse(t)[0];
+if(V.state=="armed"){V.state="run";V.t0=performance.now();$("cap").textContent="Selesaikan kubusnya!";
+(function tick(){if(vs===V&&V.state=="run"){$("vt").textContent=fmt(performance.now()-V.t0);V.raf=requestAnimationFrame(tick);}})();}
+V.moves++;
+const chk=()=>{if(vs===V&&V.state=="run"&&isSolved())vsFinish();};
+if(done)chk();else vq=vq.then(()=>vs===V?turn(mv,200):0).then(chk);}
+function vsFinish(){
+const V=vs,t=Math.round(performance.now()-V.t0);cancelAnimationFrame(V.raf);
+V.state="done";V.res={t:t,m:V.moves};
+VS.unshift({t:t,s:V.scr,m:V.moves,d:Date.now()});vsave();
+bigOff();$("cap").textContent="Selesai dalam "+fmt(t);vsRender();}
+function closeBig(){bigOff();if(document.body.dataset.page=="solve")vsPage();}
 
 /* ---------- event ---------- */
 $("nav").onclick=e=>{const b=e.target.closest("button");if(b)go(b.dataset.p);};
@@ -386,10 +559,28 @@ if(d.m)pzMove(d.m);
 else if(d.tab!=null)showTab(+d.tab);
 else if(d.row!=null)rowClick(b);
 else if(d.a){const a=d.a;
-if(a=="next")pzNew();else if(a=="giveup")pzFail();else if(a=="undo")pzUndo();
+if(a=="next")pzNew();else if(a=="retry")pzRetry();else if(a=="giveup")pzFail();else if(a=="undo")pzUndo();
 else if(a=="learn")openCase(pz.t,pz.i);
 else if(a=="clearh"){H={solved:{},failed:{}};save();stat();histPage();}
+else if(a=="vstart")vsStart();
+else if(a=="vnew")vsNew();
+else if(a=="vclear"){VS=[];vsave();vsRender();}
+else if(a.startsWith("vdel:")){VS.splice(+a.slice(5),1);vsave();vsRender();}
+else if(a=="tscr"){tmScr=scramble();$("tscr").textContent=tmScr;}
+else if(a=="tclear"){TM=[];tsave();timerPage();}
+else if(a.startsWith("tdel:")){TM.splice(+a.slice(5),1);tsave();timerPage();}
+else if(a=="tinsp"){tmInsp=!tmInsp;timerPage();}
+else if(a.startsWith("try:")){const [t,i]=a.slice(4).split(":");pzCase(+t,+i);}
 else if(a.startsWith("open:")){const [t,i]=a.slice(5).split(":");openCase(+t,+i);}}});
+function bigOn(){$("stage").classList.add("big");document.body.classList.add("bigon");}
+function bigOff(){
+if(vs&&(vs.state=="armed"||vs.state=="run")&&$("stage").classList.contains("big")){cancelAnimationFrame(vs.raf);vs.state="ready";}
+$("stage").classList.remove("big");document.body.classList.remove("bigon");}
+function setMode(m){mode=m;const b=$("bMode");if(b)b.textContent=m=="view"?"Geser: Tampilan":"Geser: Lapisan";}
+$("bMode").onclick=()=>setMode(mode=="view"?"layer":"view");
+$("bBig").onclick=bigOn;$("bClose").onclick=closeBig;
+$("bUndo").onclick=()=>{if(document.body.dataset.page=="puzzle")pzUndo();};
+document.addEventListener("keydown",e=>{if(e.key=="Escape")closeBig();});
 stat();go("belajar",1);
 load(TABS[0].i[0],0).then(play);
 </script>
