@@ -1,0 +1,69 @@
+<section class="max-w-xl">
+    <h1 class="mb-6 font-display text-4xl text-ink">Setting</h1>
+
+    <!-- Mode konten: kerangka untuk donghua / komik / novel -->
+    <h2 class="mb-3 font-mono text-xs font-bold tracking-wider text-slate-600">MODE KONTEN</h2>
+    <div class="mb-8 grid grid-cols-2 gap-3 sm:grid-cols-4">
+        <div class="rounded-2xl border-2 border-brand bg-white p-4 text-center" aria-current="true">
+            <p class="text-sm font-bold text-ink">Anime</p>
+            <p class="mt-1 font-mono text-[11px] font-bold text-brand">AKTIF</p>
+        </div>
+        <div class="rounded-2xl border border-dashed border-slate-300 bg-white/60 p-4 text-center opacity-70" aria-disabled="true">
+            <p class="text-sm font-bold text-ink">Donghua</p>
+            <p class="mt-1 font-mono text-[11px] text-slate-600">SEGERA</p>
+        </div>
+        <div class="rounded-2xl border border-dashed border-slate-300 bg-white/60 p-4 text-center opacity-70" aria-disabled="true">
+            <p class="text-sm font-bold text-ink">Komik</p>
+            <p class="mt-1 font-mono text-[11px] text-slate-600">SEGERA</p>
+        </div>
+        <div class="rounded-2xl border border-dashed border-slate-300 bg-white/60 p-4 text-center opacity-70" aria-disabled="true">
+            <p class="text-sm font-bold text-ink">Novel</p>
+            <p class="mt-1 font-mono text-[11px] text-slate-600">SEGERA</p>
+        </div>
+    </div>
+
+    <h2 class="mb-3 font-mono text-xs font-bold tracking-wider text-slate-600">DATA</h2>
+    <div class="divide-y divide-slate-200 rounded-2xl border border-slate-200 bg-white shadow-sm">
+        <div class="flex items-center justify-between gap-4 p-5">
+            <div class="min-w-0">
+                <h3 class="text-sm font-bold text-ink">Riwayat tonton</h3>
+                <p id="historyCount" class="mt-0.5 font-mono text-xs text-slate-600">&nbsp;</p>
+            </div>
+            <button type="button" data-clear="anime_history" data-count="historyCount" data-label="riwayat"
+                    class="shrink-0 rounded-full border border-slate-300 px-4 py-2 text-xs font-bold text-slate-700 transition hover:border-sakura hover:text-sakura disabled:cursor-not-allowed">Hapus</button>
+        </div>
+
+        <div class="flex items-center justify-between gap-4 p-5">
+            <div class="min-w-0">
+                <h3 class="text-sm font-bold text-ink">Bookmark</h3>
+                <p id="bookmarkCount" class="mt-0.5 font-mono text-xs text-slate-600">&nbsp;</p>
+            </div>
+            <button type="button" data-clear="anime_bookmarks" data-count="bookmarkCount" data-label="bookmark"
+                    class="shrink-0 rounded-full border border-slate-300 px-4 py-2 text-xs font-bold text-slate-700 transition hover:border-sakura hover:text-sakura disabled:cursor-not-allowed">Hapus</button>
+        </div>
+    </div>
+
+    <p class="mt-4 text-xs leading-relaxed text-slate-600">
+        Riwayat dan bookmark disimpan di browser perangkat ini saja, jadi tidak ikut pindah ke perangkat lain dan hilang jika data browser dibersihkan.
+    </p>
+</section>
+
+<script>
+(function () {
+    function read(key) { try { return JSON.parse(localStorage.getItem(key) || '[]'); } catch (e) { return []; } }
+    function show(btn) {
+        var n = read(btn.dataset.clear).length;
+        document.getElementById(btn.dataset.count).textContent = n + ' tersimpan';
+        btn.disabled = n === 0;
+        btn.classList.toggle('opacity-40', n === 0);
+    }
+    document.querySelectorAll('[data-clear]').forEach(function (btn) {
+        show(btn);
+        btn.addEventListener('click', function () {
+            if (!confirm('Hapus semua ' + btn.dataset.label + '?')) return;
+            try { localStorage.removeItem(btn.dataset.clear); } catch (e) {}
+            show(btn);
+        });
+    });
+})();
+</script>

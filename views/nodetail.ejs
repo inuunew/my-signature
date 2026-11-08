@@ -1,0 +1,33 @@
+<%
+    const d = (result && result.data) ? result.data : {};
+    const isNoDetail = d.mode === 'nodetail';
+    const watchPath = '/' + encodeURIComponent(d.slug || '');
+%>
+<section class="mx-auto max-w-xl py-6 text-center">
+    <div class="mx-auto mb-5 grid h-16 w-16 place-items-center rounded-3xl bg-brand-soft text-brand" aria-hidden="true">
+        <% if (isNoDetail) { %>
+            <svg class="h-8 w-8 ml-0.5" viewBox="0 0 24 24" fill="currentColor"><path d="M7 4.5v15a1 1 0 0 0 1.5.86l12-7.5a1 1 0 0 0 0-1.72l-12-7.5A1 1 0 0 0 7 4.5z"/></svg>
+        <% } else { %>
+            <svg class="h-8 w-8" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" viewBox="0 0 24 24"><path d="M21 21l-4.3-4.3M17 10.5a6.5 6.5 0 11-13 0 6.5 6.5 0 0113 0zM8.5 10.5h4"/></svg>
+        <% } %>
+    </div>
+
+    <% if (isNoDetail) { %>
+        <h1 class="font-display text-3xl leading-tight text-ink sm:text-4xl"><%= d.title %></h1>
+        <p class="mt-3 text-base font-semibold text-ink">Detail tidak ada, silakan langsung streaming.</p>
+        <p class="mt-1 text-sm text-slate-600">Anime ini tidak punya halaman detail, tapi biasanya bisa langsung ditonton.</p>
+
+        <div class="mt-7 flex flex-col items-center gap-3 sm:flex-row sm:justify-center">
+            <a href="<%= watchPath %>"
+               class="inline-flex w-full items-center justify-center gap-2 rounded-full bg-brand px-8 py-3.5 text-base font-bold text-white shadow-lg shadow-brand/30 transition hover:bg-brand-dark focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand sm:w-auto">
+                <svg class="h-4 w-4" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M7 4.5v15a1 1 0 0 0 1.5.86l12-7.5a1 1 0 0 0 0-1.72l-12-7.5A1 1 0 0 0 7 4.5z"/></svg>
+                Mulai Menonton
+            </a>
+            <a href="/" class="inline-flex w-full items-center justify-center rounded-full border border-slate-300 bg-white px-8 py-3.5 text-base font-bold text-ink transition hover:border-brand hover:text-brand sm:w-auto">Kembali ke beranda</a>
+        </div>
+    <% } else { %>
+        <h1 class="font-display text-3xl text-ink sm:text-4xl">Halaman tidak ditemukan</h1>
+        <p class="mt-3 text-sm text-slate-600">Halaman yang kamu cari tidak tersedia atau sudah dipindahkan.</p>
+        <a href="/" class="mt-7 inline-flex items-center justify-center rounded-full bg-brand px-8 py-3.5 text-base font-bold text-white transition hover:bg-brand-dark">Kembali ke beranda</a>
+    <% } %>
+</section>

@@ -1,0 +1,286 @@
+<%
+    const d = result.data;
+    const eps = d.episodes || [];
+
+    // Tentukan episode pertama & terbaru berdasarkan nomor di URL (fallback: urutan daftar)
+    const epNum = (e) => { const m = (e.url || '').match(/episode-(\d+)/); return m ? parseInt(m[1], 10) : null; };
+    let firstEp = eps[eps.length - 1];
+    let latestEp = eps[0];
+    if (eps.length > 0 && eps.every(e => epNum(e) !== null)) {
+        const asc = eps.slice().sort((a, b) => epNum(a) - epNum(b));
+        firstEp = asc[0];
+        latestEp = asc[asc.length - 1];
+    }
+    const localUrl = (u) => (u || '').replace(/https?:\/\/[^\/]+/, '');
+
+    // Info status: pakai quickInfo bila ada, kalau tidak jatuh ke status saja
+    const info = (d.quickInfo && d.quickInfo.length > 0) ? d.quickInfo : (d.status && d.status !== '-' ? [d.status] : []);
+    const isAiring = info.length > 0 && /airing|ongoing|tayang/i.test(info[0]) && !/finished|selesai/i.test(info[0]);
+
+    // Daftar detail: pakai hasil scraping lengkap, fallback ke studio & rilis
+    let rows = d.details || [];
+    if (rows.length === 0) {
+        if (d.studio && d.studio !== '-') rows.push({ label: 'Studios', value: d.studio });
+        if (d.released && d.released !== '-') rows.push({ label: 'Aired', value: d.released });
+    }
+%>
+
+<div class="flex flex-col md:flex-row gap-8 mb-10">
+
+    <!-- Kolom kiri: poster, skor, tombol aksi -->
+    <div class="flex-shrink-0 mx-auto md:mx-0 w-full max-w-xs md:w-64">
+        <% if (d.thumbnail) { %>
+            <div class="relative w-48 md:w-full mx-auto">
+                <div class="absolute inset-0 translate-x-2.5 translate-y-2.5 rounded-3xl bg-sun" aria-hidden="true"></div>
+                <img src="<%= d.thumbnail %>" alt="<%= d.title %>" class="relative w-full h-auto rounded-3xl ring-4 ring-white object-cover">
+            </div>
+        <% } %>
+
+        <div class="mt-7 flex items-center justify-center gap-3 rounded-2xl bg-white border border-slate-200 px-4 py-3 shadow-sm">
+            <span class="text-2xl text-amber-500" aria-hidden="true">★</span>
+            <span class="font-display text-2xl font-extrabold text-ink"><%= d.rating && d.rating !== '-' ? d.rating : 'N/A' %></span>
+            <% if (d.type && d.type !== '-') { %>
+                <span class="rounded-full bg-brand-soft px-2.5 py-0.5 text-xs font-bold text-brand-dark"><%= d.type %></span>
+            <% } %>
+        </div>
+
+        <div class="mt-3 flex flex-col gap-2.5">
+            <% if (d.trailer) { %>
+                <a href="<%= d.trailer %>" target="_blank" rel="noopener noreferrer"
+                   class="inline-flex items-center justify-center gap-2 rounded-full bg-red-600 hover:bg-red-700 px-5 py-3 text-sm font-bold text-white transition focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-red-600">
+                    <svg class="w-4 h-4" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M7 4.5v15a1 1 0 0 0 1.5.86l12-7.5a1 1 0 0 0 0-1.72l-12-7.5A1 1 0 0 0 7 4.5z"/></svg>
+                    Trailer
+                </a>
+            <% } %>
+            <button id="bookmarkBtn" type="button" aria-pressed="false"
+                    data-title="<%= d.title %>" data-thumb="<%= d.thumbnail || '' %>"
+                    class="inline-flex items-center justify-center gap-2 rounded-full border-2 border-brand text-brand-dark hover:bg-brand hover:text-white aria-pressed:bg-brand aria-pressed:text-white px-5 py-2.5 text-sm font-bold transition focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand">
+                <svg id="bookmarkIcon" class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round" aria-hidden="true"><path d="M12 3.5l2.6 5.4 5.9.8-4.3 4.1 1 5.9L12 16.9 6.8 19.7l1-5.9L3.5 9.7l5.9-.8L12 3.5z"/></svg>
+                <span id="bookmarkLabel">Bookmark</span>
+            </button>
+        </div>
+    </div>
+
+    <!-- Kolom kanan: judul, tab, genre, status, episode awal/terbaru -->
+    <div class="flex-grow min-w-0">
+        <h1 class="font-display text-3xl md:text-4xl font-extrabold text-ink leading-tight mb-5"><%= d.title %></h1>
+
+        <!-- Tab -->
+        <div role="tablist" aria-label="Informasi anime" class="flex gap-1 border-b border-slate-200 mb-4">
+            <button role="tab" id="tab-details" aria-controls="panel-details" aria-selected="true" data-tab="details"
+                    class="tab-btn -mb-px border-b-2 border-brand px-4 py-2.5 text-sm font-bold text-brand-dark transition">Details</button>
+            <button role="tab" id="tab-synopsis" aria-controls="panel-synopsis" aria-selected="false" data-tab="synopsis" tabindex="-1"
+                    class="tab-btn -mb-px border-b-2 border-transparent px-4 py-2.5 text-sm font-bold text-slate-500 hover:text-ink transition">Sinopsis</button>
+        </div>
+
+        <div id="panel-details" role="tabpanel" aria-labelledby="tab-details"
+             class="bg-white rounded-2xl border border-slate-200 shadow-sm p-5">
+            <% if (rows.length > 0) { %>
+                <dl class="grid grid-cols-[7.5rem_1fr] sm:grid-cols-[9rem_1fr] gap-x-4 gap-y-3 text-sm">
+                    <% rows.forEach(row => { %>
+                        <dt class="font-bold text-ink"><%= row.label %></dt>
+                        <dd class="text-slate-600 break-words"><%= row.value %></dd>
+                    <% }) %>
+                </dl>
+            <% } else { %>
+                <p class="text-sm text-slate-600">Detail belum tersedia.</p>
+            <% } %>
+        </div>
+
+        <div id="panel-synopsis" role="tabpanel" aria-labelledby="tab-synopsis" hidden
+             class="bg-white rounded-2xl border border-slate-200 shadow-sm p-5">
+            <p class="text-slate-700 text-sm leading-relaxed max-w-prose">
+                <%= d.synopsis ? d.synopsis : "Sinopsis belum tersedia untuk anime ini." %>
+            </p>
+        </div>
+
+        <!-- Genre -->
+        <% if (d.genres && d.genres.length > 0) { %>
+            <div class="flex flex-wrap gap-2 mt-5">
+                <% d.genres.forEach(genre => { %>
+                    <a href="<%= localUrl(genre.url) %>" class="rounded-full bg-white border border-slate-200 px-3.5 py-1.5 text-xs font-semibold text-slate-700 hover:bg-brand hover:border-brand hover:text-white transition">
+                        <%= genre.name %>
+                    </a>
+                <% }) %>
+            </div>
+        <% } %>
+
+        <!-- Kartu status -->
+        <% if (info.length > 0) { %>
+            <div class="mt-5 grid grid-cols-2 gap-3 rounded-2xl bg-brand-soft p-4 text-sm">
+                <% info.forEach((text, i) => { %>
+                    <div class="flex items-center gap-2 font-semibold <%= i === 0 ? (isAiring ? 'text-amber-700' : 'text-emerald-700') : 'text-slate-700' %>">
+                        <% if (i === 0) { %>
+                            <span class="w-2.5 h-2.5 rounded-full <%= isAiring ? 'bg-amber-500' : 'bg-emerald-500' %>" aria-hidden="true"></span>
+                        <% } %>
+                        <span><%= text %></span>
+                    </div>
+                <% }) %>
+            </div>
+        <% } %>
+
+        <!-- Episode pertama & terbaru -->
+        <% if (firstEp) { %>
+            <div class="mt-5 grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <a href="<%= localUrl(firstEp.url) %>" class="group rounded-2xl bg-white border border-slate-200 hover:border-brand shadow-sm p-4 text-center transition">
+                    <span class="block text-[11px] font-bold tracking-wider text-slate-500">PERTAMA</span>
+                    <span class="block mt-1 text-base font-bold text-ink group-hover:text-brand transition-colors"><%= firstEp.title %></span>
+                </a>
+                <% if (latestEp && latestEp.url !== firstEp.url) { %>
+                    <a href="<%= localUrl(latestEp.url) %>" class="group rounded-2xl bg-white border border-slate-200 hover:border-brand shadow-sm p-4 text-center transition">
+                        <span class="block text-[11px] font-bold tracking-wider text-slate-500">TERBARU</span>
+                        <span class="block mt-1 text-base font-bold text-ink group-hover:text-brand transition-colors"><%= latestEp.title %></span>
+                    </a>
+                <% } %>
+            </div>
+        <% } %>
+    </div>
+</div>
+
+<!-- Lompat ke episode -->
+<div class="mb-8">
+    <form onsubmit="redirectToEpisode(event)" class="flex gap-2">
+        <label for="searchEpisodeNum" class="sr-only">Nomor episode</label>
+        <input
+            type="number"
+            id="searchEpisodeNum"
+            placeholder="Masukkan nomor episode (contoh: 567)..."
+            required
+            class="w-full bg-white text-ink placeholder-slate-500 border border-slate-200 text-sm rounded-full px-5 py-3 focus:outline-none focus:border-brand focus:ring-4 focus:ring-brand/15 transition"
+        />
+        <button type="submit" class="bg-brand hover:bg-brand-dark text-white text-sm font-bold px-7 py-3 rounded-full transition shrink-0">
+            Cari
+        </button>
+    </form>
+</div>
+
+<h2 class="font-display text-xl sm:text-2xl font-extrabold text-ink mb-4">Daftar episode</h2>
+
+<div class="grid grid-cols-1 sm:grid-cols-2 gap-3 max-h-[520px] overflow-y-auto pr-1" id="episodeList">
+    <% if (eps.length > 0) { %>
+        <% eps.forEach(ep => { %>
+            <a href="<%= localUrl(ep.url) || '#' %>" class="ep-item group bg-white hover:border-brand border border-slate-200 p-4 rounded-2xl transition flex items-center justify-between gap-3 shadow-sm">
+                <span class="min-w-0">
+                    <span class="block text-ink text-sm font-bold group-hover:text-brand transition-colors"><%= ep.title %></span>
+                    <% if (ep.date) { %>
+                        <span class="block text-slate-600 text-xs mt-1"><%= ep.date %></span>
+                    <% } %>
+                </span>
+                <span class="grid place-items-center w-9 h-9 shrink-0 rounded-full bg-brand-soft text-brand group-hover:bg-brand group-hover:text-white transition" aria-hidden="true">
+                    <svg class="w-3.5 h-3.5 ml-0.5" viewBox="0 0 24 24" fill="currentColor"><path d="M7 4.5v15a1 1 0 0 0 1.5.86l12-7.5a1 1 0 0 0 0-1.72l-12-7.5A1 1 0 0 0 7 4.5z"/></svg>
+                </span>
+            </a>
+        <% }) %>
+    <% } else { %>
+        <p class="text-slate-600 text-sm col-span-full text-center py-8">Tidak ada daftar episode tersedia.</p>
+    <% } %>
+</div>
+
+<!-- Terkait -->
+<% if (d.related && d.related.length > 0) { %>
+    <section class="mt-12" aria-labelledby="related-heading">
+        <h2 id="related-heading" class="font-display text-xl sm:text-2xl font-extrabold text-ink mb-4">Terkait</h2>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+            <% d.related.forEach(rel => { %>
+                <a href="<%= localUrl(rel.url) %>" class="group flex gap-4 bg-white rounded-2xl p-3 border border-slate-200 shadow-sm hover:border-brand hover:shadow-md transition">
+                    <% if (rel.thumbnail) { %>
+                        <img src="<%= rel.thumbnail %>" alt="<%= rel.title %>" loading="lazy" class="w-20 h-28 object-cover rounded-xl shrink-0">
+                    <% } else { %>
+                        <div class="grid place-items-center w-20 h-28 rounded-xl bg-brand-soft text-brand shrink-0" aria-hidden="true">
+                            <svg class="w-6 h-6 ml-0.5" viewBox="0 0 24 24" fill="currentColor"><path d="M7 4.5v15a1 1 0 0 0 1.5.86l12-7.5a1 1 0 0 0 0-1.72l-12-7.5A1 1 0 0 0 7 4.5z"/></svg>
+                        </div>
+                    <% } %>
+                    <div class="min-w-0 flex-1 py-0.5">
+                        <h3 class="text-ink font-bold text-sm leading-snug line-clamp-2 group-hover:text-brand transition-colors"><%= rel.title %></h3>
+                        <% if (rel.rating || rel.type) { %>
+                            <div class="flex flex-wrap items-center gap-2 text-xs my-1.5">
+                                <% if (rel.rating) { %>
+                                    <span class="rounded-full bg-sun px-2.5 py-0.5 font-bold text-ink">★ <%= rel.rating %></span>
+                                <% } %>
+                                <% if (rel.type) { %>
+                                    <span class="rounded-full bg-brand-soft px-2.5 py-0.5 font-semibold text-brand-dark"><%= rel.type %></span>
+                                <% } %>
+                            </div>
+                        <% } %>
+                        <% if (rel.synopsis) { %>
+                            <p class="text-slate-600 text-xs line-clamp-2"><%= rel.synopsis %></p>
+                        <% } %>
+                    </div>
+                </a>
+            <% }) %>
+        </div>
+    </section>
+<% } %>
+
+<script>
+// ---- Tab Details / Sinopsis ----
+(function () {
+    var tabs = document.querySelectorAll('.tab-btn');
+    var ACTIVE = ['border-brand', 'text-brand-dark'];
+    var IDLE = ['border-transparent', 'text-slate-500'];
+
+    function select(name) {
+        tabs.forEach(function (t) {
+            var on = t.dataset.tab === name;
+            t.setAttribute('aria-selected', on ? 'true' : 'false');
+            t.tabIndex = on ? 0 : -1;
+            ACTIVE.forEach(function (c) { t.classList.toggle(c, on); });
+            IDLE.forEach(function (c) { t.classList.toggle(c, !on); });
+            document.getElementById('panel-' + t.dataset.tab).hidden = !on;
+        });
+    }
+    tabs.forEach(function (t) {
+        t.addEventListener('click', function () { select(t.dataset.tab); });
+        t.addEventListener('keydown', function (e) {
+            if (e.key !== 'ArrowRight' && e.key !== 'ArrowLeft') return;
+            var other = Array.prototype.find.call(tabs, function (x) { return x !== t; });
+            other.focus();
+            select(other.dataset.tab);
+        });
+    });
+})();
+
+// ---- Bookmark (disimpan di localStorage browser) ----
+(function () {
+    var KEY = 'anime_bookmarks';
+    var btn = document.getElementById('bookmarkBtn');
+    if (!btn) return;
+    var label = document.getElementById('bookmarkLabel');
+    var icon = document.getElementById('bookmarkIcon');
+    var item = { url: location.pathname, title: btn.dataset.title, thumbnail: btn.dataset.thumb };
+
+    function read() {
+        try { return JSON.parse(localStorage.getItem(KEY) || '[]'); } catch (e) { return []; }
+    }
+    function write(list) {
+        try { localStorage.setItem(KEY, JSON.stringify(list)); } catch (e) {}
+    }
+    function render() {
+        var on = read().some(function (b) { return b.url === item.url; });
+        btn.setAttribute('aria-pressed', on ? 'true' : 'false');
+        label.textContent = on ? 'Tersimpan' : 'Bookmark';
+        icon.setAttribute('fill', on ? 'currentColor' : 'none');
+    }
+    btn.addEventListener('click', function () {
+        var list = read();
+        var exists = list.some(function (b) { return b.url === item.url; });
+        write(exists ? list.filter(function (b) { return b.url !== item.url; }) : list.concat([item]));
+        render();
+    });
+    render();
+})();
+
+// ---- Lompat ke episode berdasarkan nomor ----
+function redirectToEpisode(event) {
+    event.preventDefault();
+    const epNum = document.getElementById('searchEpisodeNum').value;
+    if (!epNum) return;
+
+    // Slug anime dari segmen terakhir URL (abaikan trailing slash)
+    // /anime/one-piece/ -> "one-piece"
+    const slug = window.location.pathname.split('/').filter(Boolean).pop();
+
+    // Hasil: /one-piece-episode-536
+    window.location.href = `/${slug}-episode-${epNum}`;
+}
+</script>

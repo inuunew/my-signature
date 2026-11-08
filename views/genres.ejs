@@ -1,0 +1,33 @@
+<section>
+    <h1 class="font-display text-2xl sm:text-3xl font-extrabold text-ink mb-6">Daftar genre anime</h1>
+
+    <% if (result && result.data && result.data.genresList && result.data.genresList.length > 0) { %>
+        <div class="grid grid-cols-1 min-[420px]:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+            <% result.data.genresList.forEach(genre => { %>
+                <% const cleanUrl = genre.url.replace(/https?:\/\/[^\/]+/, ''); %>
+                <a href="<%= cleanUrl %>" class="group bg-white border border-slate-200 rounded-2xl p-3 flex items-center gap-4 shadow-sm hover:border-brand hover:shadow-md transition">
+
+                    <% if (genre.thumbnail) { %>
+                        <img src="<%= genre.thumbnail %>" alt="<%= genre.name %>" loading="lazy" class="w-14 h-14 object-cover rounded-xl flex-shrink-0">
+                    <% } %>
+
+                    <div class="overflow-hidden flex flex-col justify-center">
+                        <h2 class="text-ink font-bold text-sm truncate group-hover:text-brand transition-colors">
+                            <%= genre.name %>
+                        </h2>
+                        <% if (genre.totalSeries && genre.totalSeries !== '-') { %>
+                            <span class="text-slate-600 text-xs mt-1">
+                                <%= genre.totalSeries %> judul
+                            </span>
+                        <% } %>
+                    </div>
+
+                </a>
+            <% }) %>
+        </div>
+    <% } else { %>
+        <div class="bg-white border border-slate-200 rounded-3xl p-10 text-center my-6">
+            <p class="text-slate-600 text-sm">Belum ada data genre yang dimuat.</p>
+        </div>
+    <% } %>
+</section>

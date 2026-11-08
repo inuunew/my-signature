@@ -1,0 +1,186 @@
+<section>
+    <h1 class="mb-5 font-display text-4xl text-ink">Library</h1>
+
+    <div role="tablist" aria-label="Isi library" class="mb-6 flex gap-2">
+        <button type="button" role="tab" id="tab-history" data-lib-tab="history" aria-controls="panel-history" aria-selected="true"
+                class="lib-tab rounded-full border border-slate-200 bg-white px-5 py-2 text-sm font-bold text-slate-700 transition hover:border-brand aria-selected:border-brand aria-selected:bg-brand aria-selected:text-white">
+            History <span id="countHistory" class="ml-1 font-mono text-xs opacity-80"></span>
+        </button>
+        <button type="button" role="tab" id="tab-bookmark" data-lib-tab="bookmark" aria-controls="panel-bookmark" aria-selected="false" tabindex="-1"
+                class="lib-tab rounded-full border border-slate-200 bg-white px-5 py-2 text-sm font-bold text-slate-700 transition hover:border-brand aria-selected:border-brand aria-selected:bg-brand aria-selected:text-white">
+            Bookmark <span id="countBookmark" class="ml-1 font-mono text-xs opacity-80"></span>
+        </button>
+    </div>
+
+    <!-- HISTORY -->
+    <div id="panel-history" role="tabpanel" aria-labelledby="tab-history">
+        <div class="mb-4 flex justify-end">
+            <button id="clearHistory" type="button" class="hidden font-mono text-xs font-bold tracking-wider text-sakura hover:underline">HAPUS SEMUA</button>
+        </div>
+        <div id="historyGrid" class="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3"></div>
+        <div id="historyEmpty" class="hidden my-6 rounded-3xl border border-slate-200 bg-white p-10 text-center">
+            <p class="mb-5 text-sm text-slate-600">Belum ada riwayat. Anime yang kamu tonton akan muncul di sini.</p>
+            <a href="/" class="inline-block rounded-full bg-brand px-5 py-2.5 text-sm font-bold text-white transition hover:bg-brand-dark">Mulai nonton</a>
+        </div>
+    </div>
+
+    <!-- BOOKMARK -->
+    <div id="panel-bookmark" role="tabpanel" aria-labelledby="tab-bookmark" hidden>
+        <div id="bookmarkGrid" class="grid grid-cols-2 gap-x-4 gap-y-6 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6"></div>
+        <div id="bookmarkEmpty" class="hidden my-6 rounded-3xl border border-slate-200 bg-white p-10 text-center">
+            <p class="mb-5 text-sm text-slate-600">Belum ada bookmark. Tekan tombol Bookmark di halaman detail anime.</p>
+            <a href="/" class="inline-block rounded-full bg-brand px-5 py-2.5 text-sm font-bold text-white transition hover:bg-brand-dark">Jelajahi anime</a>
+        </div>
+    </div>
+</section>
+
+<script>
+(function () {
+    var HKEY = 'anime_history', BKEY = 'anime_bookmarks';
+
+    function read(key) { try { return JSON.parse(localStorage.getItem(key) || '[]'); } catch (e) { return []; } }
+    function write(key, list) { try { localStorage.setItem(key, JSON.stringify(list)); } catch (e) {} }
+    function hi(u, w) { return /i0\.wp\.com/.test(u || '') ? u.replace(/\?.*$/, '') + '?w=' + w : (u || ''); }
+    function ago(ts) {
+        var m = Math.floor((Date.now() - ts) / 60000);
+        if (m < 1) return 'baru saja';
+        if (m < 60) return m + ' menit lalu';
+        var h = Math.floor(m / 60);
+        if (h < 24) return h + ' jam lalu';
+        return Math.floor(h / 24) + ' hari lalu';
+    }
+    function removeBtn(label, onClick) {
+        var b = document.createElement('button');
+        b.type = 'button';
+        b.setAttribute('aria-label', label);
+        b.className = 'absolute top-2 right-2 grid h-8 w-8 place-items-center rounded-full bg-white/95 text-slate-700 shadow transition hover:bg-sakura hover:text-white';
+        b.innerHTML = '<svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg>';
+        b.addEventListener('click', onClick);
+        return b;
+    }
+
+    /* ---------- History ---------- */
+    var hGrid = document.getElementById('historyGrid');
+    var hEmpty = document.getElementById('historyEmpty');
+    var hClear = document.getElementById('clearHistory');
+
+    function drawHistory() {
+        var list = read(HKEY);
+        hGrid.textContent = '';
+        hEmpty.classList.toggle('hidden', list.length > 0);
+        hClear.classList.toggle('hidden', list.length === 0);
+        document.getElementById('countHistory').textContent = list.length ? list.length : '';
+
+        list.forEach(function (it) {
+            var card = document.createElement('div');
+            card.className = 'group relative';
+
+            var a = document.createElement('a');
+            a.href = it.url;
+            a.className = 'block';
+
+            var frame = document.createElement('div');
+            frame.className = 'aspect-video overflow-hidden rounded-2xl bg-slate-200 ring-1 ring-slate-900/5 shadow-sm';
+            if (it.thumbnail) {
+                var img = document.createElement('img');
+                img.src = hi(it.thumbnail, 640);
+                img.alt = '';
+                img.loading = 'lazy';
+                img.className = 'h-full w-full object-cover transition-transform duration-300 group-hover:scale-105';
+                img.style.objectPosition = '50% 22%';
+                img.onerror = function () { img.onerror = null; img.src = it.thumbnail; };
+                frame.appendChild(img);
+            }
+
+            var title = document.createElement('h3');
+            title.className = 'mt-2.5 truncate text-base font-bold text-ink group-hover:text-brand transition-colors';
+            title.textContent = it.seriesTitle || it.title;
+
+            var meta = document.createElement('p');
+            meta.className = 'mt-0.5 font-mono text-xs text-slate-600';
+            meta.textContent = (it.episodeNumber ? 'Ep ' + it.episodeNumber + ' \u2022 ' : '') + ago(it.ts);
+
+            a.appendChild(frame); a.appendChild(title); a.appendChild(meta);
+            card.appendChild(a);
+            card.appendChild(removeBtn('Hapus dari riwayat: ' + (it.seriesTitle || it.title), function () {
+                write(HKEY, read(HKEY).filter(function (x) { return x.url !== it.url; }));
+                drawHistory();
+            }));
+            hGrid.appendChild(card);
+        });
+    }
+    hClear.addEventListener('click', function () {
+        if (confirm('Hapus seluruh riwayat tonton?')) { write(HKEY, []); drawHistory(); }
+    });
+
+    /* ---------- Bookmark ---------- */
+    var bGrid = document.getElementById('bookmarkGrid');
+    var bEmpty = document.getElementById('bookmarkEmpty');
+
+    function drawBookmarks() {
+        var list = read(BKEY);
+        bGrid.textContent = '';
+        bEmpty.classList.toggle('hidden', list.length > 0);
+        document.getElementById('countBookmark').textContent = list.length ? list.length : '';
+
+        list.forEach(function (b) {
+            var card = document.createElement('div');
+            card.className = 'group relative';
+
+            var link = document.createElement('a');
+            link.href = b.url;
+            link.className = 'block';
+
+            var frame = document.createElement('div');
+            frame.className = 'overflow-hidden rounded-2xl bg-slate-200 ring-1 ring-slate-900/5 shadow-sm';
+            if (b.thumbnail) {
+                var img = document.createElement('img');
+                img.src = b.thumbnail;
+                img.alt = b.title;
+                img.loading = 'lazy';
+                img.className = 'aspect-[2/3] w-full object-cover transition-transform duration-300 group-hover:scale-105';
+                frame.appendChild(img);
+            } else {
+                frame.classList.add('aspect-[2/3]');
+            }
+
+            var title = document.createElement('h3');
+            title.className = 'mt-2 text-sm font-semibold text-ink line-clamp-2 group-hover:text-brand transition-colors';
+            title.textContent = b.title;
+
+            link.appendChild(frame); link.appendChild(title);
+            card.appendChild(link);
+            card.appendChild(removeBtn('Hapus bookmark ' + b.title, function () {
+                write(BKEY, read(BKEY).filter(function (x) { return x.url !== b.url; }));
+                drawBookmarks();
+            }));
+            bGrid.appendChild(card);
+        });
+    }
+
+    /* ---------- Tab (hash: #history / #bookmark) ---------- */
+    var tabs = Array.prototype.slice.call(document.querySelectorAll('.lib-tab'));
+    function select(name, updateHash) {
+        tabs.forEach(function (t) {
+            var on = t.dataset.libTab === name;
+            t.setAttribute('aria-selected', on ? 'true' : 'false');
+            t.tabIndex = on ? 0 : -1;
+            document.getElementById('panel-' + t.dataset.libTab).hidden = !on;
+        });
+        if (updateHash) { try { history.replaceState(null, '', '#' + name); } catch (e) {} }
+    }
+    tabs.forEach(function (t) {
+        t.addEventListener('click', function () { select(t.dataset.libTab, true); });
+        t.addEventListener('keydown', function (e) {
+            if (e.key !== 'ArrowRight' && e.key !== 'ArrowLeft') return;
+            var other = tabs.filter(function (x) { return x !== t; })[0];
+            other.focus();
+            select(other.dataset.libTab, true);
+        });
+    });
+
+    drawHistory();
+    drawBookmarks();
+    select(location.hash === '#bookmark' ? 'bookmark' : 'history', false);
+})();
+</script>

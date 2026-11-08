@@ -1,0 +1,195 @@
+<%
+    const d = (result && result.data) ? result.data : {};
+    const days = d.days || [];
+    const pathOf = (u) => (u || '').replace(/https?:\/\/[^\/]+/, '');
+    const initial = (days.find(x => x.active) || days[0] || {}).id;
+    const countText = (day) => {
+        const on = day.items.filter(i => !i.delayed).length;
+        const late = day.items.length - on;
+        return on + ' Series' + (late > 0 ? ' \u2022 ' + late + ' ditunda' : '');
+    };
+%>
+<section>
+    <h1 class="mb-5 font-display text-4xl text-ink">Jadwal Rilis</h1>
+
+<% if (!result || !result.success || days.length === 0) { %>
+    <div class="rounded-3xl border border-slate-200 bg-white p-8 text-center shadow-sm">
+        <h2 class="text-base font-bold text-ink">Jadwal belum bisa dimuat</h2>
+        <p class="mt-2 text-sm text-slate-600">Coba lagi beberapa saat lagi.</p>
+        <a href="/schedule" class="mt-5 inline-block rounded-full bg-brand px-6 py-2.5 text-sm font-bold text-white transition hover:bg-brand-dark">Muat ulang</a>
+    </div>
+<% } else { %>
+
+    <!-- Progres musim -->
+    <% if (d.season && d.season.name) { %>
+        <div class="mb-8 rounded-2xl border border-slate-200 bg-white p-4 shadow-sm">
+            <div class="flex items-center justify-between font-mono text-xs font-bold tracking-wider">
+                <span class="uppercase text-ink"><%= d.season.name %></span>
+                <span class="text-brand-dark"><%= (d.season.percent || '').replace(/complete/i, 'selesai') %></span>
+            </div>
+            <div class="mt-2.5 h-2 overflow-hidden rounded-full bg-slate-200" role="progressbar" aria-label="Progres musim" aria-valuemin="0" aria-valuemax="100" aria-valuenow="<%= d.season.width %>">
+                <div class="h-full rounded-full bg-brand" style="width: <%= d.season.width %>%"></div>
+            </div>
+        </div>
+    <% } %>
+
+    <!-- Segera tayang -->
+    <% if (d.upcoming && d.upcoming.length > 0) { %>
+        <section class="mb-8" aria-labelledby="upcoming-heading">
+            <h2 id="upcoming-heading" class="mb-3 font-display text-2xl text-ink">Segera Tayang</h2>
+            <div class="grid grid-cols-1 gap-3 md:grid-cols-3">
+                <% d.upcoming.forEach(it => { %>
+                    <a href="/search?q=<%= encodeURIComponent(it.title) %>" class="group flex items-center gap-3 rounded-2xl border border-slate-200 bg-white p-3 shadow-sm transition hover:border-brand hover:shadow-md">
+                        <% if (it.thumbnail) { %>
+                            <img src="<%= it.thumbnail %>" alt="" loading="lazy" class="h-20 w-14 shrink-0 rounded-xl bg-slate-200 object-cover">
+                        <% } %>
+                        <div class="min-w-0 flex-1">
+                            <h3 class="line-clamp-2 text-sm font-bold text-ink transition-colors group-hover:text-brand"><%= it.title %></h3>
+                            <p class="mt-1 font-mono text-xs text-slate-600"><%= it.episode %></p>
+                        </div>
+                        <% if (it.countdown) { %>
+                            <span class="shrink-0 rounded-full bg-brand-soft px-2.5 py-1 text-xs font-bold text-brand-dark"><%= it.countdown %></span>
+                        <% } %>
+                    </a>
+                <% }) %>
+            </div>
+        </section>
+    <% } %>
+
+    <!-- Kalender per hari -->
+    <div id="dayTabs" role="tablist" aria-label="Hari rilis" class="no-scrollbar relative -mx-4 mb-6 flex gap-2 overflow-x-auto px-4 sm:mx-0 sm:px-0">
+        <% days.forEach(day => { %>
+            <button type="button" role="tab" id="dtab-<%= day.id %>" data-day="<%= day.id %>" aria-controls="dpanel-<%= day.id %>"
+                    aria-selected="<%= day.id === initial ? 'true' : 'false' %>" tabindex="<%= day.id === initial ? '0' : '-1' %>"
+                    class="day-tab shrink-0 rounded-2xl border border-slate-200 bg-white px-4 py-2 text-center transition hover:border-brand aria-selected:border-brand aria-selected:bg-brand aria-selected:text-white">
+                <span class="block font-mono text-[11px] font-bold uppercase tracking-wider opacity-80"><%= day.name %></span>
+                <span class="block font-display text-2xl leading-none"><%= day.date %></span>
+                <span class="block font-mono text-[11px] opacity-80"><%= day.month %></span>
+            </button>
+        <% }) %>
+    </div>
+
+    <div class="mb-4 flex flex-wrap items-center gap-2">
+        <h2 class="font-display text-2xl text-ink"><span id="dayPrefix">Rilis &bull; </span><span id="dayDate"></span></h2>
+        <span id="dayCount" class="rounded-full bg-brand-soft px-2.5 py-1 font-mono text-xs font-bold text-brand-dark"></span>
+    </div>
+
+    <% days.forEach(day => { %>
+        <div id="dpanel-<%= day.id %>" role="tabpanel" aria-labelledby="dtab-<%= day.id %>"
+             data-date-text="<%= day.dateText || (day.name + ', ' + day.date + ' ' + day.month) %>" data-count-text="<%= countText(day) %>"
+             <%- day.id === initial ? '' : 'hidden' %>>
+            <% if (day.items.length === 0) { %>
+                <div class="rounded-2xl border border-slate-200 bg-white p-8 text-center text-sm text-slate-600 shadow-sm">Tidak ada jadwal tayang pada hari ini.</div>
+            <% } else { %>
+                <div class="grid grid-cols-1 gap-3 md:grid-cols-2 lg:grid-cols-3">
+                    <% day.items.forEach(it => { %>
+                        <a href="<%= pathOf(it.url) %>" class="group flex gap-4 rounded-2xl border border-slate-200 bg-white p-3 shadow-sm transition hover:border-brand hover:shadow-md">
+                            <img src="<%= it.thumbnail %>" alt="" loading="lazy" class="h-32 w-24 shrink-0 rounded-xl bg-slate-200 object-cover">
+                            <div class="min-w-0 flex-1">
+                                <h3 class="line-clamp-2 text-sm font-bold text-ink transition-colors group-hover:text-brand"><%= it.title %></h3>
+
+                                <div class="mt-1.5 flex flex-wrap items-center gap-2 text-xs">
+                                    <span class="font-mono text-slate-600"><%= it.episode %></span>
+                                    <% if (it.type) { %><span class="rounded-full bg-brand-soft px-2 py-0.5 font-bold text-brand-dark"><%= it.type %></span><% } %>
+                                </div>
+
+                                <% if (it.delayed) { %>
+                                    <p class="mt-2 inline-block rounded-full bg-sakura-soft px-2.5 py-1 text-xs font-bold text-sakura"><%= it.delayText || 'Tayang ditunda' %></p>
+                                <% } else if (it.time) { %>
+                                    <p class="mt-2 flex items-center gap-1.5 font-mono text-xs font-medium text-ink">
+                                        <svg class="h-3.5 w-3.5 text-brand" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>
+                                        <%= it.time %>
+                                    </p>
+                                <% } %>
+
+                                <% if (it.rating || it.members) { %>
+                                    <p class="mt-1.5 font-mono text-xs text-slate-600">
+                                        <% if (it.rating) { %><span class="font-bold text-ink">★ <%= it.rating %></span><% } %>
+                                        <% if (it.rating && it.members) { %> &middot; <% } %>
+                                        <% if (it.members) { %><%= it.members %> member<% } %>
+                                    </p>
+                                <% } %>
+
+                                <% if (it.genres && it.genres.length > 0) { %>
+                                    <div class="mt-2 flex flex-wrap gap-1.5">
+                                        <% it.genres.forEach(g => { %>
+                                            <span class="rounded-full border border-slate-200 bg-paper px-2 py-0.5 text-[11px] font-semibold text-slate-700"><%= g %></span>
+                                        <% }) %>
+                                    </div>
+                                <% } %>
+                            </div>
+                        </a>
+                    <% }) %>
+                </div>
+            <% } %>
+        </div>
+    <% }) %>
+
+    <!-- Pengumuman & catatan -->
+    <div class="mt-10 grid grid-cols-1 gap-3 md:grid-cols-2">
+        <% if (d.announcements && d.announcements.length > 0) { %>
+            <section class="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm" aria-labelledby="ann-heading">
+                <h2 id="ann-heading" class="mb-2 font-display text-xl text-ink">Pengumuman Libur</h2>
+                <ul class="space-y-2 text-sm text-slate-700">
+                    <% d.announcements.forEach(a => { %>
+                        <li><% if (a.title) { %><strong class="text-ink"><%= a.title %></strong><br><% } %><span class="text-slate-600"><%= a.text %></span></li>
+                    <% }) %>
+                </ul>
+            </section>
+        <% } %>
+        <% if (d.notes && d.notes.length > 0) { %>
+            <section class="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm" aria-labelledby="notes-heading">
+                <h2 id="notes-heading" class="mb-2 font-display text-xl text-ink">Perlu Diperhatikan</h2>
+                <ul class="list-disc space-y-1.5 pl-5 text-sm text-slate-600">
+                    <% d.notes.forEach(n => { %><li><%= n.text %></li><% }) %>
+                </ul>
+            </section>
+        <% } %>
+    </div>
+
+    <script>
+    (function () {
+        var list = document.getElementById('dayTabs');
+        var tabs = Array.prototype.slice.call(document.querySelectorAll('.day-tab'));
+        if (!tabs.length) return;
+
+        var names = ['minggu', 'senin', 'selasa', 'rabu', 'kamis', 'jumat', 'sabtu'];
+        var todayId = names[new Date().getDay()];
+        var prefix = document.getElementById('dayPrefix');
+        var dateEl = document.getElementById('dayDate');
+        var countEl = document.getElementById('dayCount');
+
+        function select(id, focus) {
+            tabs.forEach(function (t) {
+                var on = t.dataset.day === id;
+                t.setAttribute('aria-selected', on ? 'true' : 'false');
+                t.tabIndex = on ? 0 : -1;
+                document.getElementById('dpanel-' + t.dataset.day).hidden = !on;
+                if (on) {
+                    // geser daftar hari secara horizontal saja (tanpa menggulung halaman)
+                    list.scrollLeft = t.offsetLeft - (list.clientWidth - t.offsetWidth) / 2;
+                    if (focus) t.focus();
+                }
+            });
+            var panel = document.getElementById('dpanel-' + id);
+            prefix.textContent = id === todayId ? 'Rilis Hari Ini \u2022 ' : 'Rilis \u2022 ';
+            dateEl.textContent = panel.dataset.dateText;
+            countEl.textContent = panel.dataset.countText;
+        }
+
+        tabs.forEach(function (t, i) {
+            t.addEventListener('click', function () { select(t.dataset.day, false); });
+            t.addEventListener('keydown', function (e) {
+                var dir = e.key === 'ArrowRight' ? 1 : e.key === 'ArrowLeft' ? -1 : 0;
+                if (!dir) return;
+                select(tabs[(i + dir + tabs.length) % tabs.length].dataset.day, true);
+            });
+        });
+
+        var hasToday = tabs.some(function (t) { return t.dataset.day === todayId; });
+        select(hasToday ? todayId : tabs.filter(function (t) { return t.getAttribute('aria-selected') === 'true'; })[0].dataset.day, false);
+    })();
+    </script>
+
+<% } %>
+</section>

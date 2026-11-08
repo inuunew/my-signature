@@ -1,0 +1,147 @@
+<%
+    const getSlug = (fullUrl) => {
+        if (!fullUrl) return '#';
+        return fullUrl.replace('https://s13.nontonanimeid.boats/', '').replace(/\/$/, '');
+    };
+%>
+
+<% if (result.data.seriesUrl) { %>
+    <a href="<%= result.data.seriesUrl.replace(/https?:\/\/[^\/]+/, '') %>" class="inline-flex items-center gap-1.5 text-sm font-semibold text-brand hover:text-brand-dark transition mb-3">
+        &larr; <%= result.data.seriesTitle || 'Semua episode' %>
+    </a>
+<% } %>
+<h1 class="font-display text-2xl md:text-3xl font-extrabold text-ink leading-tight mb-5"><%= result.data.episodeTitle %></h1>
+
+<!-- Pemutar Video Utama -->
+<div class="aspect-video w-full bg-black rounded-3xl overflow-hidden mb-5 shadow-xl ring-4 ring-white relative">
+    <div id="loader" class="absolute inset-0 bg-black/70 flex items-center justify-center z-10 hidden">
+        <div class="animate-spin rounded-full h-10 w-10 border-b-2 border-white"></div>
+    </div>
+    <iframe id="main-iframe" src="<%= result.data.streams && result.data.streams.length > 0 ? result.data.streams[0].embedURL : '' %>" class="w-full h-full" allowfullscreen referrerpolicy="no-referrer" sandbox="allow-scripts allow-same-origin allow-presentation allow-forms"></iframe>
+</div>
+
+<!-- Navigasi Episode -->
+<div class="flex flex-wrap gap-3 mb-6">
+    <% if (result.data.prevURL) { %>
+        <a href="/<%= getSlug(result.data.prevURL) %>" class="bg-white hover:border-brand hover:text-brand border border-slate-200 px-5 py-2.5 rounded-full text-sm font-bold text-ink transition">&larr; Episode sebelumnya</a>
+    <% } %>
+    <% if (result.data.nextURL) { %>
+        <a href="/<%= getSlug(result.data.nextURL) %>" class="bg-brand hover:bg-brand-dark px-5 py-2.5 rounded-full text-sm font-bold transition text-white">Episode berikutnya &rarr;</a>
+    <% } %>
+</div>
+
+<!-- Pilihan Server Streaming -->
+<div class="mb-10 bg-white border border-slate-200 p-5 rounded-2xl shadow-sm">
+    <h2 class="text-sm font-bold text-ink mb-3">Pilih server streaming</h2>
+    <div class="flex flex-wrap gap-2">
+        <% if (result.data.streams && result.data.streams.length > 0) { %>
+            <% result.data.streams.forEach((stream, index) => { %>
+                <button onclick="changeServer('<%= stream.postId %>', '<%= stream.nume %>', '<%= stream.type %>', '<%= stream.nonce %>', '<%= stream.pageURL %>', this)"
+                    class="server-btn px-4 py-2 rounded-full text-xs font-bold transition border <%= index === 0 ? 'bg-brand text-white border-brand' : 'bg-paper text-slate-700 border-slate-200 hover:border-brand hover:text-brand' %>">
+                    <%= stream.serverName %>
+                </button>
+            <% }) %>
+        <% } else { %>
+            <p class="text-slate-600 text-xs">Tidak ada pilihan server.</p>
+        <% } %>
+    </div>
+</div>
+
+<%
+    const epList = (result.data.episodeList || []).slice();
+    const pathOf = (u) => (u || '').replace(/https?:\/\/[^\/]+/, '').replace(/\/+$/, '');
+    const numOf = (e) => { const m = (e.url || '').match(/-episode-(\d+)/); return m ? parseInt(m[1], 10) : null; };
+    const currentPath = pathOf(result.data.episodeURL);
+    if (epList.length > 0 && epList.every(e => numOf(e) !== null)) {
+        epList.sort((a, b) => numOf(a) - numOf(b));
+    }
+%>
+<% if (epList.length > 0) { %>
+    <section class="mb-10 bg-white border border-slate-200 p-5 rounded-2xl shadow-sm" aria-labelledby="picker-heading">
+        <div class="flex items-center justify-between gap-3 mb-3">
+            <h2 id="picker-heading" class="text-sm font-bold text-ink">Pilih episode</h2>
+            <span class="text-xs text-slate-600"><%= epList.length %> episode</span>
+        </div>
+        <div id="episodePicker" class="relative max-h-64 overflow-y-auto grid grid-cols-5 sm:grid-cols-8 md:grid-cols-10 lg:grid-cols-12 gap-2 pr-1">
+            <% epList.forEach(ep => { %>
+                <% const isCurrent = pathOf(ep.url) === currentPath; %>
+                <% const n = numOf(ep); %>
+                <a href="<%= pathOf(ep.url) %>" title="<%= ep.title %>" <%- isCurrent ? 'aria-current="page"' : '' %>
+                   class="grid place-items-center rounded-xl border px-1 py-2 text-xs font-bold transition <%= isCurrent ? 'bg-brand text-white border-brand' : 'bg-paper text-slate-700 border-slate-200 hover:border-brand hover:text-brand' %>">
+                    <%= n !== null ? n : ep.title %>
+                </a>
+            <% }) %>
+        </div>
+    </section>
+<% } %>
+
+<!-- Skrip Pengganti Server Otomatis -->
+<script>
+const BTN_BASE = "server-btn px-4 py-2 rounded-full text-xs font-bold transition border ";
+const BTN_IDLE = BTN_BASE + "bg-paper text-slate-700 border-slate-200 hover:border-brand hover:text-brand";
+const BTN_ACTIVE = BTN_BASE + "bg-brand text-white border-brand";
+
+async function changeServer(post, nume, type, nonce, pageUrl, buttonEl) {
+    const iframe = document.getElementById('main-iframe');
+    const loader = document.getElementById('loader');
+
+    // Tampilkan efek loading & ubah status tombol aktif
+    loader.classList.remove('hidden');
+    document.querySelectorAll('.server-btn').forEach(btn => { btn.className = BTN_IDLE; });
+    buttonEl.className = BTN_ACTIVE;
+
+    try {
+        const response = await fetch(`/get-stream?post=${post}&nume=${nume}&type=${type}&nonce=${nonce}&pageUrl=${encodeURIComponent(pageUrl)}`);
+        const data = await response.json();
+
+        if (data.success && data.embedURL) {
+            iframe.src = data.embedURL;
+        } else {
+            alert('Gagal memuat server ini, silakan coba server lain.');
+        }
+    } catch (err) {
+        console.error('Error switching server:', err);
+    } finally {
+        loader.classList.add('hidden');
+    }
+}
+
+// Gulir kotak pemilih agar episode yang sedang ditonton terlihat
+(function () {
+    var picker = document.getElementById('episodePicker');
+    if (!picker) return;
+    var cur = picker.querySelector('[aria-current="page"]');
+    if (cur) picker.scrollTop = cur.offsetTop - picker.clientHeight / 2 + cur.clientHeight / 2;
+})();
+</script>
+
+<!-- Catat riwayat tonton di browser (dipakai "Lanjut Tonton") -->
+<script>
+(function () {
+    try {
+        var info = <%- JSON.stringify({
+            seriesUrl: (result.data.seriesUrl || '').replace(/https?:\/\/[^\/]+/, ''),
+            seriesTitle: result.data.seriesTitle || '',
+            episodeNumber: result.data.episodeNumber || (((result.data.episodeURL || '').match(/-episode-(\d+)/) || [])[1] || ''),
+            title: result.data.episodeTitle || '',
+            thumbnail: result.data.thumbnail || ''
+        }).replace(/</g, '\\u003c') %>;
+        var item = {
+            url: location.pathname.replace(/\/+$/, ''),
+            seriesUrl: info.seriesUrl,
+            seriesTitle: info.seriesTitle,
+            episodeNumber: info.episodeNumber,
+            title: info.title,
+            thumbnail: info.thumbnail,
+            ts: Date.now()
+        };
+        var list = JSON.parse(localStorage.getItem('anime_history') || '[]');
+        // satu entri per series: episode terakhir yang dibuka
+        list = list.filter(function (x) {
+            return item.seriesUrl ? x.seriesUrl !== item.seriesUrl : x.url !== item.url;
+        });
+        list.unshift(item);
+        localStorage.setItem('anime_history', JSON.stringify(list.slice(0, 50)));
+    } catch (e) {}
+})();
+</script>
