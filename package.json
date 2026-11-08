@@ -1,13 +1,18 @@
 {
-"name": "anikai-stream-vercel",
-"version": "1.0.0",
-"description": "Website Streaming Anime berbasis Scraper anikai.org untuk Vercel Serverless",
-"type": "module",
-"dependencies": {
-"cheerio": "^1.0.0-rc.12",
-"node-fetch": "^3.3.2"
-},
-"engines": {
-"node": ">=18.x"
-}
+  "name": "anime-scraper",
+  "version": "1.0.0",
+  "description": "Anime Web Scraper",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "dependencies": {
+    "axios": "^1.6.0",
+    "cheerio": "^1.0.0-rc.12",
+    "ejs": "^3.1.9",
+    "express": "^4.18.2"
+  },
+  "engines": {
+    "node": "20.x"
+  }
 }
